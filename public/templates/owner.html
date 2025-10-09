@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Website Visibility Report</title>
+  <style>
+    @page {
+      size: Letter;
+      margin: 40px 50px;
+      @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 10pt;
+        color: rgb(107,114,128);
+      }
+    }
+    @page:first { @bottom-center { content: ""; } }
+
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      color: rgb(15,23,42);
+      line-height: 1.6;
+      font-size: 12pt;
+    }
+
+    p, .factor-desc, .summary-box p {
+      text-align: justify;
+      text-align-last: left;
+    }
+
+    .center { text-align: center; }
+    .logo { display: block; margin: 0 auto; width: 160px; }
+    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
+    .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
+
+    h2 { font-size: 14pt; margin-top: 26px; font-weight: 700; color: rgb(15,23,42); }
+    p { margin: 8px 0; color: rgb(15,23,42); }
+
+    .donut-wrap { display: flex; justify-content: center; margin: 20px 0 18px; }
+    .donut-label {
+      text-align: center;
+      font-weight: 700;
+      font-size: 14pt;
+      color: rgb(15,23,42);
+      margin-top: 20px;
+    }
+
+    .summary-box {
+      margin-top: 12px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgb(249,250,251);
+      border: 1px solid rgb(229,231,235);
+      color: rgb(55,65,81);
+    }
+    .summary-box p:nth-of-type(1),
+    .summary-box p:nth-of-type(2) {
+      font-size: 15pt;
+      margin-bottom: 24px;
+    }
+
+    .factor {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border: 1px solid rgb(229,231,235);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .factor-head {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+      margin-bottom: 6px;
+    }
+    .factor-lead { display: flex; align-items: center; gap: 8px; }
+    .factor-lead.good { color: rgb(16,185,129); }
+    .factor-lead.moderate { color: rgb(245,158,11); }
+    .factor-lead.poor { color: rgb(239,68,68); }
+
+    .dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid currentColor;
+      background: #fff;
+      display: inline-block;
+      box-sizing: border-box;
+    }
+
+    .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
+    .status { font-weight: 700; font-size: 11pt; }
+    .status.good { color: rgb(16,185,129); }
+    .status.moderate { color: rgb(245,158,11); }
+    .status.poor { color: rgb(239,68,68); }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
+    <h1>AI Website Visibility Report</h1>
+    <div class="meta">Website: {{website}} &nbsp; | &nbsp; Date: {{date}}</div>
+  </div>
+
+  <div class="donut-wrap">
+    <svg width="260" height="260" viewBox="0 0 260 260">
+      <circle cx="130" cy="130" r="90" stroke="#e5e7eb" stroke-width="14" fill="none" />
+      <circle cx="130" cy="130" r="90" stroke="{{donut_color}}" stroke-width="14"
+              fill="none" stroke-linecap="round" stroke-dasharray="565.49"
+              stroke-dashoffset="{{donut_offset}}" transform="rotate(-90 130 130)" />
+      <text x="130" y="130" text-anchor="middle" dominant-baseline="central"
+            font-size="48" font-weight="700" fill="#111827">{{score}}%</text>
+    </svg>
+  </div>
+  <div class="donut-label">{{visibility_level}}</div>
+
+  <div class="summary-box">
+    <p>{{assessment_p1}}</p>
+    <p>{{assessment_p2}}</p>
+  </div>
+
+  <div style="page-break-before: always;"></div>
+  <h2>Introduction</h2>
+  <p>This report has been prepared for the website owner. It shows the current condition of your site in terms of visibility across AI platforms and explains which factors have the greatest impact. The results are summarized first, followed by detailed explanations and recommendations. The final section of this report contains a developer’s checklist that can be handed over directly for implementation.</p>
+
+  <h2>Checked Parameters</h2>
+
+  <!-- 1 Robots.txt -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_robots_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Robots.txt</div>
+      </div>
+      <div class="status {{status_robots_class}}">{{status_robots}}</div>
+    </div>
+    <p class="factor-desc">This file determines whether AI systems can access your website. If it is misconfigured or blocks access, your entire site may disappear from AI-driven results.</p>
+  </div>
+
+  <!-- 2 Sitemap.xml -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_sitemap_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Sitemap.xml</div>
+      </div>
+      <div class="status {{status_sitemap_class}}">{{status_sitemap}}</div>
+    </div>
+    <p class="factor-desc">A sitemap tells AI which pages exist on your website and which are most important for indexing.</p>
+  </div>
+
+  <!-- 3 X-Robots-Tag -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_xrobots_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">X-Robots-Tag</div>
+      </div>
+      <div class="status {{status_xrobots_class}}">{{status_xrobots}}</div>
+    </div>
+    <p class="factor-desc">These server-side headers signal whether AI can display your pages.</p>
+  </div>
+
+  <!-- 4 Meta Robots -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Meta Robots</div>
+      </div>
+      <div class="status {{status_meta_class}}">{{status_meta}}</div>
+    </div>
+    <p class="factor-desc">This is a meta tag placed in the page’s HTML that also controls whether AI can index it.</p>
+  </div>
+
+  <!-- 5 Canonical -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_canonical_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Canonical</div>
+      </div>
+      <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
+    </div>
+    <p class="factor-desc">A canonical tag tells AI which version of a page is the “master” copy.</p>
+  </div>
+
+  <!-- 6 Title Tag -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_title_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Title Tag</div>
+      </div>
+      <div class="status {{status_title_class}}">{{status_title}}</div>
+    </div>
+    <p class="factor-desc">The page title is the first element both customers and AI systems see.</p>
+  </div>
+
+  <!-- 7 Meta Description -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_metadesc_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Meta Description</div>
+      </div>
+      <div class="status {{status_metadesc_class}}">{{status_metadesc}}</div>
+    </div>
+    <p class="factor-desc">A meta description provides a short preview of your page content beneath the title in results.</p>
+  </div>
+
+  <!-- 8 Open Graph Tags -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_og_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Open Graph Tags</div>
+      </div>
+      <div class="status {{status_og_class}}">{{status_og}}</div>
+    </div>
+    <p class="factor-desc">These tags control how your links appear in social media, messengers, and AI-generated answers.</p>
+  </div>
+
+  <!-- 9 H1 Headings -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_h1_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">H1 Headings</div>
+      </div>
+      <div class="status {{status_h1_class}}">{{status_h1}}</div>
+    </div>
+    <p class="factor-desc">The H1 tag is the main headline of a page.</p>
+  </div>
+
+  <!-- 10 Structured Data -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_schema_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Structured Data</div>
+      </div>
+      <div class="status {{status_schema_class}}">{{status_schema}}</div>
+    </div>
+    <p class="factor-desc">Structured data markup helps AI understand exactly what is on your site.</p>
+  </div>
+
+  <!-- 11 Mobile Friendly -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_mobile_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Mobile Friendly</div>
+      </div>
+      <div class="status {{status_mobile_class}}">{{status_mobile}}</div>
+    </div>
+    <p class="factor-desc">Today, most visitors access websites from mobile devices.</p>
+  </div>
+
+  <!-- 12 HTTPS Security -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_https_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">HTTPS Security</div>
+      </div>
+      <div class="status {{status_https_class}}">{{status_https}}</div>
+    </div>
+    <p class="factor-desc">A secure HTTPS connection is a basic trust signal.</p>
+  </div>
+
+  <!-- 13 Alt Attributes -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_alt_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Alt Attributes</div>
+      </div>
+      <div class="status {{status_alt_class}}">{{status_alt}}</div>
+    </div>
+    <p class="factor-desc">Alt texts are descriptions of images that allow AI systems to “see” visual content.</p>
+  </div>
+
+  <!-- 14 Favicon -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_favicon_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Favicon</div>
+      </div>
+      <div class="status {{status_favicon_class}}">{{status_favicon}}</div>
+    </div>
+    <p class="factor-desc">The favicon is the small icon displayed in browsers and results.</p>
+  </div>
+
+  <!-- 15 Custom 404 Page -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_404_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Custom 404 Page</div>
+      </div>
+      <div class="status {{status_404_class}}">{{status_404}}</div>
+    </div>
+    <p class="factor-desc">A 404 error page tells AI and users that a page doesn’t exist.</p>
+  </div>
+
+  <h2>Support and Contact</h2>
+  <p>If you do not currently have access to a developer, our team can assist in quickly improving your website’s visibility across AI platforms.</p>
+  <p>Contact: <a href="mailto:support@aisignalmax.com">support@aisignalmax.com</a></p>
+
+  <div class="footer" style="margin-top: 40px; text-align: center; font-size: 10pt;">
+    <p style="margin-bottom: 8px; color: rgb(15,23,42);">© 2025 AI Signal Max. All rights reserved.</p>
+    <div style="opacity: 0.6; color: rgb(55,65,81);">
+      <p>Visibility scores are estimated and based on publicly available data.</p>
+      <p>This report is provided for informational purposes only and does not constitute legal advice.</p>
+      <p>Disclaimer: <a href="https://aivcheck.com/disclaimer" style="color: rgb(37,99,235); text-decoration: none;">aivcheck.com/disclaimer</a></p>
+      <p>AI Signal Max is a product of Magic of Discoveries LLC.</p>
+    </div>
+  </div>
+</body>
+</html>
