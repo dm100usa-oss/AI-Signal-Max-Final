@@ -16,7 +16,10 @@ export async function generatePDF({
   type,
   data,
 }: GeneratePDFParams): Promise<Buffer> {
-  const filename = type === "owner" ? "owner.html" : "developer_v2.html";
+  // ✅ Здесь мы явно указываем какие шаблоны использовать:
+  const filename =
+    type === "owner" ? "owner_newtest.html" : "developer.html";
+
   const templatePath = path.join(process.cwd(), "public", "templates", filename);
   const template = await fs.readFile(templatePath, "utf8");
 
