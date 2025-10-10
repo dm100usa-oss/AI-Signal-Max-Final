@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Donut from "../../../components/Donut";
 
 type Mode = "quick" | "pro";
@@ -12,62 +12,21 @@ interface Factor {
   status: "Good" | "Moderate" | "Poor";
 }
 
-interface ResultData {
-  url: string;
-  score: number;
-  results: Record<string, "Good" | "Moderate" | "Poor">;
-  mode: Mode;
-}
-
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
-  const [data, setData] = useState<ResultData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
 
-  useEffect(() => {
-    let attempts = 0;
-    async function fetchData() {
-      try {
-        const res = await fetch("/api/result", { cache: "no-store" });
-        const json = await res.json();
-        if (json && json.score !== undefined) {
-          setData(json);
-          setLoading(false);
-        } else if (attempts < 5) {
-          attempts++;
-          setTimeout(fetchData, 800);
-        } else {
-          setLoading(false);
-        }
-      } catch {
-        if (attempts < 5) {
-          attempts++;
-          setTimeout(fetchData, 800);
-        } else {
-          setLoading(false);
-        }
-      }
-    }
-    fetchData();
-  }, []);
+  const score = Number(searchParams.get("score") || 0);
+  const url = (searchParams.get("url") || "").trim();
+  const rawResults = searchParams.get("results");
+  let results: Record<string, "Good" | "Moderate" | "Poor"> = {};
 
-  if (loading) {
-    return (
-      <main className="max-w-3xl mx-auto px-6 py-20 text-center text-gray-600">
-        Loading results...
-      </main>
-    );
+  try {
+    if (rawResults) results = JSON.parse(decodeURIComponent(rawResults));
+  } catch {
+    results = {};
   }
 
-  if (!data) {
-    return (
-      <main className="max-w-3xl mx-auto px-6 py-20 text-center text-gray-600">
-        No analysis data found.
-      </main>
-    );
-  }
-
-  const { url, score, results } = data;
   const date = new Date().toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -227,3 +186,4 @@ function FactorItem({ factor }: { factor: Factor }) {
     </div>
   );
 }
+
