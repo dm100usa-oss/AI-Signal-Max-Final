@@ -7,13 +7,12 @@
     @page {
       size: Letter;
       margin: 40px 50px;
-      @bottom-center {
+      @bottom-right {
         content: "Page " counter(page) " of " counter(pages);
         font-size: 10pt;
         color: rgb(107,114,128);
       }
     }
-    @page:first { @bottom-center { content: ""; } }
 
     html, body {
       margin: 0;
@@ -42,6 +41,7 @@
       border: 1px solid rgb(229,231,235);
       border-radius: 10px;
       background: #fff;
+      page-break-inside: avoid;
     }
     .factor-head {
       display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
@@ -66,28 +66,25 @@
     .status.moderate { color: rgb(245,158,11); }
     .status.poor { color: rgb(239,68,68); }
 
+    a { color: rgb(37,99,235); text-decoration: none; }
+
+    /* Footer for last page only */
     .footer {
-      position: fixed;
-      bottom: 30px;
-      left: 0;
-      width: 100%;
+      margin-top: 40px;
       text-align: center;
       font-size: 10pt;
       color: rgb(55,65,81);
       line-height: 1.4;
+      page-break-before: always;
     }
-
     .footer p:first-of-type {
       color: rgb(15,23,42);
       opacity: 1;
     }
-
     .footer p:nth-of-type(2),
     .footer p:nth-of-type(3) {
       opacity: 0.7;
     }
-
-    a { color: rgb(37,99,235); text-decoration: none; }
   </style>
 </head>
 <body>
@@ -282,7 +279,7 @@
     <p>Provide a custom 404 page with clear navigation links. Helps both users and AI handle missing pages properly.</p>
   </div>
 
-  <!-- Fixed Footer Disclaimer -->
+  <!-- Footer only on last page -->
   <div class="footer">
     <p>© 2025 AI Signal Max. All rights reserved.</p>
     <p>Information is for general guidance only and does not constitute legal advice.</p>
