@@ -58,11 +58,18 @@
       line-height: 1.5;
     }
 
-    .footer p {
-      margin: 4px 0;
-    }
+    .footer p { margin: 4px 0; }
 
     a { color: rgb(37,99,235); text-decoration: none; }
+
+    /* ✅ New block styling */
+    .test-section {
+      margin-top: 40px;
+      padding: 20px;
+      border: 2px dashed rgb(37,99,235);
+      border-radius: 8px;
+      background: rgba(219,234,254,0.3);
+    }
   </style>
 </head>
 <body>
@@ -210,6 +217,13 @@
       <div class="status {{status_404_class}}">{{status_404}}</div>
     </div>
     <p>Provide a custom 404 page with clear navigation links. Helps both users and AI handle missing pages properly.</p>
+  </div>
+
+  <!-- ✅ Новый раздел для проверки -->
+  <div class="test-section">
+    <h2>Template Check</h2>
+    <p>This block confirms that the new developer_v2.html template is being used for PDF generation.</p>
+    <p>If you can see this section, the updated template has been successfully applied.</p>
   </div>
 
   <!-- Footer -->
