@@ -7,13 +7,7 @@
     @page {
       size: Letter;
       margin: 40px 50px;
-      @bottom-center {
-        content: "Page " counter(page) " of " counter(pages);
-        font-size: 10pt;
-        color: rgb(107,114,128);
-      }
     }
-    @page:first { @bottom-center { content: ""; } }
 
     html, body {
       margin: 0;
@@ -75,16 +69,6 @@
       font-size: 10pt;
       color: rgb(55,65,81);
       line-height: 1.4;
-    }
-
-    .footer p:first-of-type {
-      color: rgb(15,23,42);
-      opacity: 1;
-    }
-
-    .footer p:nth-of-type(2),
-    .footer p:nth-of-type(3) {
-      opacity: 0.7;
     }
 
     a { color: rgb(37,99,235); text-decoration: none; }
@@ -282,11 +266,12 @@
     <p>Provide a custom 404 page with clear navigation links. Helps both users and AI handle missing pages properly.</p>
   </div>
 
-  <!-- Fixed Footer Disclaimer -->
+  <!-- New Section -->
+  <h2>Next Steps</h2>
+  <p>Focus on addressing all “Poor” and “Moderate” areas first, as they have the highest impact on AI visibility. Once improvements are applied, rerun a full AI Signal Max analysis to verify progress.</p>
+
   <div class="footer">
     <p>© 2025 AI Signal Max. All rights reserved.</p>
-    <p>Information is for general guidance only and does not constitute legal advice.</p>
-    <p>Disclaimer: <a href="https://aivcheck.com/disclaimer">aivcheck.com/disclaimer</a></p>
   </div>
 </body>
 </html>
