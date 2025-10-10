@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const mode = session.metadata?.mode || "pro";
     const date = new Date().toISOString().split("T")[0];
 
-    // Only send emails and PDFs for "pro" mode
+    // Skip PDFs for Quick mode
     if (mode !== "pro") {
       console.log("Quick mode — no email or PDF generation.");
       return new NextResponse("Quick mode — skipped.", { status: 200 });
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
     try {
       if (customerEmail) {
-        // Run full analysis
+        // Full analysis
         const result = await analyze(website, "pro");
 
         const scoreNum = result.score;
@@ -57,22 +57,22 @@ export async function POST(req: Request) {
         const donut_offset = getDonutOffset(scoreNum);
         const base64_logo = await getLogoBase64();
 
-        // Build statuses from analyzed factors
+        // Normalize keys — only rename where truly necessary
         const statuses: Record<string, "Good" | "Moderate" | "Poor"> = {};
         for (const item of result.items) {
           const key = item.key
             .replace("robots_txt", "robots")
             .replace("sitemap_xml", "sitemap")
             .replace("x_robots_tag", "xrobots")
-            .replace("meta_robots", "meta")
+            .replace("meta_robots", "metarobots")
             .replace("title_tag", "title")
             .replace("meta_description", "metadesc")
-            .replace("open_graph", "og")
+            .replace("open_graph", "opengraph")
             .replace("h1_present", "h1")
-            // keep structured_data as is (no schema rename)
+            // keep structured_data as structured_data
             .replace("mobile_friendly", "mobile")
             .replace("alt_attributes", "alt")
-            .replace("page_404", "404");
+            .replace("page_404", "page404");
 
           const status =
             item.passed === true
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
         const cls = (s: "Good" | "Moderate" | "Poor") =>
           s === "Good" ? "good" : s === "Moderate" ? "moderate" : "poor";
 
-        // Owner report data
+        // Owner report
         const ownerData: Record<string, string> = {
           base64_logo,
           website,
@@ -99,32 +99,28 @@ export async function POST(req: Request) {
           assessment_p1: assessment.p1,
           assessment_p2: assessment.p2,
         };
-
         for (const key in statuses) {
           ownerData[`status_${key}`] = statuses[key];
           ownerData[`status_${key}_class`] = cls(statuses[key]);
         }
 
-        // Developer report data
+        // Developer report
         const developerData: Record<string, string> = {
           base64_logo,
           website,
           date,
         };
-
         for (const key in statuses) {
           developerData[`status_${key}`] = statuses[key];
           developerData[`status_${key}_class`] = cls(statuses[key]);
         }
 
-        // Generate PDFs
         const ownerBuffer = await generatePDF({ type: "owner", data: ownerData });
         const developerBuffer = await generatePDF({
           type: "developer",
           data: developerData,
         });
 
-        // Send email
         await sendReportEmail({
           to: customerEmail,
           url: website,
@@ -146,7 +142,7 @@ export async function POST(req: Request) {
   return new NextResponse("Event type not handled", { status: 200 });
 }
 
-// Helper: read logo as Base64
+// Helper: logo to base64
 async function getLogoBase64(): Promise<string> {
   if (process.env.LOGO_BASE64) return process.env.LOGO_BASE64;
   const tryPaths = [
