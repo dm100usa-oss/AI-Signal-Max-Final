@@ -69,16 +69,18 @@ export async function POST(req: Request) {
             .replace("meta_description", "metadesc")
             .replace("open_graph", "og")
             .replace("h1_present", "h1")
-            .replace("structured_data", "schema")
+            // keep structured_data as is (no schema rename)
             .replace("mobile_friendly", "mobile")
             .replace("alt_attributes", "alt")
             .replace("page_404", "404");
+
           const status =
             item.passed === true
               ? "Good"
               : item.passed === null
               ? "Moderate"
               : "Poor";
+
           statuses[key] = status;
         }
 
