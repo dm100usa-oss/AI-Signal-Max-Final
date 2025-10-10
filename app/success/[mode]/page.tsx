@@ -21,22 +21,31 @@ interface ResultData {
 
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
-
   const [data, setData] = useState<ResultData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let attempts = 0;
     async function fetchData() {
       try {
         const res = await fetch("/api/result", { cache: "no-store" });
         const json = await res.json();
         if (json && json.score !== undefined) {
           setData(json);
+          setLoading(false);
+        } else if (attempts < 5) {
+          attempts++;
+          setTimeout(fetchData, 800);
+        } else {
+          setLoading(false);
         }
-      } catch (e) {
-        console.error("Failed to load result:", e);
-      } finally {
-        setLoading(false);
+      } catch {
+        if (attempts < 5) {
+          attempts++;
+          setTimeout(fetchData, 800);
+        } else {
+          setLoading(false);
+        }
       }
     }
     fetchData();
@@ -82,8 +91,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
     { key: "metadesc", name: "Meta Description", desc: "A short description under the title that explains why users should click. If missing or vague, AI inserts random text." },
     { key: "opengraph", name: "Open Graph Tags", desc: "Special tags that make your site links look good in AI answers and social media. Without them, users see random text or cropped images." },
     { key: "h1", name: "H1 Headings", desc: "The main heading of a page tells AI and visitors what it’s about. If missing or duplicated, AI cannot clearly understand the content." },
-    { key: "schema", name: "Structured Data", desc: "Special markup (JSON-LD) that explains what’s on your site: product, service, article, or company. Without it, AI doesn’t fully understand your content." },
-    { key: "mobile", name: "Mobile Friendly", desc: "If the design breaks on mobile or buttons don’t work, AI considers it inconvenient." },
+    { key: "schema", name: "Structured Data (Schema Markup)", desc: "Special markup (JSON-LD) that explains what’s on your site: product, service, article, or company. Without it, AI doesn’t fully understand your content." },
+    { key: "mobile", name: "Mobile-Friendly", desc: "If the design breaks on mobile or buttons don’t work, AI considers it inconvenient." },
     { key: "https", name: "HTTPS Security", desc: "A secure protocol that ensures safe connections. Sites without HTTPS are flagged as unsafe." },
     { key: "alt", name: "Alt Attributes", desc: "Captions for images that help AI interpret visuals. Without alt texts, images remain invisible." },
     { key: "favicon", name: "Favicon", desc: "A small site icon shown in browsers and AI previews. Without it, your site looks unfinished." },
