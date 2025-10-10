@@ -1,40 +1,53 @@
+<!-- PART 1 START -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>Developer Technical Checklist — AI Signal Max</title>
   <style>
+    @page {
+      size: Letter;
+      margin: 40px 50px;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       background: #fff;
+    }
+
+    body {
       font-family: Helvetica, Arial, sans-serif;
       color: rgb(15,23,42);
       line-height: 1.6;
       font-size: 12pt;
       position: relative;
-      counter-reset: page;
-    }
-
-    @media print {
-      .page-number:after {
-        counter-increment: page;
-        content: "Page " counter(page);
-        position: fixed;
-        right: 50px;
-        bottom: 20px;
-        font-size: 10pt;
-        color: rgb(107,114,128);
-      }
     }
 
     .center { text-align: center; }
     .logo { display: block; margin: 0 auto; width: 160px; }
-    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
-    .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
+    h1 { font-size: 14pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
+    .meta { text-align: center; font-size: 12pt; color: rgb(55,65,81); margin-top: 8px; }
 
-    h2 { font-size: 14pt; margin-top: 26px; font-weight: 700; color: rgb(15,23,42); }
-    p { margin: 8px 0; color: rgb(15,23,42); }
+    h2 {
+      font-size: 14pt;
+      margin-top: 26px;
+      font-weight: 700;
+      color: rgb(15,23,42);
+    }
+
+    h3 {
+      font-size: 14pt;
+      margin-top: 16px;
+      font-weight: 400;
+      color: rgb(15,23,42);
+    }
+
+    p {
+      margin: 8px 0;
+      color: rgb(15,23,42);
+      font-size: 12pt;
+    }
 
     .factor {
       margin-top: 14px;
@@ -42,75 +55,101 @@
       border: 1px solid rgb(229,231,235);
       border-radius: 10px;
       background: #fff;
-      page-break-inside: avoid;
     }
+
     .factor-head {
-      display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
       margin-bottom: 6px;
     }
+
     .factor-lead { display: flex; align-items: center; gap: 8px; }
     .factor-lead.good { color: rgb(16,185,129); }
     .factor-lead.moderate { color: rgb(245,158,11); }
     .factor-lead.poor { color: rgb(239,68,68); }
 
     .dot {
-      width: 14px; height: 14px; border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
       border: 2px solid currentColor;
       background: #fff;
       display: inline-block;
       box-sizing: border-box;
     }
 
-    .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
-    .status { font-weight: 700; font-size: 11pt; }
+    .factor-name {
+      font-weight: 700;
+      font-size: 14pt;
+      color: rgb(15,23,42);
+    }
+
+    .status {
+      font-weight: 700;
+      font-size: 12pt;
+    }
+
     .status.good { color: rgb(16,185,129); }
     .status.moderate { color: rgb(245,158,11); }
     .status.poor { color: rgb(239,68,68); }
 
-    a { color: rgb(37,99,235); text-decoration: none; }
-
     .footer {
-      margin-top: 50px;
-      text-align: center;
+      margin-top: 40px;
+      text-align: left;
       font-size: 10pt;
       color: rgb(55,65,81);
       line-height: 1.4;
-      page-break-before: always;
     }
+
     .footer p:first-of-type {
       color: rgb(15,23,42);
       opacity: 1;
     }
+
     .footer p:nth-of-type(2),
     .footer p:nth-of-type(3) {
       opacity: 0.7;
     }
+
+    a { color: rgb(37,99,235); text-decoration: none; }
   </style>
 </head>
 <body>
-  <div class="page-number"></div>
-
   <div class="center">
     <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
     <h1>Developer Technical Checklist</h1>
     <div class="meta">Website: {{website}} &nbsp; | &nbsp; Date: {{date}}</div>
   </div>
 
-  <h2>Introduction</h2>
-  <p>This document provides technical recommendations for developers to improve a website’s visibility across AI platforms such as ChatGPT, Microsoft Copilot, Google Gemini, and Anthropic Claude. Each factor below reflects a key aspect affecting how AI systems interpret, index, and trust your site. The statuses correspond to the actual analysis results.</p>
+  <h2>1. Document Origin</h2>
+  <p>This checklist is part of the AI Signal Max analysis report, provided to developers for technical improvements that increase website visibility for AI platforms. Recommendations are based on public technical data and reflect the level of compliance with AI interpretation standards.</p>
 
-  <h2>Technical Factors and Current Status</h2>
+  <h2>2. Introduction</h2>
+  <p>This document provides technical recommendations for developers and administrators to improve a website’s visibility across AI platforms such as ChatGPT, Microsoft Copilot, Google Gemini, and Anthropic Claude. It extends traditional SEO by focusing on AI-readiness — ensuring that your website’s structure, metadata, and signals are properly understood by AI systems.</p>
+
+  <h2>3. Purpose and Scope</h2>
+  <p>The purpose of this document is to help technical teams ensure that websites are structured for correct interpretation and visibility by AI models. The scope covers public websites and applications accessible to external AI systems, using standard web technologies (HTML, CSS, JavaScript).</p>
+
+  <h2>4. Core Technical Guidelines</h2>
+  <p>The following baseline principles ensure proper visibility for AI and search crawlers. These include HTTPS security, valid HTTP responses, fast load time, mobile responsiveness, proper meta information, and structured metadata.</p>
+
+<!-- PART 1 END -->
+<!-- PART 2 START -->
+  <h2>5. AI Visibility Factors</h2>
+  <p>The following 15 factors determine how AI systems interpret and assess your website. Each includes a short explanation and reflects the actual analysis results.</p>
 
   <!-- 1 robots.txt -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_robots_class}}">
         <span class="dot"></span>
-        <div class="factor-name">robots.txt</div>
+        <div class="factor-name">1. robots.txt</div>
       </div>
       <div class="status {{status_robots_class}}">{{status_robots}}</div>
     </div>
-    <p>Controls AI access to your site. Ensure it allows indexing where needed and references the sitemap.</p>
+    <p>Controls AI access to your site. Ensure it allows indexing and references the sitemap correctly.</p>
   </div>
 
   <!-- 2 sitemap.xml -->
@@ -118,11 +157,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_sitemap_class}}">
         <span class="dot"></span>
-        <div class="factor-name">sitemap.xml</div>
+        <div class="factor-name">2. sitemap.xml</div>
       </div>
       <div class="status {{status_sitemap_class}}">{{status_sitemap}}</div>
     </div>
-    <p>Defines site structure for AI and search crawlers. Keep it complete, valid, and automatically updated.</p>
+    <p>Defines site structure for AI and search crawlers. Keep it complete, valid, and updated.</p>
   </div>
 
   <!-- 3 X-Robots-Tag -->
@@ -130,11 +169,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_xrobots_class}}">
         <span class="dot"></span>
-        <div class="factor-name">X-Robots-Tag</div>
+        <div class="factor-name">3. X-Robots-Tag</div>
       </div>
       <div class="status {{status_xrobots_class}}">{{status_xrobots}}</div>
     </div>
-    <p>HTTP header indicating whether pages can be indexed. Avoid conflicting or restrictive directives.</p>
+    <p>Specifies indexing permissions through HTTP headers. Avoid conflicting directives.</p>
   </div>
 
   <!-- 4 Meta Robots -->
@@ -142,11 +181,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_meta_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Meta Robots</div>
+        <div class="factor-name">4. Meta Robots</div>
       </div>
       <div class="status {{status_meta_class}}">{{status_meta}}</div>
     </div>
-    <p>Meta tag in the HTML head defining indexing permissions. Ensure it does not unintentionally block pages.</p>
+    <p>Defines indexing behavior through meta tags. Ensure no accidental noindex tags are applied.</p>
   </div>
 
   <!-- 5 Canonical -->
@@ -154,11 +193,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_canonical_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Canonical</div>
+        <div class="factor-name">5. Canonical</div>
       </div>
       <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
     </div>
-    <p>Specifies the main version of a page. Prevents duplication and helps AI identify preferred URLs.</p>
+    <p>Specifies the main page version and prevents duplication issues.</p>
   </div>
 
   <!-- 6 Title Tag -->
@@ -166,11 +205,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_title_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Title Tag</div>
+        <div class="factor-name">6. Title Tag</div>
       </div>
       <div class="status {{status_title_class}}">{{status_title}}</div>
     </div>
-    <p>Defines the main topic of the page. Each page must have a unique, concise, and descriptive title.</p>
+    <p>Defines the main topic of a page. Each page should have a unique, concise title.</p>
   </div>
 
   <!-- 7 Meta Description -->
@@ -178,11 +217,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_metadesc_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Meta Description</div>
+        <div class="factor-name">7. Meta Description</div>
       </div>
       <div class="status {{status_metadesc_class}}">{{status_metadesc}}</div>
     </div>
-    <p>Summarizes page content in search and AI results. Write strong, unique descriptions for better visibility.</p>
+    <p>Summarizes page content for search and AI platforms. Write clear, unique descriptions.</p>
   </div>
 
   <!-- 8 Open Graph -->
@@ -190,11 +229,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_og_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Open Graph</div>
+        <div class="factor-name">8. Open Graph</div>
       </div>
       <div class="status {{status_og_class}}">{{status_og}}</div>
     </div>
-    <p>Ensures proper previews on social and AI platforms. Include og:title, og:description, and og:image.</p>
+    <p>Ensures correct link previews in social and AI systems. Include og:title, og:description, and og:image.</p>
   </div>
 
   <!-- 9 H1 Headings -->
@@ -202,23 +241,24 @@
     <div class="factor-head">
       <div class="factor-lead {{status_h1_class}}">
         <span class="dot"></span>
-        <div class="factor-name">H1 Headings</div>
+        <div class="factor-name">9. H1 Headings</div>
       </div>
       <div class="status {{status_h1_class}}">{{status_h1}}</div>
     </div>
-    <p>Each page should have one main H1 headline matching the core topic. Avoid duplication across pages.</p>
+    <p>Use one H1 per page matching the main topic. Avoid duplication or empty headings.</p>
   </div>
-
+<!-- PART 2 END -->
+<!-- PART 3 START -->
   <!-- 10 Structured Data -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_schema_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Structured Data (Schema Markup)</div>
+        <div class="factor-name">10. Structured Data (Schema Markup)</div>
       </div>
       <div class="status {{status_schema_class}}">{{status_schema}}</div>
     </div>
-    <p>Add JSON-LD schema to help AI understand the type of content and its context (Organization, Product, etc.).</p>
+    <p>Add structured data (JSON-LD) to help AI understand content type and context (Organization, Product, etc.).</p>
   </div>
 
   <!-- 11 Mobile-Friendly -->
@@ -226,11 +266,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_mobile_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Mobile-Friendly</div>
+        <div class="factor-name">11. Mobile-Friendly Design</div>
       </div>
       <div class="status {{status_mobile_class}}">{{status_mobile}}</div>
     </div>
-    <p>Ensure full responsiveness and usability on mobile devices. Avoid small touch targets and broken layouts.</p>
+    <p>Ensure the website is fully responsive and easy to navigate on all mobile devices.</p>
   </div>
 
   <!-- 12 HTTPS Security -->
@@ -238,11 +278,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_https_class}}">
         <span class="dot"></span>
-        <div class="factor-name">HTTPS Security</div>
+        <div class="factor-name">12. HTTPS Security</div>
       </div>
       <div class="status {{status_https_class}}">{{status_https}}</div>
     </div>
-    <p>Serve all pages via HTTPS. Expired or missing certificates reduce AI trust and user confidence.</p>
+    <p>Serve all pages via HTTPS. Keep SSL certificates valid and renew them before expiration.</p>
   </div>
 
   <!-- 13 Alt Attributes -->
@@ -250,11 +290,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_alt_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Alt Attributes</div>
+        <div class="factor-name">13. Alt Attributes for Images</div>
       </div>
       <div class="status {{status_alt_class}}">{{status_alt}}</div>
     </div>
-    <p>Use alt text for images so AI systems and accessibility tools can interpret visual content.</p>
+    <p>Use descriptive alt text for images so AI systems and accessibility tools can interpret visual content.</p>
   </div>
 
   <!-- 14 Favicon -->
@@ -262,11 +302,11 @@
     <div class="factor-head">
       <div class="factor-lead {{status_favicon_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Favicon</div>
+        <div class="factor-name">14. Favicon</div>
       </div>
       <div class="status {{status_favicon_class}}">{{status_favicon}}</div>
     </div>
-    <p>Maintain a valid favicon for consistent brand presence in browsers and AI previews.</p>
+    <p>Maintain a valid favicon for consistent brand presence across browsers and AI previews.</p>
   </div>
 
   <!-- 15 Custom 404 Page -->
@@ -274,17 +314,38 @@
     <div class="factor-head">
       <div class="factor-lead {{status_404_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Custom 404 Page</div>
+        <div class="factor-name">15. Custom 404 Page</div>
       </div>
       <div class="status {{status_404_class}}">{{status_404}}</div>
     </div>
-    <p>Provide a custom 404 page with clear navigation links. Helps both users and AI handle missing pages properly.</p>
+    <p>Provide a helpful custom 404 page with clear navigation links for users and AI crawlers.</p>
   </div>
 
+  <h2>6. Verification and Testing</h2>
+  <p>Use automated tools to confirm correct implementation of all elements above. Recommended tools include:</p>
+  <ul>
+    <li>AI Signal Max Method — visibility assessment system.</li>
+    <li>Google Lighthouse — performance and accessibility checks.</li>
+    <li>Schema.org Validator — structured data validation.</li>
+    <li>SSL Labs — HTTPS and certificate testing.</li>
+    <li>Open Graph Debugger — OG tag validation.</li>
+  </ul>
+
+  <h2>7. Methodology</h2>
+  <p>The AI Signal Max evaluation method uses only public technical signals to determine a site’s readiness for AI visibility. The approach ensures transparency and consistency in results.</p>
+
+  <h2>8. Documentation and Reporting</h2>
+  <p>Maintain clear documentation of all technical changes, store reports in version control systems, and keep changelogs to track improvements over time.</p>
+
+  <h2>9. Conclusion</h2>
+  <p>This checklist provides actionable guidance for developers to increase AI visibility, trust, and stability of a website. Proper implementation improves indexing, interpretation, and ranking within AI-driven systems.</p>
+<!-- PART 3 END -->
+<!-- PART 4 START -->
   <div class="footer">
     <p>© 2025 AI Signal Max. All rights reserved.</p>
-    <p>Information is for general guidance only and does not constitute legal advice.</p>
+    <p>Information is provided for general guidance only and does not constitute legal advice.</p>
     <p>Disclaimer: <a href="https://aivcheck.com/disclaimer">aivcheck.com/disclaimer</a></p>
   </div>
 </body>
 </html>
+<!-- PART 4 END -->
