@@ -4,27 +4,28 @@
   <meta charset="UTF-8" />
   <title>Developer Technical Checklist — AI Signal Max</title>
   <style>
-    @page {
-      size: Letter;
-      margin: 40px 50px;
-      @bottom-right {
-        content: "Page " counter(page) " of " counter(pages);
-        font-size: 10pt;
-        color: rgb(107,114,128);
-      }
-    }
-
     html, body {
       margin: 0;
       padding: 0;
       background: #fff;
-    }
-    body {
       font-family: Helvetica, Arial, sans-serif;
       color: rgb(15,23,42);
       line-height: 1.6;
       font-size: 12pt;
       position: relative;
+      counter-reset: page;
+    }
+
+    @media print {
+      .page-number:after {
+        counter-increment: page;
+        content: "Page " counter(page);
+        position: fixed;
+        right: 50px;
+        bottom: 20px;
+        font-size: 10pt;
+        color: rgb(107,114,128);
+      }
     }
 
     .center { text-align: center; }
@@ -68,9 +69,8 @@
 
     a { color: rgb(37,99,235); text-decoration: none; }
 
-    /* Footer for last page only */
     .footer {
-      margin-top: 40px;
+      margin-top: 50px;
       text-align: center;
       font-size: 10pt;
       color: rgb(55,65,81);
@@ -88,6 +88,8 @@
   </style>
 </head>
 <body>
+  <div class="page-number"></div>
+
   <div class="center">
     <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
     <h1>Developer Technical Checklist</h1>
@@ -279,7 +281,6 @@
     <p>Provide a custom 404 page with clear navigation links. Helps both users and AI handle missing pages properly.</p>
   </div>
 
-  <!-- Footer only on last page -->
   <div class="footer">
     <p>© 2025 AI Signal Max. All rights reserved.</p>
     <p>Information is for general guidance only and does not constitute legal advice.</p>
