@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { analyze } from "../../../lib/analyze";
+import { setCache } from "../../../lib/cache";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
@@ -38,6 +39,9 @@ export async function POST(req: NextRequest) {
 
     const base = getBaseUrl(req);
     const { score, results } = await analyze(url, mode);
+
+    // Save results to cache
+    setCache(url, mode, { score, results });
 
     const successUrl = `${base}/success/${mode}?url=${encodeURIComponent(
       url
