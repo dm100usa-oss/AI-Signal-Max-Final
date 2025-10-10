@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Developer Technical Checklist — AI Signal Max (v2)</title>
+  <style>
+    @page {
+      size: Letter;
+      margin: 40px 50px;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      color: rgb(15,23,42);
+      line-height: 1.6;
+      font-size: 12pt;
+      position: relative;
+    }
+
+    .center { text-align: center; }
+    .logo { display: block; margin: 0 auto; width: 160px; }
+    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
+    .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
+
+    h2 { font-size: 14pt; margin-top: 26px; font-weight: 700; color: rgb(15,23,42); }
+    p { margin: 8px 0; color: rgb(15,23,42); }
+
+    .factor {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border: 1px solid rgb(229,231,235);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .factor-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
+    .status { font-weight: 700; font-size: 11pt; }
+    .status.good { color: rgb(16,185,129); }
+    .status.moderate { color: rgb(245,158,11); }
+    .status.poor { color: rgb(239,68,68); }
+
+    .footer {
+      margin-top: 80px;
+      text-align: left;
+      font-size: 10pt;
+      color: rgb(55,65,81);
+      line-height: 1.5;
+    }
+
+    .footer p {
+      margin: 4px 0;
+    }
+
+    a { color: rgb(37,99,235); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
+    <h1>Developer Technical Checklist — v2</h1>
+    <div class="meta">Website: {{website}} &nbsp; | &nbsp; Date: {{date}}</div>
+  </div>
+
+  <h2>Introduction</h2>
+  <p>This document provides technical recommendations for developers to improve a website’s visibility across AI platforms such as ChatGPT, Microsoft Copilot, Google Gemini, and Anthropic Claude. Each factor below reflects a key aspect affecting how AI systems interpret, index, and trust your site. The statuses correspond to the actual analysis results.</p>
+
+  <h2>Technical Factors and Current Status</h2>
+
+  <!-- 1 robots.txt -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">robots.txt</div>
+      <div class="status {{status_robots_class}}">{{status_robots}}</div>
+    </div>
+    <p>Controls AI access to your site. Ensure it allows indexing where needed and references the sitemap.</p>
+  </div>
+
+  <!-- 2 sitemap.xml -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">sitemap.xml</div>
+      <div class="status {{status_sitemap_class}}">{{status_sitemap}}</div>
+    </div>
+    <p>Defines site structure for AI and search crawlers. Keep it complete, valid, and automatically updated.</p>
+  </div>
+
+  <!-- 3 X-Robots-Tag -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">X-Robots-Tag</div>
+      <div class="status {{status_xrobots_class}}">{{status_xrobots}}</div>
+    </div>
+    <p>HTTP header indicating whether pages can be indexed. Avoid conflicting or restrictive directives.</p>
+  </div>
+
+  <!-- 4 Meta Robots -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Meta Robots</div>
+      <div class="status {{status_meta_class}}">{{status_meta}}</div>
+    </div>
+    <p>Meta tag in the HTML head defining indexing permissions. Ensure it does not unintentionally block pages.</p>
+  </div>
+
+  <!-- 5 Canonical -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Canonical</div>
+      <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
+    </div>
+    <p>Specifies the main version of a page. Prevents duplication and helps AI identify preferred URLs.</p>
+  </div>
+
+  <!-- 6 Title Tag -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Title Tag</div>
+      <div class="status {{status_title_class}}">{{status_title}}</div>
+    </div>
+    <p>Defines the main topic of the page. Each page must have a unique, concise, and descriptive title.</p>
+  </div>
+
+  <!-- 7 Meta Description -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Meta Description</div>
+      <div class="status {{status_metadesc_class}}">{{status_metadesc}}</div>
+    </div>
+    <p>Summarizes page content in search and AI results. Write strong, unique descriptions for better visibility.</p>
+  </div>
+
+  <!-- 8 Open Graph -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Open Graph</div>
+      <div class="status {{status_og_class}}">{{status_og}}</div>
+    </div>
+    <p>Ensures proper previews on social and AI platforms. Include og:title, og:description, and og:image.</p>
+  </div>
+
+  <!-- 9 H1 Headings -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">H1 Headings</div>
+      <div class="status {{status_h1_class}}">{{status_h1}}</div>
+    </div>
+    <p>Each page should have one main H1 headline matching the core topic. Avoid duplication across pages.</p>
+  </div>
+
+  <!-- 10 Structured Data (Schema Markup) -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Structured Data (Schema Markup)</div>
+      <div class="status {{status_schema_class}}">{{status_schema}}</div>
+    </div>
+    <p>Add JSON-LD schema to help AI understand the type of content and its context (Organization, Product, etc.).</p>
+  </div>
+
+  <!-- 11 Mobile-Friendly -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Mobile-Friendly</div>
+      <div class="status {{status_mobile_class}}">{{status_mobile}}</div>
+    </div>
+    <p>Ensure full responsiveness and usability on mobile devices. Avoid small touch targets and broken layouts.</p>
+  </div>
+
+  <!-- 12 HTTPS Security -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">HTTPS Security</div>
+      <div class="status {{status_https_class}}">{{status_https}}</div>
+    </div>
+    <p>Serve all pages via HTTPS. Expired or missing certificates reduce AI trust and user confidence.</p>
+  </div>
+
+  <!-- 13 Alt Attributes -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Alt Attributes</div>
+      <div class="status {{status_alt_class}}">{{status_alt}}</div>
+    </div>
+    <p>Use alt text for images so AI systems and accessibility tools can interpret visual content.</p>
+  </div>
+
+  <!-- 14 Favicon -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Favicon</div>
+      <div class="status {{status_favicon_class}}">{{status_favicon}}</div>
+    </div>
+    <p>Maintain a valid favicon for consistent brand presence in browsers and AI previews.</p>
+  </div>
+
+  <!-- 15 Custom 404 Page -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-name">Custom 404 Page</div>
+      <div class="status {{status_404_class}}">{{status_404}}</div>
+    </div>
+    <p>Provide a custom 404 page with clear navigation links. Helps both users and AI handle missing pages properly.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>© 2025 AI Signal Max. All rights reserved.</p>
+    <p>Information is provided for general guidance only and does not constitute legal or technical advice. All percentages and evaluation results are approximate, based on publicly available data and intended for user convenience.</p>
+    <p>For full terms and disclaimer, visit <a href="https://aivcheck.com/disclaimer">aivcheck.com/disclaimer</a>.</p>
+  </div>
+</body>
+</html>
