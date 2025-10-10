@@ -7,6 +7,8 @@ type SendReportEmailParams = {
   mode: string;
   ownerBuffer: Buffer;
   developerBuffer: Buffer;
+  score?: number;
+  results?: Record<string, string>;
 };
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -14,7 +16,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendReportEmail(params: SendReportEmailParams) {
   const from = "AI Signal Max <reports@aivcheck.com>";
 
-  const { to, url, mode, ownerBuffer, developerBuffer } = params;
+  const { to, url, mode, ownerBuffer, developerBuffer, score, results } = params;
 
   const subject = `AI Signal Max — Reports for ${url} (${mode})`;
   const html = `
@@ -42,6 +44,18 @@ export async function sendReportEmail(params: SendReportEmailParams) {
       { filename: "AI_Signal_Max_Developer.pdf", content: developerBuffer },
     ],
   });
+
+  if (score && results) {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "https://ai-signal-max-final.vercel.app"}/api/result`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, mode, score, results }),
+      });
+    } catch (e) {
+      console.error("Failed to store result", e);
+    }
+  }
 }
 
 function escapeHtml(s: string) {
