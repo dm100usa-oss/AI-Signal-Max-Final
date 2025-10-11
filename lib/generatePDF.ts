@@ -1,4 +1,3 @@
-// lib/generatePDF.ts
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -19,6 +18,13 @@ export async function generatePDF({
   const filename = type === "owner" ? "owner.html" : "developer.html";
   const templatePath = path.join(process.cwd(), "public", "templates", filename);
   const template = await fs.readFile(templatePath, "utf8");
+
+  // Diagnostic log to verify which template version is being loaded
+  console.log(
+    `Loaded template for ${type} from: ${templatePath}`,
+    "\nSnippet:\n",
+    template.slice(0, 250)
+  );
 
   const filledHtml = fillPlaceholders(template, data);
 
@@ -55,27 +61,20 @@ export async function generatePDF({
   return Buffer.from(ab);
 }
 
-/**
- * Replace all {{key}} placeholders in the template with actual values.
- * Supports all dynamic data: donut values, scores, classes, assessments, etc.
- */
 function fillPlaceholders(
   template: string,
   data: Record<string, string>
 ): string {
   let html = template;
 
-  // 1. Insert all known data keys
   for (const [key, value] of Object.entries(data)) {
     const safeValue = value ?? "";
     const re = new RegExp(`{{\\s*${escapeRegExp(key)}\\s*}}`, "g");
     html = html.replace(re, safeValue);
   }
 
-  // 2. Clean up unused placeholders
   html = html.replace(/{{\s*[\w.-]+\s*}}/g, "");
 
-  // 3. Extra: handle dynamic donut color if needed
   if (data.donut_color) {
     html = html.replace(
       /<stop offset="0%" stop-color="#ef4444" \/>/,
