@@ -14,61 +14,88 @@
       padding: 0;
       background: #fff;
     }
+
     body {
       font-family: Helvetica, Arial, sans-serif;
       color: rgb(15,23,42);
-      line-height: 1.6;
+      line-height: 1.5;
       font-size: 12pt;
-      position: relative;
     }
 
     .center { text-align: center; }
-    .logo { display: block; margin: 0 auto; width: 160px; }
-    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
-    .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
+    .logo { display: block; margin: 0 auto; width: 150px; }
+    h1 {
+      font-size: 19pt;
+      text-align: center;
+      margin: 14px 0 6px;
+      font-weight: 700;
+    }
+    .meta {
+      text-align: center;
+      font-size: 12pt;
+      color: rgb(75,85,99);
+      margin-bottom: 20px;
+    }
 
-    h2 { font-size: 14pt; margin-top: 26px; font-weight: 700; color: rgb(15,23,42); }
-    p { margin: 8px 0; color: rgb(15,23,42); }
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: rgb(15,23,42);
+      margin-top: 32px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 6px 0 12px;
+      color: rgb(15,23,42);
+    }
 
     .factor {
-      margin-top: 14px;
-      padding: 12px 16px;
-      border: 1px solid rgb(229,231,235);
-      border-radius: 10px;
       background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      page-break-inside: avoid;
     }
-    .factor-head {
-      display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-      margin-bottom: 6px;
-    }
-    .factor-lead { display: flex; align-items: center; gap: 8px; }
-    .factor-lead.good { color: rgb(16,185,129); }
-    .factor-lead.moderate { color: rgb(245,158,11); }
-    .factor-lead.poor { color: rgb(239,68,68); }
 
+    .factor-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+      gap: 10px;
+    }
+
+    .factor-lead { display: flex; align-items: center; gap: 8px; font-size: 13pt; }
     .dot {
-      width: 14px; height: 14px; border-radius: 50%;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
       border: 2px solid currentColor;
       background: #fff;
-      display: inline-block;
       box-sizing: border-box;
     }
 
-    .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
-    .status { font-weight: 700; font-size: 11pt; }
-    .status.good { color: rgb(16,185,129); }
-    .status.moderate { color: rgb(245,158,11); }
-    .status.poor { color: rgb(239,68,68); }
+    .factor-lead.good { color: #16a34a; }
+    .factor-lead.moderate { color: #ca8a04; }
+    .factor-lead.poor { color: #dc2626; }
+
+    .factor-name { font-weight: 700; }
+    .status {
+      font-size: 14pt;
+      font-weight: 700;
+    }
+    .status.good { color: #16a34a; }
+    .status.moderate { color: #ca8a04; }
+    .status.poor { color: #dc2626; }
 
     .footer {
-      position: fixed;
-      bottom: 30px;
-      left: 0;
-      width: 100%;
       text-align: center;
       font-size: 10pt;
-      color: rgb(55,65,81);
+      color: rgb(107,114,128);
       line-height: 1.4;
+      margin-top: 120px;
     }
 
     a { color: rgb(37,99,235); text-decoration: none; }
@@ -266,12 +293,9 @@
     <p>Provide a custom 404 page with clear navigation links. Helps both users and AI handle missing pages properly.</p>
   </div>
 
-  <!-- New Section -->
-  <h2>Next Steps</h2>
-  <p>Focus on improving the factors with “Poor” or “Moderate” status first, as they have the greatest impact on AI visibility. After updates, rerun the AI Signal Max analysis to confirm improvements.</p>
-
   <div class="footer">
-    <p>© 2025 AI Signal Max. All rights reserved.</p>
+    <p>© 2025 AI Signal Max. All rights reserved.<br />
+    Visibility scores are estimated and based on publicly available data. Not legal advice.</p>
   </div>
 </body>
 </html>
