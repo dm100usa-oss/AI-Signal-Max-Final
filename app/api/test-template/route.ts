@@ -11,7 +11,7 @@ export async function GET() {
       preview: fs.readFileSync(path.join(dir, f), "utf8").slice(0, 400)
     }));
     return NextResponse.json({ templates: result });
-  } catch (e) {
+  } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
