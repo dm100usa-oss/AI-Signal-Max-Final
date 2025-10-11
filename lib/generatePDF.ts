@@ -32,6 +32,8 @@ export async function generatePDF({
     throw new Error("Missing HTML2PDF API key (set HTML2PDF_API_KEY).");
   }
 
+  // Add cache-busting parameter to ensure fresh template each time
+  const nocache = Date.now();
   const body = {
     html: filledHtml,
     options: {
@@ -41,9 +43,10 @@ export async function generatePDF({
     },
     inline: true,
     apiKey: API_KEY,
+    nocache, // just included for visibility; not used by API directly
   };
 
-  const res = await fetch(API_URL, {
+  const res = await fetch(`${API_URL}?nocache=${nocache}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
