@@ -67,7 +67,14 @@
       gap: 10px;
     }
 
-    .factor-lead { display: flex; align-items: center; gap: 8px; font-size: 13pt; }
+    .factor-lead {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13pt;
+      color: rgb(15,23,42);
+    }
+
     .dot {
       width: 13px;
       height: 13px;
@@ -77,11 +84,12 @@
       box-sizing: border-box;
     }
 
-    .factor-lead.good { color: #16a34a; }
-    .factor-lead.moderate { color: #ca8a04; }
-    .factor-lead.poor { color: #dc2626; }
+    .factor-lead.good .dot { border-color: #16a34a; }
+    .factor-lead.moderate .dot { border-color: #ca8a04; }
+    .factor-lead.poor .dot { border-color: #dc2626; }
 
     .factor-name { font-weight: 700; }
+
     .status {
       font-size: 14pt;
       font-weight: 700;
@@ -113,24 +121,24 @@
 
   <h2>Technical Factors and Current Status</h2>
 
-  <!-- 1 robots.txt -->
+  <!-- 1 Robots.txt -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_robots_class}}">
         <span class="dot"></span>
-        <div class="factor-name">robots.txt</div>
+        <div class="factor-name">Robots.txt</div>
       </div>
       <div class="status {{status_robots_class}}">{{status_robots}}</div>
     </div>
     <p>Controls AI access to your site. Ensure it allows indexing where needed and references the sitemap.</p>
   </div>
 
-  <!-- 2 sitemap.xml -->
+  <!-- 2 Sitemap.xml -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_sitemap_class}}">
         <span class="dot"></span>
-        <div class="factor-name">sitemap.xml</div>
+        <div class="factor-name">Sitemap.xml</div>
       </div>
       <div class="status {{status_sitemap_class}}">{{status_sitemap}}</div>
     </div>
@@ -197,12 +205,12 @@
     <p>Summarizes page content in search and AI results. Write strong, unique descriptions for better visibility.</p>
   </div>
 
-  <!-- 8 Open Graph -->
+  <!-- 8 Open Graph Tags -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_og_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Open Graph</div>
+        <div class="factor-name">Open Graph Tags</div>
       </div>
       <div class="status {{status_og_class}}">{{status_og}}</div>
     </div>
@@ -226,7 +234,7 @@
     <div class="factor-head">
       <div class="factor-lead {{status_schema_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Structured Data (Schema Markup)</div>
+        <div class="factor-name">Structured Data</div>
       </div>
       <div class="status {{status_schema_class}}">{{status_schema}}</div>
     </div>
