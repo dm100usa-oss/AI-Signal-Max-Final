@@ -50,14 +50,16 @@ export async function POST(req: Request) {
 
     try {
       // Generate both PDF reports
-      const pdfOwner = await generatePDF("owner", {
+      const pdfOwner = await generatePDF({
+        template: "owner",
         website: url,
         score,
         results,
         mode,
       });
 
-      const pdfDeveloper = await generatePDF("developer", {
+      const pdfDeveloper = await generatePDF({
+        template: "developer",
         website: url,
         score,
         results,
