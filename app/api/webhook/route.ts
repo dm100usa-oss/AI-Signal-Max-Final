@@ -64,14 +64,16 @@ export async function POST(req: Request) {
       const donut_color = getDonutColor(scoreNum);
       const donut_offset = getDonutOffset(scoreNum);
 
-      // Build statuses (already plain strings)
+      // Build statuses for 15 factors
       const statuses: Record<string, "Good" | "Moderate" | "Poor"> = {};
       for (const [key, value] of Object.entries(results)) {
-        if (value === "Good" || value === "Moderate" || value === "Poor") {
-          statuses[key] = value;
-        } else {
-          statuses[key] = "Moderate";
-        }
+        const v: any = value;
+        const passed = v?.passed ?? false;
+        statuses[key] = passed
+          ? "Good"
+          : v === null
+          ? "Moderate"
+          : "Poor";
       }
 
       const cls = (s: "Good" | "Moderate" | "Poor") =>
