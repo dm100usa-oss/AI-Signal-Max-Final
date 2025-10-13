@@ -60,12 +60,10 @@ export async function POST(req: Request) {
 
       await sendReportEmail({
         to: email,
-        subject: "Your AI Signal Max Reports",
-        text: `Here are your visibility reports for ${url}.`,
-        attachments: [
-          { filename: "AI-Signal-Owner-Report.pdf", content: pdfOwner },
-          { filename: "AI-Signal-Developer-Checklist.pdf", content: pdfDeveloper },
-        ],
+        url,
+        mode,
+        ownerBuffer: pdfOwner,
+        developerBuffer: pdfDeveloper,
       });
 
       console.log("PDF reports successfully sent to:", email);
