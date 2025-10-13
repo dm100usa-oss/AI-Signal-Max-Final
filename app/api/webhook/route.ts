@@ -38,9 +38,9 @@ export async function POST(req: Request) {
     const email = session.customer_email || session.metadata?.email || "";
     const mode = (session.metadata?.mode as "quick" | "pro") || "quick";
     const url = session.metadata?.url || "";
-    const sessionId = session.id;
+    const sessionId = session.metadata?.sessionId || "";
 
-    // Get cached analysis
+    // Retrieve cached analysis
     const cached =
       getCache(`session:${sessionId}`, mode) || getCache(url, mode);
 
@@ -50,83 +50,82 @@ export async function POST(req: Request) {
     }
 
     const { score, results } = cached;
-    const donut_color = getDonutColor(score);
-    const donut_offset = getDonutOffset(score);
-    const assessment = buildAssessment(score);
-    const base64_logo = await getLogoBase64();
 
-    // Build statuses safely
-    const statuses: Record<string, "Good" | "Moderate" | "Poor"> = {};
-    for (const [key, value] of Object.entries(results)) {
-      if (typeof value === "string") {
-        const normalized =
-          value === "Good" || value === "Moderate" || value === "Poor"
-            ? value
-            : "Poor";
-        statuses[key] = normalized;
-      } else if (typeof value === "object" && value !== null) {
-        const passed =
-          typeof (value as any).passed === "boolean"
-            ? (value as any).passed
-            : false;
-        statuses[key] = passed ? "Good" : "Poor";
-      } else {
-        statuses[key] = "Poor";
-      }
-    }
-
-    const cls = (s: "Good" | "Moderate" | "Poor") =>
-      s === "Good" ? "good" : s === "Moderate" ? "moderate" : "poor";
-
-    const ownerData: Record<string, string> = {
-      base64_logo,
-      website: url,
-      date: new Date().toLocaleDateString("en-US"),
-      score: String(score),
-      donut_color,
-      donut_offset,
-      visibility_level: assessment.level,
-      assessment_p1: assessment.p1,
-      assessment_p2: assessment.p2,
-    };
-
-    for (const key in statuses) {
-      ownerData[`status_${key}`] = statuses[key];
-      ownerData[`status_${key}_class`] = cls(statuses[key]);
-    }
-
-    const developerData: Record<string, string> = {
-      base64_logo,
-      website: url,
-      date: new Date().toLocaleDateString("en-US"),
-    };
-
-    for (const key in statuses) {
-      developerData[`status_${key}`] = statuses[key];
-      developerData[`status_${key}_class`] = cls(statuses[key]);
+    // Only Pro mode sends email + PDFs
+    if (mode !== "pro") {
+      console.log("Quick mode — no email or PDF generation.");
+      return new NextResponse("Quick mode — skipped.", { status: 200 });
     }
 
     try {
-      // Generate PDFs
+      const base64_logo = await getLogoBase64();
+      const scoreNum = Number(score);
+      const assessment = buildAssessment(scoreNum);
+      const donut_color = getDonutColor(scoreNum);
+      const donut_offset = getDonutOffset(scoreNum);
+
+      // Build statuses for 15 factors
+      const statuses: Record<string, "Good" | "Moderate" | "Poor"> = {};
+      for (const [key, value] of Object.entries(results)) {
+        if (typeof value !== "object") continue;
+        const passed = value?.passed ?? false;
+        statuses[key] = passed
+          ? "Good"
+          : value === null
+          ? "Moderate"
+          : "Poor";
+      }
+
+      const cls = (s: "Good" | "Moderate" | "Poor") =>
+        s === "Good" ? "good" : s === "Moderate" ? "moderate" : "poor";
+
+      // === Owner PDF data ===
+      const ownerData: Record<string, string> = {
+        base64_logo,
+        website: url,
+        date: new Date().toLocaleDateString("en-US"),
+        score: String(scoreNum),
+        donut_color,
+        donut_offset,
+        visibility_level: assessment.level,
+        assessment_p1: assessment.p1,
+        assessment_p2: assessment.p2,
+      };
+      for (const key in statuses) {
+        ownerData[`status_${key}`] = statuses[key];
+        ownerData[`status_${key}_class`] = cls(statuses[key]);
+      }
+
+      // === Developer PDF data (no donut, no score) ===
+      const developerData: Record<string, string> = {
+        base64_logo,
+        website: url,
+        date: new Date().toLocaleDateString("en-US"),
+      };
+      for (const key in statuses) {
+        developerData[`status_${key}`] = statuses[key];
+        developerData[`status_${key}_class`] = cls(statuses[key]);
+      }
+
+      // Generate both PDFs
       const pdfOwner = await generatePDF({ type: "owner", data: ownerData });
       const pdfDeveloper = await generatePDF({
         type: "developer",
         data: developerData,
       });
 
-      // Send email only for PRO mode
-      if (mode === "pro" && email) {
-        await sendReportEmail({
-          to: email,
-          url,
-          mode,
-          ownerBuffer: pdfOwner,
-          developerBuffer: pdfDeveloper,
-        });
-        console.log("Email with two PDFs sent to:", email);
-      } else {
-        console.log("Quick mode — email skipped.");
-      }
+      // Send email with both reports
+      await sendReportEmail({
+        to: email,
+        url,
+        mode,
+        ownerBuffer: pdfOwner,
+        developerBuffer: pdfDeveloper,
+        score: scoreNum,
+        results,
+      });
+
+      console.log("PDF reports successfully sent to:", email);
     } catch (err) {
       console.error("Error generating or sending PDF:", err);
     }
@@ -135,7 +134,7 @@ export async function POST(req: Request) {
   return new NextResponse("Success", { status: 200 });
 }
 
-// Helper: read logo as Base64
+// Helper: read logo file as base64
 async function getLogoBase64(): Promise<string> {
   if (process.env.LOGO_BASE64) return process.env.LOGO_BASE64;
   const tryPaths = [
