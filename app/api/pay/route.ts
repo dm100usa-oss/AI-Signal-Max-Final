@@ -38,32 +38,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Perform pre-check analysis before payment
+    // Run pre-check analysis before payment
     const base = getBaseUrl(req);
     const { score, results } = await analyze(url, mode);
 
-    // Create a unique sessionId for synchronization
-    const sessionId = Date.now().toString();
-
-    // Save analysis results in cache by both url and sessionId
-    setCache(url, mode, { score, results });
-    setCache(`session:${sessionId}`, mode, { url, score, results });
-
-    // Success URL will instantly display results after payment
-    const successUrl = `${base}/success/${mode}?url=${encodeURIComponent(
-      url
-    )}&status=ok&paid=1&score=${score}&results=${encodeURIComponent(
-      JSON.stringify(results)
-    )}`;
-
-    // Create Stripe Checkout Session
+    // Create Stripe Checkout session first
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: successUrl,
+      success_url: `${base}/success/${mode}?url=${encodeURIComponent(
+        url
+      )}&status=ok&paid=1&score=${score}&results=${encodeURIComponent(
+        JSON.stringify(results)
+      )}`,
       cancel_url: `${base}/`,
       customer_email: mode === "pro" && email ? email : undefined,
-      metadata: { url, mode, email: email || "", sessionId },
+      metadata: { url, mode, email: email || "", sessionId: "" }, // placeholder
+    });
+
+    // Now use the real Stripe session ID for cache linking
+    setCache(url, mode, { score, results });
+    setCache(`session:${session.id}`, mode, { url, score, results });
+
+    // Update metadata with real sessionId (optional, but safe)
+    await stripe.checkout.sessions.update(session.id, {
+      metadata: { url, mode, email: email || "", sessionId: session.id },
     });
 
     return NextResponse.json({ url: session.url });
