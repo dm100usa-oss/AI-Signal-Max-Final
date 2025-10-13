@@ -37,7 +37,6 @@ export async function POST(req: Request) {
     const url = session.metadata?.url || "";
     const sessionId = session.metadata?.sessionId || "";
 
-    // Retrieve cached result
     const cached =
       getCache(`session:${sessionId}`, mode) || getCache(url, mode);
 
@@ -49,9 +48,7 @@ export async function POST(req: Request) {
     const { score, results } = cached;
 
     try {
-      // Generate both PDF reports
       const pdfOwner = await generatePDF({
-        template: "owner",
         website: url,
         score,
         results,
@@ -59,14 +56,12 @@ export async function POST(req: Request) {
       });
 
       const pdfDeveloper = await generatePDF({
-        template: "developer",
         website: url,
         score,
         results,
         mode,
       });
 
-      // Send email with attachments
       await sendReportEmail({
         to: email,
         website: url,
