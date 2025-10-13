@@ -103,3 +103,49 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
 
   return resultData;
 }
+
+function calcWeightedScore(all: Record<CheckKey, CheckItem>): number {
+  const total = PRO_KEYS.reduce((a, k) => a + weightOf(k), 0);
+  const pass = PRO_KEYS.reduce(
+    (a, k) => a + (all[k].passed === true ? weightOf(k) : 0),
+    0
+  );
+  return Math.round((pass / total) * 100);
+}
+
+function normalizeUrl(input: string): { origin: string; url: string } {
+  let u = input.trim();
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  const urlObj = new URL(u);
+  return { origin: urlObj.origin, url: urlObj.toString() };
+}
+
+async function fetchWithTimeout(
+  resource: string,
+  opts: RequestInit & { timeoutMs?: number } = {}
+) {
+  const { timeoutMs = 12000, ...rest } = opts;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(resource, {
+      ...rest,
+      redirect: "follow",
+      headers: { "user-agent": DEFAULT_UA, ...(rest.headers || {}) },
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    return res;
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+async function fetchHTML(
+  url: string
+): Promise<{ html: string | null; headers: Headers; schemeOk: boolean }> {
+  const res = await fetchWithTimeout(url);
+  const schemeOk = url.startsWith("https://") && res.ok;
+  const html = res.ok ? await res.text() : null;
+  return { html, headers: res.headers, schemeOk };
+}
