@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getData } from "@/lib/storage";
-import { generateOwnerPDF, generateDeveloperPDF } from "@/lib/generatePDF";
+import { generatePDF } from "@/lib/generatePDF";
 import { sendReportEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
@@ -22,8 +22,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No analysis found" }, { status: 404 });
     }
 
-    const ownerBuffer = await generateOwnerPDF(analysis);
-    const developerBuffer = await generateDeveloperPDF(analysis);
+    // unified PDF generation (both Owner + Developer)
+    const { ownerBuffer, developerBuffer } = await generatePDF(analysis);
 
     await sendReportEmail({
       to: customerEmail,
