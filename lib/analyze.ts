@@ -7,7 +7,29 @@ import {
   CheckKey,
   Mode,
 } from "./score";
+
+export interface CheckItem {
+  key: CheckKey;
+  name: string;
+  passed: boolean | null;
+  description: string;
+  status?: "Good" | "Moderate" | "Poor";
+}
+
+export interface AnalyzeResult {
+  url: string;
+  mode: Mode;
+  items: CheckItem[];
+  score: number;
+  interpretation: ReturnType<typeof interpret>;
+  results: Record<string, "Good" | "Moderate" | "Poor">;
+  factors: Record<string, { status: "Good" | "Moderate" | "Poor" }>;
+}
+
 import { saveData } from "./storage";
+
+const DEFAULT_UA =
+  "Mozilla/5.0 (compatible; AIVCheckBot/1.0; +https://aivcheck.com)";
 
 export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult> {
   const { origin, url } = normalizeUrl(rawUrl);
