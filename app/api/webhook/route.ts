@@ -67,11 +67,11 @@ export async function POST(req: Request) {
       // Build statuses for 15 factors
       const statuses: Record<string, "Good" | "Moderate" | "Poor"> = {};
       for (const [key, value] of Object.entries(results)) {
-        if (typeof value !== "object") continue;
-        const passed = value?.passed ?? false;
+        const v: any = value;
+        const passed = v?.passed ?? false;
         statuses[key] = passed
           ? "Good"
-          : value === null
+          : v === null
           ? "Moderate"
           : "Poor";
       }
