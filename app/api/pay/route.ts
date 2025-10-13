@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const base = getBaseUrl(req);
     const { score, results } = await analyze(url, mode);
 
-    // Create Stripe Checkout session first
+    // Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
@@ -53,17 +53,12 @@ export async function POST(req: NextRequest) {
       )}`,
       cancel_url: `${base}/`,
       customer_email: mode === "pro" && email ? email : undefined,
-      metadata: { url, mode, email: email || "", sessionId: "" }, // placeholder
+      metadata: { url, mode, email: email || "" },
     });
 
-    // Now use the real Stripe session ID for cache linking
+    // Save analysis results in cache by both url and sessionId
     setCache(url, mode, { score, results });
     setCache(`session:${session.id}`, mode, { url, score, results });
-
-    // Update metadata with real sessionId (optional, but safe)
-    await stripe.checkout.sessions.update(session.id, {
-      metadata: { url, mode, email: email || "", sessionId: session.id },
-    });
 
     return NextResponse.json({ url: session.url });
   } catch (e: any) {
