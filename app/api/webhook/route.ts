@@ -55,11 +55,24 @@ export async function POST(req: Request) {
     const assessment = buildAssessment(score);
     const base64_logo = await getLogoBase64();
 
+    // Build statuses safely
     const statuses: Record<string, "Good" | "Moderate" | "Poor"> = {};
     for (const [key, value] of Object.entries(results)) {
-      if (typeof value === "string") continue;
-      const passed = value?.passed ?? false;
-      statuses[key] = passed ? "Good" : value === null ? "Moderate" : "Poor";
+      if (typeof value === "string") {
+        const normalized =
+          value === "Good" || value === "Moderate" || value === "Poor"
+            ? value
+            : "Poor";
+        statuses[key] = normalized;
+      } else if (typeof value === "object" && value !== null) {
+        const passed =
+          typeof (value as any).passed === "boolean"
+            ? (value as any).passed
+            : false;
+        statuses[key] = passed ? "Good" : "Poor";
+      } else {
+        statuses[key] = "Poor";
+      }
     }
 
     const cls = (s: "Good" | "Moderate" | "Poor") =>
@@ -94,21 +107,26 @@ export async function POST(req: Request) {
     }
 
     try {
+      // Generate PDFs
       const pdfOwner = await generatePDF({ type: "owner", data: ownerData });
       const pdfDeveloper = await generatePDF({
         type: "developer",
         data: developerData,
       });
 
-      await sendReportEmail({
-        to: email,
-        url,
-        mode,
-        ownerBuffer: pdfOwner,
-        developerBuffer: pdfDeveloper,
-      });
-
-      console.log("Email with two PDFs sent to:", email);
+      // Send email only for PRO mode
+      if (mode === "pro" && email) {
+        await sendReportEmail({
+          to: email,
+          url,
+          mode,
+          ownerBuffer: pdfOwner,
+          developerBuffer: pdfDeveloper,
+        });
+        console.log("Email with two PDFs sent to:", email);
+      } else {
+        console.log("Quick mode — email skipped.");
+      }
     } catch (err) {
       console.error("Error generating or sending PDF:", err);
     }
