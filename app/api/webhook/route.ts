@@ -7,6 +7,9 @@ import Stripe from "stripe";
 import { generatePDF } from "@/lib/generatePDF";
 import { sendReportEmail } from "@/lib/email";
 import { getCache } from "@/lib/cache";
+import { getDonutColor, getDonutOffset, buildAssessment } from "@/lib/pdfHelpers";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
@@ -29,16 +32,15 @@ export async function POST(req: Request) {
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
-  // Handle completed checkout session
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
 
     const email = session.customer_email || session.metadata?.email || "";
     const mode = (session.metadata?.mode as "quick" | "pro") || "quick";
     const url = session.metadata?.url || "";
-    const sessionId = session.metadata?.sessionId || "";
+    const sessionId = session.id;
 
-    // Retrieve analysis results from cache
+    // Get cached analysis
     const cached =
       getCache(`session:${sessionId}`, mode) || getCache(url, mode);
 
@@ -48,43 +50,85 @@ export async function POST(req: Request) {
     }
 
     const { score, results } = cached;
+    const donut_color = getDonutColor(score);
+    const donut_offset = getDonutOffset(score);
+    const assessment = buildAssessment(score);
+    const base64_logo = await getLogoBase64();
 
-    // Always show success page immediately after payment
-    // PDFs and emails only for PRO mode
-    if (mode !== "pro") {
-      console.log("Quick mode — no PDF or email sending.");
-      return new NextResponse("Quick mode — success handled.", { status: 200 });
+    const statuses: Record<string, "Good" | "Moderate" | "Poor"> = {};
+    for (const [key, value] of Object.entries(results)) {
+      if (typeof value === "string") continue;
+      const passed = value?.passed ?? false;
+      statuses[key] = passed ? "Good" : value === null ? "Moderate" : "Poor";
     }
 
-    // Prepare data for PDF templates
-    const data = {
+    const cls = (s: "Good" | "Moderate" | "Poor") =>
+      s === "Good" ? "good" : s === "Moderate" ? "moderate" : "poor";
+
+    const ownerData: Record<string, string> = {
+      base64_logo,
       website: url,
       date: new Date().toLocaleDateString("en-US"),
       score: String(score),
-      ...results,
+      donut_color,
+      donut_offset,
+      visibility_level: assessment.level,
+      assessment_p1: assessment.p1,
+      assessment_p2: assessment.p2,
     };
 
-    try {
-      // Generate both reports
-      const pdfOwner = await generatePDF({ type: "owner", data });
-      const pdfDeveloper = await generatePDF({ type: "developer", data });
+    for (const key in statuses) {
+      ownerData[`status_${key}`] = statuses[key];
+      ownerData[`status_${key}_class`] = cls(statuses[key]);
+    }
 
-      // Send email with attachments
+    const developerData: Record<string, string> = {
+      base64_logo,
+      website: url,
+      date: new Date().toLocaleDateString("en-US"),
+    };
+
+    for (const key in statuses) {
+      developerData[`status_${key}`] = statuses[key];
+      developerData[`status_${key}_class`] = cls(statuses[key]);
+    }
+
+    try {
+      const pdfOwner = await generatePDF({ type: "owner", data: ownerData });
+      const pdfDeveloper = await generatePDF({
+        type: "developer",
+        data: developerData,
+      });
+
       await sendReportEmail({
         to: email,
         url,
         mode,
         ownerBuffer: pdfOwner,
         developerBuffer: pdfDeveloper,
-        score,
-        results,
       });
 
-      console.log("PDF reports successfully sent to:", email);
+      console.log("Email with two PDFs sent to:", email);
     } catch (err) {
       console.error("Error generating or sending PDF:", err);
     }
   }
 
   return new NextResponse("Success", { status: 200 });
+}
+
+// Helper: read logo as Base64
+async function getLogoBase64(): Promise<string> {
+  if (process.env.LOGO_BASE64) return process.env.LOGO_BASE64;
+  const tryPaths = [
+    path.join(process.cwd(), "public", "templates", "logo.png"),
+    path.join(process.cwd(), "public", "logo.png"),
+  ];
+  for (const p of tryPaths) {
+    try {
+      const bin = await fs.readFile(p);
+      return bin.toString("base64");
+    } catch {}
+  }
+  return "";
 }
