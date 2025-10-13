@@ -47,20 +47,16 @@ export async function POST(req: Request) {
 
     const { score, results } = cached;
 
-    try {
-      const pdfOwner = await generatePDF({
-        website: url,
-        score,
-        results,
-        mode,
-      });
+    const data = {
+      website: url,
+      date: new Date().toLocaleDateString("en-US"),
+      score: String(score),
+      ...results,
+    };
 
-      const pdfDeveloper = await generatePDF({
-        website: url,
-        score,
-        results,
-        mode,
-      });
+    try {
+      const pdfOwner = await generatePDF({ type: "owner", data });
+      const pdfDeveloper = await generatePDF({ type: "developer", data });
 
       await sendReportEmail({
         to: email,
