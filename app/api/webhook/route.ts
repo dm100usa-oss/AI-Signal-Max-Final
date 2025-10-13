@@ -29,6 +29,7 @@ export async function POST(req: Request) {
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
+  // Handle completed checkout session
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
 
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
     const url = session.metadata?.url || "";
     const sessionId = session.metadata?.sessionId || "";
 
+    // Retrieve analysis results from cache
     const cached =
       getCache(`session:${sessionId}`, mode) || getCache(url, mode);
 
@@ -47,6 +49,14 @@ export async function POST(req: Request) {
 
     const { score, results } = cached;
 
+    // Always show success page immediately after payment
+    // PDFs and emails only for PRO mode
+    if (mode !== "pro") {
+      console.log("Quick mode — no PDF or email sending.");
+      return new NextResponse("Quick mode — success handled.", { status: 200 });
+    }
+
+    // Prepare data for PDF templates
     const data = {
       website: url,
       date: new Date().toLocaleDateString("en-US"),
@@ -55,15 +65,19 @@ export async function POST(req: Request) {
     };
 
     try {
+      // Generate both reports
       const pdfOwner = await generatePDF({ type: "owner", data });
       const pdfDeveloper = await generatePDF({ type: "developer", data });
 
+      // Send email with attachments
       await sendReportEmail({
         to: email,
         url,
         mode,
         ownerBuffer: pdfOwner,
         developerBuffer: pdfDeveloper,
+        score,
+        results,
       });
 
       console.log("PDF reports successfully sent to:", email);
