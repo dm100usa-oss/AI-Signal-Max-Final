@@ -10,13 +10,16 @@ type CacheRecord = {
 const CACHE_TTL = 1000 * 60 * 30; // 30 minutes
 const cache = new Map<string, CacheRecord>();
 
-export function setCache(url: string, mode: "quick" | "pro", result: any) {
-  const key = `${mode}:${url}`;
-  cache.set(key, { url, mode, timestamp: Date.now(), result });
+export function setCache(key: string, mode: "quick" | "pro", result: any) {
+  cache.set(key, {
+    url: result.url || key,
+    mode,
+    timestamp: Date.now(),
+    result,
+  });
 }
 
-export function getCache(url: string, mode: "quick" | "pro") {
-  const key = `${mode}:${url}`;
+export function getCache(key: string, mode: "quick" | "pro") {
   const record = cache.get(key);
   if (!record) return null;
   if (Date.now() - record.timestamp > CACHE_TTL) {
