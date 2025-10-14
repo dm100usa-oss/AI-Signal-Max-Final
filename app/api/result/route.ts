@@ -1,34 +1,30 @@
 // app/api/result/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getData } from "@/lib/storage";
 
 export const runtime = "nodejs";
 
-let lastResult: any = null;
-
-// Save last analysis result
-export async function POST(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    const data = await req.json();
-    if (!data || typeof data !== "object") {
-      return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+    const { searchParams } = new URL(req.url);
+    const url = searchParams.get("url");
+
+    if (!url) {
+      return NextResponse.json({ error: "Missing URL" }, { status: 400 });
     }
-    lastResult = data;
-    return NextResponse.json({ ok: true });
-  } catch (e: any) {
+
+    const data = await getData(url);
+
+    if (!data) {
+      return NextResponse.json({ error: "No data found" }, { status: 404 });
+    }
+
+    return NextResponse.json(data);
+  } catch (error: any) {
+    console.error("Error in /api/result:", error);
     return NextResponse.json(
-      { error: e?.message || "Failed to save result" },
+      { error: "Failed to retrieve data", detail: error.message },
       { status: 500 }
     );
   }
-}
-
-// Get last analysis result
-export async function GET() {
-  if (!lastResult) {
-    return NextResponse.json(
-      { error: "No result stored yet" },
-      { status: 404 }
-    );
-  }
-  return NextResponse.json(lastResult);
 }
