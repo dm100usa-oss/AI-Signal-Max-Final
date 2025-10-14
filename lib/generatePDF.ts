@@ -3,7 +3,12 @@ import path from "node:path";
 
 type GeneratePDFParams = {
   type: "owner" | "developer";
-  data: Record<string, string>;
+  data: {
+    website: string;
+    score: string;
+    date: string;
+    results: Record<string, string>;
+  };
 };
 
 const API_URL =
@@ -19,20 +24,32 @@ export async function generatePDF({
   const templatePath = path.join(process.cwd(), "public", "templates", filename);
   const template = await fs.readFile(templatePath, "utf8");
 
-  // Diagnostic log to verify which template version is being loaded
-  console.log(
-    `Loaded template for ${type} from: ${templatePath}`,
-    "\nSnippet:\n",
-    template.slice(0, 250)
-  );
+  const base64Logo = await getBase64Logo();
+  const scoreValue = parseInt(data.score.replace("%", "")) || 0;
+  const donutColor = getDonutColor(scoreValue);
+  const donutOffset = getDonutOffset(scoreValue);
+  const visibilityLevel = getVisibilityText(scoreValue);
 
-  const filledHtml = fillPlaceholders(template, data);
+  const placeholders: Record<string, string> = {
+    website: data.website,
+    date: data.date,
+    score: data.score,
+    base64_logo: base64Logo,
+    donut_color: donutColor,
+    donut_offset: donutOffset.toString(),
+    visibility_level: visibilityLevel,
+    ...buildFactorStatuses(data.results),
+    ...buildFactorClasses(data.results),
+    assessment_p1: getAssessmentText1(scoreValue),
+    assessment_p2: getAssessmentText2(scoreValue),
+  };
+
+  const filledHtml = fillPlaceholders(template, placeholders);
 
   if (!API_KEY) {
     throw new Error("Missing HTML2PDF API key (set HTML2PDF_API_KEY).");
   }
 
-  // Add cache-busting parameter to ensure fresh template each time
   const nocache = Date.now();
   const body = {
     html: filledHtml,
@@ -43,7 +60,6 @@ export async function generatePDF({
     },
     inline: true,
     apiKey: API_KEY,
-    nocache, // just included for visibility; not used by API directly
   };
 
   const res = await fetch(`${API_URL}?nocache=${nocache}`, {
@@ -64,30 +80,97 @@ export async function generatePDF({
   return Buffer.from(ab);
 }
 
-function fillPlaceholders(
-  template: string,
-  data: Record<string, string>
-): string {
+function fillPlaceholders(template: string, data: Record<string, string>): string {
   let html = template;
-
   for (const [key, value] of Object.entries(data)) {
-    const safeValue = value ?? "";
+    const safe = value ?? "";
     const re = new RegExp(`{{\\s*${escapeRegExp(key)}\\s*}}`, "g");
-    html = html.replace(re, safeValue);
+    html = html.replace(re, safe);
   }
-
   html = html.replace(/{{\s*[\w.-]+\s*}}/g, "");
-
-  if (data.donut_color) {
-    html = html.replace(
-      /<stop offset="0%" stop-color="#ef4444" \/>/,
-      `<stop offset="0%" stop-color="${data.donut_color}" />`
-    );
-  }
-
   return html;
 }
 
 function escapeRegExp(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function getBase64Logo(): Promise<string> {
+  try {
+    const logoPath = path.join(process.cwd(), "public", "logo.png");
+    const buffer = await fs.readFile(logoPath);
+    return buffer.toString("base64");
+  } catch {
+    return "";
+  }
+}
+
+function getDonutColor(score: number): string {
+  if (score <= 50) return interpolateColor("#ef4444", "#f59e0b", score / 50);
+  return interpolateColor("#f59e0b", "#10b981", (score - 50) / 50);
+}
+
+function getDonutOffset(score: number): number {
+  const circumference = 2 * Math.PI * 90; // radius = 90
+  return circumference - (score / 100) * circumference;
+}
+
+function interpolateColor(color1: string, color2: string, factor: number): string {
+  const c1 = hexToRgb(color1);
+  const c2 = hexToRgb(color2);
+  const result = {
+    r: Math.round(c1.r + (c2.r - c1.r) * factor),
+    g: Math.round(c1.g + (c2.g - c1.g) * factor),
+    b: Math.round(c1.b + (c2.b - c1.b) * factor),
+  };
+  return `rgb(${result.r}, ${result.g}, ${result.b})`;
+}
+
+function hexToRgb(hex: string) {
+  const parsed = parseInt(hex.slice(1), 16);
+  return { r: (parsed >> 16) & 255, g: (parsed >> 8) & 255, b: parsed & 255 };
+}
+
+function getVisibilityText(score: number): string {
+  if (score >= 80) return "High visibility";
+  if (score >= 40) return "Moderate visibility";
+  return "Low visibility";
+}
+
+function getAssessmentText1(score: number): string {
+  if (score >= 80)
+    return "Your site demonstrates excellent visibility for AI platforms.";
+  if (score >= 40)
+    return "Your site is moderately visible for AI platforms.";
+  return "Your site currently has low visibility for AI platforms.";
+}
+
+function getAssessmentText2(score: number): string {
+  if (score >= 80)
+    return "Minor improvements may further enhance exposure across AI tools.";
+  if (score >= 40)
+    return "Some parameters require improvement to achieve better indexing.";
+  return "Several critical settings need attention to improve AI visibility.";
+}
+
+function buildFactorStatuses(results: Record<string, string>): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const [key, status] of Object.entries(results)) {
+    map[`status_${key}`] = status;
+  }
+  return map;
+}
+
+function buildFactorClasses(results: Record<string, string>): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const [key, status] of Object.entries(results)) {
+    const lower = (status || "").toLowerCase();
+    map[`status_${key}_class`] =
+      lower === "good"
+        ? "good"
+        : lower === "moderate"
+        ? "moderate"
+        : "poor";
+  }
+  return map;
 }
