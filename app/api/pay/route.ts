@@ -45,6 +45,10 @@ export async function POST(req: NextRequest) {
     const analysis = await analyze(url, mode);
     const { score, results, factors } = analysis;
 
+    // Save analysis results before creating the session
+    const tempKey = `pending:${url}`;
+    await saveData(tempKey, { score, results, factors });
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -57,9 +61,9 @@ export async function POST(req: NextRequest) {
       metadata: { url, mode, email: email || "" },
     });
 
-    // Save analysis results for webhook and success page
-    await saveData(url, { score, results, factors });
+    // Rename pending data using session.id
     await saveData(`session:${session.id}`, { url, score, results, factors });
+    await saveData(url, { score, results, factors });
 
     return NextResponse.json({ url: session.url });
   } catch (e: any) {
