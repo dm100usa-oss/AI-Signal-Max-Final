@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { analyze } from "../../../lib/analyze";
-import { setCache } from "../../../lib/cache";
 import { saveData } from "../../../lib/storage";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -40,9 +39,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Run pre-check (AI visibility analysis) before payment
     const base = getBaseUrl(req);
-    const { score, results } = await analyze(url, mode);
+
+    // Run pre-analysis before payment
+    const analysis = await analyze(url, mode);
+    const { score, results, factors } = analysis;
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -50,20 +51,15 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${base}/success/${mode}?url=${encodeURIComponent(
         url
-      )}&status=ok&paid=1&score=${score}&results=${encodeURIComponent(
-        JSON.stringify(results)
-      )}`,
+      )}&status=ok&paid=1`,
       cancel_url: `${base}/`,
       customer_email: mode === "pro" && email ? email : undefined,
       metadata: { url, mode, email: email || "" },
     });
 
-    // Save analysis results in cache (for success page)
-    setCache(url, mode, { score, results });
-    setCache(`session:${session.id}`, mode, { url, score, results });
-
-    // Also persist data in storage (for webhook access after payment)
-    await saveData(url, { score, results });
+    // Save analysis results for webhook and success page
+    await saveData(url, { score, results, factors });
+    await saveData(`session:${session.id}`, { url, score, results, factors });
 
     return NextResponse.json({ url: session.url });
   } catch (e: any) {
