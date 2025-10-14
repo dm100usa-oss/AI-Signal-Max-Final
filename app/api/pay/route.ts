@@ -3,13 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { analyze } from "../../../lib/analyze";
 import { setCache } from "../../../lib/cache";
+import { saveData } from "../../../lib/storage";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
 });
 
 function getBaseUrl(req: NextRequest) {
-  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
+  const host =
+    req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
   const proto = req.headers.get("x-forwarded-proto") || "https";
   return `${proto}://${host}`;
 }
@@ -19,11 +21,11 @@ export async function POST(req: NextRequest) {
     const { mode, url, email } = await req.json();
 
     if (mode !== "quick" && mode !== "pro") {
-      return NextResponse.json({ error: "Bad mode" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid mode" }, { status: 400 });
     }
 
     if (!url || typeof url !== "string") {
-      return NextResponse.json({ error: "Missing url" }, { status: 400 });
+      return NextResponse.json({ error: "Missing or invalid URL" }, { status: 400 });
     }
 
     const priceId =
@@ -33,16 +35,16 @@ export async function POST(req: NextRequest) {
 
     if (!priceId) {
       return NextResponse.json(
-        { error: "Price ID not configured" },
+        { error: "Stripe price ID not configured" },
         { status: 500 }
       );
     }
 
-    // Run pre-check analysis before payment
+    // Run pre-check (AI visibility analysis) before payment
     const base = getBaseUrl(req);
     const { score, results } = await analyze(url, mode);
 
-    // Create Stripe Checkout session
+    // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
@@ -56,14 +58,18 @@ export async function POST(req: NextRequest) {
       metadata: { url, mode, email: email || "" },
     });
 
-    // Save analysis results in cache by both url and sessionId
+    // Save analysis results in cache (for success page)
     setCache(url, mode, { score, results });
     setCache(`session:${session.id}`, mode, { url, score, results });
 
+    // Also persist data in storage (for webhook access after payment)
+    await saveData(url, { score, results });
+
     return NextResponse.json({ url: session.url });
   } catch (e: any) {
+    console.error("Error in /api/pay:", e);
     return NextResponse.json(
-      { error: e?.message ?? "Stripe error" },
+      { error: e?.message ?? "Stripe payment error" },
       { status: 500 }
     );
   }
