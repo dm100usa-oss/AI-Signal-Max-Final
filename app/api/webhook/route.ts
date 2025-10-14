@@ -1,5 +1,5 @@
-// app/api/webhook/route.ts
 import Stripe from "stripe";
+import { NextResponse } from "next/server";
 import { getData } from "@/lib/storage";
 import { generatePDF } from "@/lib/generatePDF";
 import { sendReportEmail } from "@/lib/email";
@@ -13,7 +13,10 @@ export async function POST(req: Request) {
     const body = await req.text();
     const sig = req.headers.get("stripe-signature");
 
-    if (!sig) return new Response("Missing signature", { status: 400 });
+    if (!sig) {
+      console.error("Missing Stripe signature");
+      return new Response("Missing signature", { status: 400 });
+    }
 
     const event = stripe.webhooks.constructEvent(
       body,
@@ -27,42 +30,43 @@ export async function POST(req: Request) {
       const mode = session.metadata?.mode || "pro";
       const email = session.metadata?.email || session.customer_email;
 
-      if (!url) return new Response("Missing URL", { status: 400 });
+      if (!url) {
+        console.error("Missing URL in metadata");
+        return new Response("Missing URL", { status: 400 });
+      }
 
-      let data =
-        (await getData(`session:${session.id}`)) ||
-        (await getData(url)) ||
-        (await getData(url.replace(/^https?:\/\//, ""))) ||
-        (await getData(url.toLowerCase()));
+      // Retrieve analysis results from Redis
+      let data = await getData(`session:${session.id}`);
+      if (!data) data = await getData(url);
 
       if (!data) {
-        console.error("No cached data found for", url);
+        console.error("No analysis data found for:", url);
         return new Response("No data found", { status: 404 });
       }
 
       const { score, results } = data;
+
       console.log(`Webhook started for ${url} | Score: ${score}`);
 
+      const baseData = {
+        website: url,
+        score: String(score),
+        date: new Date().toLocaleDateString("en-US"),
+        results,
+      };
+
+      // Generate both PDF files
       const ownerBuffer = await generatePDF({
         type: "owner",
-        data: {
-          website: url,
-          score: `${score}`,
-          date: new Date().toLocaleDateString("en-US"),
-          ...results,
-        },
+        data: baseData,
       });
 
       const developerBuffer = await generatePDF({
         type: "developer",
-        data: {
-          website: url,
-          score: `${score}`,
-          date: new Date().toLocaleDateString("en-US"),
-          ...results,
-        },
+        data: baseData,
       });
 
+      // Send report email with both PDFs
       if (email) {
         await sendReportEmail({
           to: email,
