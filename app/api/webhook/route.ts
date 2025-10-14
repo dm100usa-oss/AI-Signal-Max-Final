@@ -1,9 +1,9 @@
 // app/api/webhook/route.ts
+import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { getData } from "@/lib/storage";
 import { generatePDF } from "@/lib/generatePDF";
 import { sendReportEmail } from "@/lib/email";
-import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
@@ -15,7 +15,8 @@ export async function POST(req: Request) {
     const sig = req.headers.get("stripe-signature");
 
     if (!sig) {
-      return NextResponse.json({ error: "Missing Stripe signature" }, { status: 400 });
+      console.error("❌ Missing Stripe signature");
+      return new Response("Missing signature", { status: 400 });
     }
 
     const event = stripe.webhooks.constructEvent(
@@ -24,7 +25,6 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
 
-    // Only handle completed sessions
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const url = session.metadata?.url;
@@ -32,23 +32,24 @@ export async function POST(req: Request) {
       const email = session.metadata?.email || session.customer_email;
 
       if (!url) {
-        console.error("Webhook: Missing URL in metadata");
-        return NextResponse.json({ error: "Missing URL in metadata" }, { status: 400 });
+        console.error("❌ Missing URL in metadata");
+        return new Response("Missing URL", { status: 400 });
       }
 
-      // Retrieve analysis results from Redis (Upstash)
-      const data = await getData(url);
-      if (!data || !data.score || !data.results) {
-        console.error("Webhook: No cached analysis found for:", url);
-        return NextResponse.json(
-          { error: "No cached analysis found", url },
-          { status: 404 }
-        );
+      // Try to retrieve analysis results by session ID first, then by URL
+      let data = await getData(`session:${session.id}`);
+      if (!data) data = await getData(url);
+
+      if (!data) {
+        console.error("❌ No analysis data found for:", url);
+        return new Response("No data found", { status: 404 });
       }
 
-      const { score, results } = data;
+      const { score, results, factors } = data;
 
-      // Generate both PDF reports
+      console.log(`✅ Webhook started for ${url} | Score: ${score}`);
+
+      // Generate PDF reports
       const ownerBuffer = await generatePDF({
         type: "owner",
         data: {
@@ -69,26 +70,28 @@ export async function POST(req: Request) {
         },
       });
 
-      // Send email with both reports attached
-      await sendReportEmail({
-        to: email || "reports@aivcheck.com",
-        url,
-        mode,
-        ownerBuffer,
-        developerBuffer,
-        score,
-        results,
-      });
+      // Send email
+      if (email) {
+        await sendReportEmail({
+          to: email,
+          url,
+          mode,
+          ownerBuffer,
+          developerBuffer,
+          score,
+          results,
+        });
+        console.log(`📧 Email sent to ${email}`);
+      } else {
+        console.warn(`⚠️ No email found for ${url}`);
+      }
 
       console.log(`✅ Webhook processed successfully for ${url}`);
     }
 
-    return NextResponse.json({ received: true });
+    return new Response("ok", { status: 200 });
   } catch (error: any) {
-    console.error("Webhook error:", error);
-    return NextResponse.json(
-      { error: error.message || "Webhook processing failed" },
-      { status: 500 }
-    );
+    console.error("❌ Webhook error:", error);
+    return new Response(error?.message || "Webhook failed", { status: 500 });
   }
 }
