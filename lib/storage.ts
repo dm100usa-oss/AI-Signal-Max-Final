@@ -1,4 +1,5 @@
-import { Redis } from "@upstash/redis";
+// lib/storage.ts
+import { Redis } from '@upstash/redis';
 
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,
@@ -7,20 +8,31 @@ const redis = new Redis({
 
 export async function saveData(key: string, value: any, ttlSeconds = 3600) {
   try {
-    await redis.set(key, JSON.stringify(value), { ex: ttlSeconds });
-    console.log("Saved to Redis:", key);
+    const serialized = JSON.stringify(value);
+    await redis.set(key, serialized, { ex: ttlSeconds });
+    console.log('Saved to Redis:', key);
   } catch (error) {
-    console.error("Redis save error:", error);
+    console.error('Redis save error:', error);
   }
 }
 
 export async function getData<T = any>(key: string): Promise<T | null> {
   try {
-    console.log("Fetching from Redis:", key);
-    const data = await redis.get(key);
-    return data ? JSON.parse(data as string) : null;
+    const data = await redis.get<string>(key);
+    if (!data) return null;
+
+    if (typeof data === 'string') {
+      return JSON.parse(data);
+    }
+
+    // fallback for unexpected object values
+    if (typeof data === 'object') {
+      return data as T;
+    }
+
+    return null;
   } catch (error) {
-    console.error("Redis get error:", error);
+    console.error('Redis get error:', error);
     return null;
   }
 }
@@ -28,8 +40,8 @@ export async function getData<T = any>(key: string): Promise<T | null> {
 export async function deleteData(key: string) {
   try {
     await redis.del(key);
-    console.log("Deleted from Redis:", key);
+    console.log('Deleted from Redis:', key);
   } catch (error) {
-    console.error("Redis delete error:", error);
+    console.error('Redis delete error:', error);
   }
 }
