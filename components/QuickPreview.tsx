@@ -1,24 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function QuickPreview() {
   const router = useRouter();
   const [siteUrl, setSiteUrl] = useState("");
-  const [index, setIndex] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [dimIntro, setDimIntro] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [introDim, setIntroDim] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const u = params.get("url") || "";
-      setSiteUrl(u);
-    }
-  }, []);
+  const animRef = useRef<number | null>(null);
+  const lastTimestamp = useRef<number>(0);
 
   const steps = [
     "Открыт ли сайт для ИИ",
@@ -33,110 +26,92 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const durations = [1400, 1300, 1200, 1100, 1300, 1200, 1400, 1300, 1500, 1600];
-  const holdAtFull = 300;
-  const fadeOutDelay = 300;
-  const finalPause = 1000;
+  // параметры
+  const stepDuration = 1200;
+  const holdPause = 300;
+  const fadePause = 250;
 
-  // Основная анимация шагов
   useEffect(() => {
-    let frame: number;
-    let timeout1: NodeJS.Timeout;
-    let timeout2: NodeJS.Timeout;
-    let start: number | null = null;
+    const params = new URLSearchParams(window.location.search);
+    setSiteUrl(params.get("url") || "");
+  }, []);
 
-    if (index < steps.length) {
-      setVisible(true);
-      const duration = durations[index];
-
-      if (index === 0) {
-        // плавное затухание фразы "Мы начали проверку"
-        setTimeout(() => setIntroDim(true), 600);
-      }
-
-      const animate = (timestamp: number) => {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
-        const ratio = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - ratio, 3); // ease-out cubic
-        setProgress(eased * 100);
-
-        if (elapsed < duration) {
-          frame = requestAnimationFrame(animate);
-        } else {
-          setProgress(100);
-          timeout1 = setTimeout(() => {
-            setVisible(false);
-            timeout2 = setTimeout(() => {
-              setProgress(0);
-              setIndex((prev) => prev + 1);
-            }, fadeOutDelay);
-          }, holdAtFull);
-        }
-      };
-
-      frame = requestAnimationFrame(animate);
-      return () => {
-        cancelAnimationFrame(frame);
-        clearTimeout(timeout1);
-        clearTimeout(timeout2);
-      };
-    } else {
-      const t = setTimeout(() => setShowFinal(true), 400);
-      return () => clearTimeout(t);
-    }
-  }, [index]);
-
-  // Переход к оплате Stripe
   useEffect(() => {
-    if (showFinal && siteUrl) {
+    if (currentStep >= steps.length) {
+      setShowFinal(true);
       const timer = setTimeout(() => {
-        router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
-      }, finalPause);
+        if (siteUrl) router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
+      }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [showFinal, siteUrl, router]);
+
+    let start: number | null = null;
+    let finished = false;
+
+    function animate(timestamp: number) {
+      if (!start) {
+        start = timestamp;
+        if (currentStep === 0) setTimeout(() => setDimIntro(true), 700);
+      }
+
+      const elapsed = timestamp - start;
+      const t = Math.min(elapsed / stepDuration, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // cubic ease-out
+      setProgress(eased * 100);
+
+      if (elapsed < stepDuration) {
+        animRef.current = requestAnimationFrame(animate);
+      } else if (!finished) {
+        finished = true;
+        setProgress(100);
+        setTimeout(() => {
+          setProgress(0);
+          setCurrentStep((p) => p + 1);
+        }, holdPause + fadePause);
+      }
+    }
+
+    animRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
+  }, [currentStep, siteUrl, router]);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-[#F9FAFB] min-h-screen flex flex-col items-center font-sans text-neutral-800">
-      {/* Логотип / бренд */}
-      <div className="text-center text-3xl font-semibold text-neutral-400 opacity-60 mb-12 select-none tracking-tight transition-all duration-1000">
+      {/* бренд */}
+      <div className="text-center text-3xl font-semibold text-neutral-400 opacity-60 mb-12 select-none tracking-tight">
         AI Signal Max
       </div>
 
-      {/* Блок проверки */}
       {!showFinal ? (
-        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left transition-all duration-500">
+        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left">
           <p
             className={`text-xl md:text-2xl font-medium text-neutral-800 mb-10 text-center transition-opacity duration-700 ${
-              introDim ? "opacity-40" : "opacity-100"
+              dimIntro ? "opacity-40" : "opacity-100"
             }`}
           >
             Мы начали проверку:
           </p>
 
-          <div
-            className={`h-8 flex items-center text-lg text-neutral-700 mb-6 transition-opacity duration-500 ${
-              visible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <span className="mx-auto">{steps[index]}</span>
+          <div className="h-8 flex items-center justify-center text-lg text-neutral-700 mb-6">
+            {steps[currentStep]}
           </div>
 
           <div className="w-full h-[10px] bg-[#E5E7EB] rounded-[2px] overflow-hidden">
             <div
-              className="h-[10px] rounded-[2px] transition-[width] duration-100 ease-out"
+              className="h-[10px] rounded-[2px]"
               style={{
                 width: `${progress}%`,
                 background:
-                  "linear-gradient(to right, #E5E7EB 0%, #60A5FA 50%, #2563EB 100%)",
-                transition: "width 0.15s ease-out",
+                  "linear-gradient(to right, #E5E7EB 0%, #60A5FA 60%, #2563EB 100%)",
+                transition: "width 0.05s linear",
               }}
             />
           </div>
         </div>
       ) : (
-        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
+        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center animate-fade-in">
           <p className="text-2xl font-semibold text-neutral-800 mb-2">
             Проверка завершена
           </p>
@@ -147,6 +122,4 @@ export default function QuickPreview() {
       <footer className="mt-16 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
       </footer>
-    </main>
-  );
-}
+    </
