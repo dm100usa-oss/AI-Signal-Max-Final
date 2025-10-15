@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function QuickPreview() {
+function QuickPreviewInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const url = searchParams.get("url");
 
   useEffect(() => {
-    // Wait 1 second, then go to payment page
     const timer = setTimeout(() => {
       if (url) {
         router.push(`/pay?url=${encodeURIComponent(url)}`);
@@ -17,7 +17,6 @@ export default function QuickPreview() {
         router.push("/");
       }
     }, 1000);
-
     return () => clearTimeout(timer);
   }, [url, router]);
 
@@ -30,5 +29,13 @@ export default function QuickPreview() {
         Please wait a moment while we analyze your site before payment.
       </p>
     </main>
+  );
+}
+
+export default function QuickPreview() {
+  return (
+    <Suspense fallback={<div className="p-20 text-center text-neutral-500">Loading...</div>}>
+      <QuickPreviewInner />
+    </Suspense>
   );
 }
