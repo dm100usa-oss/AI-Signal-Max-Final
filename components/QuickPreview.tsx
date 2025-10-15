@@ -8,8 +8,8 @@ export default function QuickPreview() {
   const [siteUrl, setSiteUrl] = useState("");
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [showFinal, setShowFinal] = useState(false);
   const [visible, setVisible] = useState(true);
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -34,94 +34,95 @@ export default function QuickPreview() {
 
   const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
   const fadeOutDelay = 300;
-  const finalPause = 2200;
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    let frame: number;
-
-    if (index < steps.length) {
-      setVisible(true);
-      let start: number | null = null;
-      const duration = durations[index];
-      const animate = (timestamp: number) => {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
-        const ratio = Math.min(elapsed / duration, 1);
-        const easing =
-          ratio < 0.9 ? ratio : ratio - Math.sin((ratio - 0.9) * 10) * 0.03;
-        setProgress(easing * 100);
-        if (elapsed < duration) {
-          frame = requestAnimationFrame(animate);
-        } else {
-          timeout = setTimeout(() => {
-            setVisible(false);
-            setTimeout(() => {
-              setProgress(0);
-              setIndex((prev) => prev + 1);
-            }, fadeOutDelay);
-          }, 250);
-        }
-      };
-      frame = requestAnimationFrame(animate);
-      return () => {
-        cancelAnimationFrame(frame);
-        clearTimeout(timeout);
-      };
-    } else {
-      const t = setTimeout(() => setShowFinal(true), 400);
-      return () => clearTimeout(t);
+    if (index >= steps.length) {
+      const endTimer = setTimeout(() => setFinished(true), 600);
+      return () => clearTimeout(endTimer);
     }
+
+    let frame: number;
+    let timeout: NodeJS.Timeout;
+    let start: number | null = null;
+    const duration = durations[index];
+
+    setVisible(true);
+    setProgress(0);
+
+    const animate = (timestamp: number) => {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start;
+      const ratio = Math.min(elapsed / duration, 1);
+      setProgress(ratio * 100);
+      if (elapsed < duration) {
+        frame = requestAnimationFrame(animate);
+      } else {
+        timeout = setTimeout(() => {
+          setVisible(false);
+          setTimeout(() => {
+            setIndex((prev) => prev + 1);
+          }, fadeOutDelay);
+        }, 150);
+      }
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timeout);
+    };
   }, [index]);
 
   useEffect(() => {
-    if (showFinal && siteUrl) {
-      const timer = setTimeout(() => {
-        const redirect = `/pay?url=${encodeURIComponent(siteUrl)}`;
-        router.push(redirect);
-      }, finalPause);
-      return () => clearTimeout(timer);
+    if (finished && siteUrl) {
+      const pauseBeforeRedirect = setTimeout(() => {
+        const redirectDelay = setTimeout(() => {
+          router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
+        }, 2000); // 2 сек пауза перед переходом
+        return () => clearTimeout(redirectDelay);
+      }, 800); // 0.8 сек после появления фразы
+      return () => clearTimeout(pauseBeforeRedirect);
     }
-  }, [showFinal, router, siteUrl]);
+  }, [finished, router, siteUrl]);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center font-sans text-neutral-800">
-      <div className="text-center text-2xl font-semibold text-neutral-400 opacity-60 mb-10 select-none tracking-tight">
-        AI Signal Max
-      </div>
+    <main className="mx-auto w-full max-w-2xl px-4 py-10 bg-gray-50 min-h-screen flex flex-col justify-center font-sans text-neutral-800">
+      <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-4 py-10 transition-all duration-700">
+        {!finished ? (
+          <>
+            <p className="text-center text-xl md:text-2xl font-medium text-neutral-800 mb-8">
+              Мы начали проверку:
+            </p>
 
-      {!showFinal ? (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left transition-all duration-500">
-          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10 text-center">
-            Мы начали проверку:
-          </p>
-
-          <div
-            className={`h-8 flex items-center text-lg text-neutral-700 mb-4 transition-opacity duration-500 ${
-              visible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {steps[index]}
-          </div>
-
-          <div className="w-full h-[6px] bg-gray-300 rounded-[2px] overflow-hidden">
             <div
-              className="h-[6px] rounded-[2px]"
-              style={{
-                width: `${progress}%`,
-                background: "linear-gradient(to right, #D1D5DB, #3B82F6)",
-                transition: "width 60ms linear",
-              }}
-            />
+              className={`h-7 flex items-center justify-center text-lg md:text-xl text-neutral-700 mb-6 transition-opacity duration-500 ${
+                visible ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {steps[index]}
+            </div>
+
+            <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden transition-opacity duration-300">
+              <div
+                className={`h-2 rounded-[1px] transition-all duration-300 ${
+                  visible ? "opacity-100" : "opacity-0"
+                }`}
+                style={{
+                  width: `${progress}%`,
+                  background: "linear-gradient(to right, #D1D5DB, #3B82F6)",
+                  transition: "width 60ms linear",
+                }}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-16 fade-in">
+            <p className="text-xl md:text-2xl font-semibold text-neutral-800">
+              Проверка завершена.
+            </p>
           </div>
-        </div>
-      ) : (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
-          <p className="text-2xl font-semibold text-neutral-800">
-            Проверка завершена.
-          </p>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 }
