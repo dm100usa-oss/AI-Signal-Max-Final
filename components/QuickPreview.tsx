@@ -10,6 +10,7 @@ export default function QuickPreview() {
   const [progress, setProgress] = useState(0);
   const [showFinal, setShowFinal] = useState(false);
   const [visible, setVisible] = useState(true);
+  const [introDim, setIntroDim] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -32,12 +33,12 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  // Настройка длительности и задержек
   const durations = [1400, 1300, 1200, 1100, 1300, 1200, 1400, 1300, 1500, 1600];
-  const holdAtFull = 300; // удержание заполненной полосы
-  const fadeOutDelay = 300; // пауза перед следующим фактором
-  const finalPause = 2200; // пауза перед переходом к оплате
+  const holdAtFull = 300;
+  const fadeOutDelay = 300;
+  const finalPause = 1000;
 
+  // Основная анимация шагов
   useEffect(() => {
     let frame: number;
     let timeout1: NodeJS.Timeout;
@@ -48,13 +49,16 @@ export default function QuickPreview() {
       setVisible(true);
       const duration = durations[index];
 
+      if (index === 0) {
+        // плавное затухание фразы "Мы начали проверку"
+        setTimeout(() => setIntroDim(true), 600);
+      }
+
       const animate = (timestamp: number) => {
         if (!start) start = timestamp;
         const elapsed = timestamp - start;
         const ratio = Math.min(elapsed / duration, 1);
-
-        // ease-out для мягкости
-        const eased = 1 - Math.pow(1 - ratio, 2);
+        const eased = 1 - Math.pow(1 - ratio, 3); // ease-out cubic
         setProgress(eased * 100);
 
         if (elapsed < duration) {
@@ -83,7 +87,7 @@ export default function QuickPreview() {
     }
   }, [index]);
 
-  // Автоматический переход к Stripe-оплате
+  // Переход к оплате Stripe
   useEffect(() => {
     if (showFinal && siteUrl) {
       const timer = setTimeout(() => {
@@ -91,46 +95,58 @@ export default function QuickPreview() {
       }, finalPause);
       return () => clearTimeout(timer);
     }
-  }, [showFinal, router, siteUrl]);
+  }, [showFinal, siteUrl, router]);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center font-sans text-neutral-800">
-      <div className="text-center text-2xl font-semibold text-neutral-400 opacity-60 mb-10 select-none tracking-tight">
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-[#F9FAFB] min-h-screen flex flex-col items-center font-sans text-neutral-800">
+      {/* Логотип / бренд */}
+      <div className="text-center text-3xl font-semibold text-neutral-400 opacity-60 mb-12 select-none tracking-tight transition-all duration-1000">
         AI Signal Max
       </div>
 
+      {/* Блок проверки */}
       {!showFinal ? (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left transition-all duration-500">
-          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10 text-center">
+        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left transition-all duration-500">
+          <p
+            className={`text-xl md:text-2xl font-medium text-neutral-800 mb-10 text-center transition-opacity duration-700 ${
+              introDim ? "opacity-40" : "opacity-100"
+            }`}
+          >
             Мы начали проверку:
           </p>
 
           <div
-            className={`h-8 flex items-center text-lg text-neutral-700 mb-4 transition-opacity duration-500 ${
+            className={`h-8 flex items-center text-lg text-neutral-700 mb-6 transition-opacity duration-500 ${
               visible ? "opacity-100" : "opacity-0"
             }`}
           >
-            {steps[index]}
+            <span className="mx-auto">{steps[index]}</span>
           </div>
 
-          <div className="w-full h-[6px] bg-gray-300 rounded-[2px] overflow-hidden">
+          <div className="w-full h-[10px] bg-[#E5E7EB] rounded-[2px] overflow-hidden">
             <div
-              className="h-[6px] rounded-[2px]"
+              className="h-[10px] rounded-[2px] transition-[width] duration-100 ease-out"
               style={{
                 width: `${progress}%`,
-                background: `linear-gradient(to right, #D1D5DB, #3B82F6)`,
-                transition: "width 0.15s ease-out, background 0.3s linear",
+                background:
+                  "linear-gradient(to right, #E5E7EB 0%, #60A5FA 50%, #2563EB 100%)",
+                transition: "width 0.15s ease-out",
               }}
             />
           </div>
         </div>
       ) : (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
-          <p className="text-2xl font-semibold text-neutral-800">
-            Проверка завершена.
+        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
+          <p className="text-2xl font-semibold text-neutral-800 mb-2">
+            Проверка завершена
           </p>
+          <p className="text-neutral-600">Переход к оплате...</p>
         </div>
       )}
+
+      <footer className="mt-16 text-center text-xs text-neutral-500">
+        © 2025 AI Signal Max. All rights reserved.
+      </footer>
     </main>
   );
 }
