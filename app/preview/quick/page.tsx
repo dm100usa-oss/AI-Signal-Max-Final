@@ -21,11 +21,10 @@ export default function QuickPreviewPage({ searchParams }: { searchParams: { url
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const stepTimings = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
+  const timings = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [isDone, setIsDone] = useState(false);
 
-  // имитация последовательного анализа
   useEffect(() => {
     if (!url) {
       router.push("/");
@@ -33,18 +32,18 @@ export default function QuickPreviewPage({ searchParams }: { searchParams: { url
     }
 
     let total = 0;
-    steps.forEach((_, index) => {
-      total += stepTimings[index];
-      setTimeout(() => setCurrentStep(index + 1), total);
+    steps.forEach((_, i) => {
+      total += timings[i];
+      setTimeout(() => setActiveIndex(i), total);
     });
 
-    const finishDelay = total + 1500;
-    const redirectDelay = finishDelay + 1000;
+    const finishTime = total + 1500;
+    const redirectTime = finishTime + 1000;
 
-    const finishTimer = setTimeout(() => setIsFinished(true), finishDelay);
+    const finishTimer = setTimeout(() => setIsDone(true), finishTime);
     const redirectTimer = setTimeout(() => {
       router.push(`/pay?url=${encodeURIComponent(url)}`);
-    }, redirectDelay);
+    }, redirectTime);
 
     return () => {
       clearTimeout(finishTimer);
@@ -60,14 +59,20 @@ export default function QuickPreviewPage({ searchParams }: { searchParams: { url
         </h1>
 
         <div className="space-y-6">
-          {steps.slice(0, currentStep).map((step, index) => (
-            <div key={index}>
-              <p className="text-neutral-800 text-base mb-2">{step}</p>
+          {steps.map((text, i) => (
+            <div
+              key={i}
+              className={`transition-opacity duration-500 ${
+                i <= activeIndex ? "opacity-100" : "opacity-20"
+              }`}
+            >
+              <p className="text-neutral-800 text-base mb-2">{text}</p>
               <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden">
                 <div
-                  className="h-2 bg-gradient-to-r from-blue-400 to-blue-600 animate-[fill_1s_linear_forwards]"
+                  className={`h-2 bg-gradient-to-r from-gray-300 to-blue-600 transition-all duration-[${timings[i]}ms]`}
                   style={{
-                    animationDuration: `${stepTimings[index] / 1000}s`,
+                    width: i <= activeIndex ? "100%" : "0%",
+                    transition: `width ${timings[i]}ms linear`,
                   }}
                 />
               </div>
@@ -75,23 +80,12 @@ export default function QuickPreviewPage({ searchParams }: { searchParams: { url
           ))}
         </div>
 
-        {isFinished && (
-          <p className="text-center text-xl font-semibold text-neutral-800 mt-12 transition-opacity duration-700">
+        {isDone && (
+          <p className="text-center text-xl font-semibold text-neutral-800 mt-12">
             Проверка завершена.
           </p>
         )}
       </div>
-
-      <style jsx global>{`
-        @keyframes fill {
-          0% {
-            width: 0%;
-          }
-          100% {
-            width: 100%;
-          }
-        }
-      `}</style>
     </main>
   );
 }
