@@ -1,10 +1,12 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function QuickPreview() {
   const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
+  const searchParams = useSearchParams();
+  const siteUrl = searchParams.get("url") || "";
 
   const steps = [
     "Открыт ли сайт для ИИ",
@@ -19,54 +21,88 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
+  const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
+  const fadeOutDelay = 300;
+  const finalPause = 2000;
+  const [index, setIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [showFinal, setShowFinal] = useState(false);
+
   useEffect(() => {
-    if (currentStep < steps.length) {
-      const timer = setTimeout(() => setCurrentStep((prev) => prev + 1), 900);
-      return () => clearTimeout(timer);
+    let timeout: NodeJS.Timeout;
+    let frame: number;
+    if (index < steps.length) {
+      let start: number | null = null;
+      const duration = durations[index];
+      const animate = (timestamp: number) => {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+        const ratio = Math.min(elapsed / duration, 1);
+        const easing =
+          ratio < 0.9 ? ratio : ratio - Math.sin((ratio - 0.9) * 10) * 0.03;
+        setProgress(easing * 100);
+        if (elapsed < duration) {
+          frame = requestAnimationFrame(animate);
+        } else {
+          timeout = setTimeout(() => {
+            setProgress(0);
+            setIndex((prev) => prev + 1);
+          }, fadeOutDelay);
+        }
+      };
+      frame = requestAnimationFrame(animate);
+      return () => {
+        cancelAnimationFrame(frame);
+        clearTimeout(timeout);
+      };
     } else {
-      setTimeout(() => router.push("/api/pay"), 1000);
+      const t = setTimeout(() => setShowFinal(true), 300);
+      return () => clearTimeout(t);
     }
-  }, [currentStep]);
+  }, [index]);
+
+  useEffect(() => {
+    if (showFinal) {
+      const timer = setTimeout(() => {
+        const redirect = `/pay?url=${encodeURIComponent(siteUrl)}`;
+        router.push(redirect);
+      }, finalPause);
+      return () => clearTimeout(timer);
+    }
+  }, [showFinal, router, siteUrl]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-md p-10 text-center">
-        <h1 className="text-2xl font-semibold mb-8 bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 bg-clip-text text-transparent animate-pulse-smooth">
-          Мы начали проверку вашего сайта
-        </h1>
-
-        <div className="space-y-6">
-          {steps.slice(0, currentStep).map((step, index) => (
-            <div key={index} className="text-left">
-              <p className="text-gray-800 mb-2 font-medium">{step}</p>
-              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-700"
-                  style={{ width: "100%" }}
-                ></div>
-              </div>
-            </div>
-          ))}
-        </div>
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center justify-start font-sans text-neutral-800">
+      <div className="text-center text-3xl font-semibold text-neutral-400 opacity-70 mb-10 select-none">
+        AI Signal Max
       </div>
 
-      <style jsx global>{`
-        @keyframes pulse-smooth {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-        .animate-pulse-smooth {
-          background-size: 200% 200%;
-          animation: pulse-smooth 3s ease-in-out infinite;
-        }
-      `}</style>
-    </div>
+      {!showFinal ? (
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-10 text-center transition-opacity duration-300">
+          <p className="text-xl md:text-2xl font-medium mb-8">
+            Мы начали проверку:
+          </p>
+          <div className="h-8 flex items-center justify-center text-lg text-neutral-700 mb-3 transition-opacity duration-300">
+            {steps[index]}
+          </div>
+          <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden">
+            <div
+              className="h-2 rounded-[1px]"
+              style={{
+                width: `${progress}%`,
+                background: "linear-gradient(to right, #D1D5DB, #3B82F6)",
+                transition: "width 50ms linear",
+              }}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-10 text-center">
+          <p className="text-xl md:text-2xl font-semibold text-neutral-800 mt-10">
+            Проверка завершена.
+          </p>
+        </div>
+      )}
+    </main>
   );
 }
