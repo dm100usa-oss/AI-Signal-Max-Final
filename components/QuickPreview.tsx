@@ -49,7 +49,7 @@ export default function QuickPreview() {
         const elapsed = timestamp - start;
         const ratio = Math.min(elapsed / duration, 1);
         const easing =
-          ratio < 0.85 ? ratio : ratio - Math.sin((ratio - 0.85) * 15) * 0.04;
+          ratio < 0.9 ? ratio : ratio - Math.sin((ratio - 0.9) * 10) * 0.03;
         setProgress(easing * 100);
         if (elapsed < duration) {
           frame = requestAnimationFrame(animate);
@@ -60,7 +60,7 @@ export default function QuickPreview() {
               setProgress(0);
               setIndex((prev) => prev + 1);
             }, fadeOutDelay);
-          }, 200);
+          }, 250);
         }
       };
       frame = requestAnimationFrame(animate);
@@ -86,27 +86,27 @@ export default function QuickPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center font-sans text-neutral-800">
-      <div className="text-center text-3xl font-semibold text-neutral-400 opacity-60 mb-10 select-none">
+      <div className="text-center text-2xl font-semibold text-neutral-400 opacity-60 mb-10 select-none tracking-tight">
         AI Signal Max
       </div>
 
       {!showFinal ? (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-12 text-center transition-all duration-500">
-          <p className="text-xl md:text-2xl font-medium mb-8">
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left transition-all duration-500">
+          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10 text-center">
             Мы начали проверку:
           </p>
 
           <div
-            className={`h-8 flex items-center justify-center text-lg text-neutral-700 mb-3 transition-opacity duration-500 ${
+            className={`h-8 flex items-center text-lg text-neutral-700 mb-4 transition-opacity duration-500 ${
               visible ? "opacity-100" : "opacity-0"
             }`}
           >
             {steps[index]}
           </div>
 
-          <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden">
+          <div className="w-full h-[6px] bg-gray-300 rounded-[2px] overflow-hidden">
             <div
-              className="h-2 rounded-[1px]"
+              className="h-[6px] rounded-[2px]"
               style={{
                 width: `${progress}%`,
                 background: "linear-gradient(to right, #D1D5DB, #3B82F6)",
@@ -116,8 +116,8 @@ export default function QuickPreview() {
           </div>
         </div>
       ) : (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-16 text-center">
-          <p className="text-xl md:text-2xl font-semibold text-neutral-800">
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
+          <p className="text-2xl font-semibold text-neutral-800">
             Проверка завершена.
           </p>
         </div>
