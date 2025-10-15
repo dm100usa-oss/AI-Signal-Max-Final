@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 export default function QuickPreview() {
   const router = useRouter();
   const [siteUrl, setSiteUrl] = useState("");
+  const [index, setIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [showFinal, setShowFinal] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -30,15 +34,14 @@ export default function QuickPreview() {
 
   const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
   const fadeOutDelay = 300;
-  const finalPause = 2000;
-  const [index, setIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [showFinal, setShowFinal] = useState(false);
+  const finalPause = 2200;
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     let frame: number;
+
     if (index < steps.length) {
+      setVisible(true);
       let start: number | null = null;
       const duration = durations[index];
       const animate = (timestamp: number) => {
@@ -46,15 +49,18 @@ export default function QuickPreview() {
         const elapsed = timestamp - start;
         const ratio = Math.min(elapsed / duration, 1);
         const easing =
-          ratio < 0.9 ? ratio : ratio - Math.sin((ratio - 0.9) * 10) * 0.03;
+          ratio < 0.85 ? ratio : ratio - Math.sin((ratio - 0.85) * 15) * 0.04;
         setProgress(easing * 100);
         if (elapsed < duration) {
           frame = requestAnimationFrame(animate);
         } else {
           timeout = setTimeout(() => {
-            setProgress(0);
-            setIndex((prev) => prev + 1);
-          }, fadeOutDelay);
+            setVisible(false);
+            setTimeout(() => {
+              setProgress(0);
+              setIndex((prev) => prev + 1);
+            }, fadeOutDelay);
+          }, 200);
         }
       };
       frame = requestAnimationFrame(animate);
@@ -63,13 +69,13 @@ export default function QuickPreview() {
         clearTimeout(timeout);
       };
     } else {
-      const t = setTimeout(() => setShowFinal(true), 300);
+      const t = setTimeout(() => setShowFinal(true), 400);
       return () => clearTimeout(t);
     }
   }, [index]);
 
   useEffect(() => {
-    if (showFinal) {
+    if (showFinal && siteUrl) {
       const timer = setTimeout(() => {
         const redirect = `/pay?url=${encodeURIComponent(siteUrl)}`;
         router.push(redirect);
@@ -79,33 +85,39 @@ export default function QuickPreview() {
   }, [showFinal, router, siteUrl]);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center justify-start font-sans text-neutral-800">
-      <div className="text-center text-3xl font-semibold text-neutral-400 opacity-70 mb-10 select-none">
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center font-sans text-neutral-800">
+      <div className="text-center text-3xl font-semibold text-neutral-400 opacity-60 mb-10 select-none">
         AI Signal Max
       </div>
 
       {!showFinal ? (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-10 text-center transition-opacity duration-300">
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-12 text-center transition-all duration-500">
           <p className="text-xl md:text-2xl font-medium mb-8">
             Мы начали проверку:
           </p>
-          <div className="h-8 flex items-center justify-center text-lg text-neutral-700 mb-3 transition-opacity duration-300">
+
+          <div
+            className={`h-8 flex items-center justify-center text-lg text-neutral-700 mb-3 transition-opacity duration-500 ${
+              visible ? "opacity-100" : "opacity-0"
+            }`}
+          >
             {steps[index]}
           </div>
+
           <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden">
             <div
               className="h-2 rounded-[1px]"
               style={{
                 width: `${progress}%`,
                 background: "linear-gradient(to right, #D1D5DB, #3B82F6)",
-                transition: "width 50ms linear",
+                transition: "width 60ms linear",
               }}
             />
           </div>
         </div>
       ) : (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-10 text-center">
-          <p className="text-xl md:text-2xl font-semibold text-neutral-800 mt-10">
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-lg px-4 py-16 text-center">
+          <p className="text-xl md:text-2xl font-semibold text-neutral-800">
             Проверка завершена.
           </p>
         </div>
