@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 
 interface ProgressBarProps {
-  progress: number; // 0–100
-  duration?: number; // default 2000ms
+  progress: number;
+  duration?: number;
 }
 
 export default function ProgressBar({ progress, duration = 2000 }: ProgressBarProps) {
@@ -21,7 +21,7 @@ export default function ProgressBar({ progress, duration = 2000 }: ProgressBarPr
       if (!start) start = timestamp;
       const elapsed = timestamp - start;
       const fraction = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - fraction, 3); // ease-out cubic
+      const eased = 1 - Math.pow(1 - fraction, 3);
       const width = eased * target;
 
       if (barRef.current) {
