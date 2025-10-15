@@ -1,7 +1,4 @@
 "use client";
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-export const fetchCache = "force-no-store";
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,7 +22,6 @@ export default function QuickPreview() {
     "Формируем факторы, способствующие видимости сайта",
   ];
 
-  // Время показа каждого пункта (секунды)
   useEffect(() => {
     const durations = [0.9, 1.1, 1.2, 0.8, 1.0, 1.3, 1.4, 1.3];
     let total = 0;
@@ -35,7 +31,6 @@ export default function QuickPreview() {
       setTimeout(() => setCurrentIndex(i + 1), total);
     });
 
-    // финальная пауза после завершения
     setTimeout(() => setDone(true), total + 1200);
   }, []);
 
