@@ -1,12 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function QuickPreview() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const siteUrl = searchParams.get("url") || "";
+  const [siteUrl, setSiteUrl] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const u = params.get("url") || "";
+      setSiteUrl(u);
+    }
+  }, []);
 
   const steps = [
     "Открыт ли сайт для ИИ",
