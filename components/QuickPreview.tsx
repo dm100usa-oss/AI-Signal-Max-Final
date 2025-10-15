@@ -8,8 +8,8 @@ export default function QuickPreview() {
   const [siteUrl, setSiteUrl] = useState("");
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [showFinal, setShowFinal] = useState(false);
   const [visible, setVisible] = useState(true);
-  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -19,6 +19,7 @@ export default function QuickPreview() {
     }
   }, []);
 
+  // 10 шагов проверки
   const steps = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
@@ -26,103 +27,97 @@ export default function QuickPreview() {
     "Видит ли ИИ заголовки и описания",
     "Понимает ли ИИ структуру сайта",
     "Видит ли ИИ изображения на сайте",
-    "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия",
+    "Считает ли ИИ ваш сайт безопасным",
     "Учитывает ли ИИ ваш сайт при поиске",
-    "Видит ли ИИ ваш сайт среди конкурентов",
-    "Как оценивает ИИ ваш сайт",
+    "Сравнивает ли ИИ ваш сайт с конкурентами",
+    "Оценивает ли ИИ ваш сайт корректно",
   ];
 
-  const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
-  const fadeOutDelay = 300;
+  // Длительность каждого шага
+  const durations = [1000, 1200, 900, 1000, 1000, 900, 1200, 1100, 1300, 1400];
+  const fadeDelay = 300;
+  const redirectDelay = 1200; // пауза перед переходом
 
+  // Анимация полосы и текста
   useEffect(() => {
-    if (index >= steps.length) {
-      const endTimer = setTimeout(() => setFinished(true), 600);
-      return () => clearTimeout(endTimer);
-    }
-
-    let frame: number;
     let timeout: NodeJS.Timeout;
-    let start: number | null = null;
-    const duration = durations[index];
+    let frame: number;
 
-    setVisible(true);
-    setProgress(0);
+    if (index < steps.length) {
+      setVisible(true);
+      setProgress(0);
+      const duration = durations[index];
+      let start: number | null = null;
 
-    const animate = (timestamp: number) => {
-      if (!start) start = timestamp;
-      const elapsed = timestamp - start;
-      const ratio = Math.min(elapsed / duration, 1);
-      setProgress(ratio * 100);
-      if (elapsed < duration) {
-        frame = requestAnimationFrame(animate);
-      } else {
-        timeout = setTimeout(() => {
-          setVisible(false);
-          setTimeout(() => {
-            setIndex((prev) => prev + 1);
-          }, fadeOutDelay);
-        }, 150);
-      }
-    };
+      const animate = (timestamp: number) => {
+        if (!start) start = timestamp;
+        const elapsed = timestamp - start;
+        const ratio = Math.min(elapsed / duration, 1);
+        // линейная плавность
+        const eased = 1 - Math.pow(1 - ratio, 2);
+        setProgress(eased * 100);
+        if (elapsed < duration) {
+          frame = requestAnimationFrame(animate);
+        } else {
+          timeout = setTimeout(() => {
+            setVisible(false);
+            setTimeout(() => setIndex((prev) => prev + 1), fadeDelay);
+          }, 200);
+        }
+      };
 
-    frame = requestAnimationFrame(animate);
-    return () => {
-      cancelAnimationFrame(frame);
-      clearTimeout(timeout);
-    };
+      frame = requestAnimationFrame(animate);
+      return () => {
+        cancelAnimationFrame(frame);
+        clearTimeout(timeout);
+      };
+    } else {
+      const t = setTimeout(() => setShowFinal(true), 400);
+      return () => clearTimeout(t);
+    }
   }, [index]);
 
+  // Переход на страницу оплаты
   useEffect(() => {
-    if (finished && siteUrl) {
-      const pauseBeforeRedirect = setTimeout(() => {
-        const redirectDelay = setTimeout(() => {
-          router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
-        }, 2000); // 2 сек пауза перед переходом
-        return () => clearTimeout(redirectDelay);
-      }, 800); // 0.8 сек после появления фразы
-      return () => clearTimeout(pauseBeforeRedirect);
+    if (showFinal && siteUrl) {
+      const timer = setTimeout(() => {
+        router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
+      }, redirectDelay);
+      return () => clearTimeout(timer);
     }
-  }, [finished, router, siteUrl]);
+  }, [showFinal, router, siteUrl]);
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-10 bg-gray-50 min-h-screen flex flex-col justify-center font-sans text-neutral-800">
-      <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-4 py-10 transition-all duration-700">
-        {!finished ? (
-          <>
-            <p className="text-center text-xl md:text-2xl font-medium text-neutral-800 mb-8">
-              Мы начали проверку:
-            </p>
+    <div className="flex flex-col items-center justify-center w-full">
+      {!showFinal ? (
+        <div className="text-center transition-all duration-500">
+          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10">
+            Мы начали проверку:
+          </p>
 
-            <div
-              className={`h-7 flex items-center justify-center text-lg md:text-xl text-neutral-700 mb-6 transition-opacity duration-500 ${
-                visible ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              {steps[index]}
-            </div>
-
-            <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden transition-opacity duration-300">
-              <div
-                className={`h-2 rounded-[1px] transition-all duration-300 ${
-                  visible ? "opacity-100" : "opacity-0"
-                }`}
-                style={{
-                  width: `${progress}%`,
-                  background: "linear-gradient(to right, #D1D5DB, #3B82F6)",
-                  transition: "width 60ms linear",
-                }}
-              />
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-16 fade-in">
-            <p className="text-xl md:text-2xl font-semibold text-neutral-800">
-              Проверка завершена.
-            </p>
+          <div
+            className={`h-7 flex items-center justify-center text-lg font-medium text-neutral-800 mb-6 transition-opacity duration-400 ${
+              visible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {steps[index]}
           </div>
-        )}
-      </div>
-    </main>
+
+          {/* Полоса прогресса */}
+          <div className="w-full h-[8px] bg-gray-200 rounded-md overflow-hidden">
+            <div
+              className="h-[8px] bg-[#3B82F6] rounded-md transition-[width] duration-200 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="text-center">
+          <p className="text-2xl font-semibold text-neutral-800">
+            Проверка завершена.
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
