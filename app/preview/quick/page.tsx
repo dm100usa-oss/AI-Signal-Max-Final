@@ -9,7 +9,7 @@ export default function Page() {
           <h1 className="text-3xl font-semibold tracking-tight text-neutral-800">
             AI Signal Max
           </h1>
-          <p className="text-base text-neutral-500 mt-1">
+          <p className="text-base font-semibold tracking-tight text-neutral-500 mt-1">
             Быстрая проверка видимости сайта
           </p>
         </div>
@@ -20,7 +20,7 @@ export default function Page() {
         </div>
 
         {/* Дисклеймер */}
-        <footer className="mt-12 text-center text-xs text-neutral-500 leading-snug">
+        <footer className="mt-12 text-center text-xs font-medium text-neutral-500 leading-snug tracking-tight">
           © 2025 AI Signal Max. All rights reserved.
           <br />
           <span className="opacity-60">
