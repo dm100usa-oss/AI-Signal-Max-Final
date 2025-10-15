@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import ProgressBar from "./ProgressBar";
 
 export default function QuickPreview() {
   const router = useRouter();
@@ -10,8 +11,6 @@ export default function QuickPreview() {
   const [progress, setProgress] = useState(0);
   const [dimIntro, setDimIntro] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
-  const animRef = useRef<number | null>(null);
-  const lastTimestamp = useRef<number>(0);
 
   const steps = [
     "Открыт ли сайт для ИИ",
@@ -26,55 +25,33 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  // параметры
-  const stepDuration = 1200;
-  const holdPause = 300;
-  const fadePause = 250;
-
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setSiteUrl(params.get("url") || "");
   }, []);
 
+  // анимация шагов
   useEffect(() => {
     if (currentStep >= steps.length) {
       setShowFinal(true);
-      const timer = setTimeout(() => {
+      const t = setTimeout(() => {
         if (siteUrl) router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
       }, 1000);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(t);
     }
 
-    let start: number | null = null;
-    let finished = false;
+    const duration = 2000; // можно позже варьировать
+    setProgress(100);
+    const hold = setTimeout(() => {
+      setProgress(0);
+      setCurrentStep((p) => p + 1);
+    }, duration + 300);
 
-    function animate(timestamp: number) {
-      if (!start) {
-        start = timestamp;
-        if (currentStep === 0) setTimeout(() => setDimIntro(true), 700);
-      }
-
-      const elapsed = timestamp - start;
-      const t = Math.min(elapsed / stepDuration, 1);
-      const eased = 1 - Math.pow(1 - t, 3); // cubic ease-out
-      setProgress(eased * 100);
-
-      if (elapsed < stepDuration) {
-        animRef.current = requestAnimationFrame(animate);
-      } else if (!finished) {
-        finished = true;
-        setProgress(100);
-        setTimeout(() => {
-          setProgress(0);
-          setCurrentStep((p) => p + 1);
-        }, holdPause + fadePause);
-      }
+    if (currentStep === 0) {
+      setTimeout(() => setDimIntro(true), 700);
     }
 
-    animRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (animRef.current) cancelAnimationFrame(animRef.current);
-    };
+    return () => clearTimeout(hold);
   }, [currentStep, siteUrl, router]);
 
   return (
@@ -98,20 +75,10 @@ export default function QuickPreview() {
             {steps[currentStep]}
           </div>
 
-          <div className="w-full h-[10px] bg-[#E5E7EB] rounded-[2px] overflow-hidden">
-            <div
-              className="h-[10px] rounded-[2px]"
-              style={{
-                width: `${progress}%`,
-                background:
-                  "linear-gradient(to right, #E5E7EB 0%, #60A5FA 60%, #2563EB 100%)",
-                transition: "width 0.05s linear",
-              }}
-            />
-          </div>
+          <ProgressBar progress={progress} duration={2000} />
         </div>
       ) : (
-        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center animate-fade-in">
+        <div className="w-full bg-[#FDFDFB] border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
           <p className="text-2xl font-semibold text-neutral-800 mb-2">
             Проверка завершена
           </p>
