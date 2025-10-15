@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function QuickPreview() {
+  const router = useRouter();
   const [siteUrl, setSiteUrl] = useState("");
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -17,7 +19,6 @@ export default function QuickPreview() {
     }
   }, []);
 
-  // 10 шагов проверки
   const steps = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
@@ -31,118 +32,98 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  // Время на каждый шаг (в мс)
-  const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
-  const fadeDelay = 300;
-  const finalDelay = 1200;
+  const durations = [
+    2200, 3000, 2400, 2000, 2600, 1800, 3200, 3000, 3400, 3000,
+  ];
+  const fadeOutDelay = 400;
+  const finalPause = 2000;
 
-  // Анимация шагов
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     let frame: number;
 
     if (index < steps.length) {
       setVisible(true);
-      setProgress(0);
-      const duration = durations[index];
       let start: number | null = null;
-
+      const duration = durations[index];
       const animate = (timestamp: number) => {
         if (!start) start = timestamp;
         const elapsed = timestamp - start;
         const ratio = Math.min(elapsed / duration, 1);
-        // плавное ускорение и замедление (ease-in-out)
-        const eased = ratio < 0.5
-          ? 2 * ratio * ratio
-          : -1 + (4 - 2 * ratio) * ratio;
-        setProgress(eased * 100);
-
+        const easing = ratio < 1 ? ratio : 1;
+        setProgress(easing * 100);
         if (elapsed < duration) {
           frame = requestAnimationFrame(animate);
         } else {
           timeout = setTimeout(() => {
             setVisible(false);
-            setTimeout(() => setIndex((prev) => prev + 1), fadeDelay);
-          }, 200);
+            setTimeout(() => {
+              setProgress(0);
+              setIndex((prev) => prev + 1);
+            }, fadeOutDelay);
+          }, 300);
         }
       };
-
       frame = requestAnimationFrame(animate);
       return () => {
         cancelAnimationFrame(frame);
         clearTimeout(timeout);
       };
     } else {
-      const t = setTimeout(() => setShowFinal(true), 400);
+      const t = setTimeout(() => setShowFinal(true), 500);
       return () => clearTimeout(t);
     }
   }, [index]);
 
-  // Реальный переход в Stripe Checkout
   useEffect(() => {
     if (showFinal && siteUrl) {
-      const timer = setTimeout(async () => {
-        try {
-          const resp = await fetch("/api/pay", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "quick", url: siteUrl }),
-          });
-          const json = await resp.json();
-          if (json?.url) window.location.href = json.url;
-        } catch (err) {
-          console.error("Payment redirect failed:", err);
-        }
-      }, finalDelay);
+      const timer = setTimeout(() => {
+        const redirect = `/pay?url=${encodeURIComponent(siteUrl)}`;
+        router.push(redirect);
+      }, finalPause);
       return () => clearTimeout(timer);
     }
-  }, [showFinal, siteUrl]);
-
-  // Получаем цвет плавного перехода между серым и синим
-  const getBarColor = (value: number) => {
-    const start = { r: 209, g: 213, b: 219 }; // #D1D5DB серый
-    const end = { r: 59, g: 130, b: 246 }; // #3B82F6 синий
-    const ratio = value / 100;
-    const r = Math.round(start.r + (end.r - start.r) * ratio);
-    const g = Math.round(start.g + (end.g - start.g) * ratio);
-    const b = Math.round(start.b + (end.b - start.b) * ratio);
-    return `rgb(${r}, ${g}, ${b})`;
-  };
+  }, [showFinal, router, siteUrl]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full font-sans">
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center font-sans text-neutral-800">
+      <div className="text-center text-2xl font-semibold text-neutral-400 opacity-60 mb-10 select-none tracking-tight">
+        AI Signal Max
+      </div>
+
       {!showFinal ? (
-        <div className="w-full text-center transition-all duration-500">
-          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10">
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left transition-all duration-500">
+          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10 text-center">
             Мы начали проверку:
           </p>
 
           <div
-            className={`h-7 flex items-center justify-center text-lg font-medium text-neutral-800 mb-6 transition-opacity duration-400 ${
+            className={`h-8 flex items-center text-lg text-neutral-700 mb-5 transition-opacity duration-700 ${
               visible ? "opacity-100" : "opacity-0"
             }`}
           >
             {steps[index]}
           </div>
 
-          {/* Полоса проверки */}
-          <div className="w-full h-[8px] bg-gray-200 rounded-md overflow-hidden">
+          <div className="w-full h-[12px] bg-gray-300 rounded-[3px] overflow-hidden">
             <div
-              className="h-[8px] rounded-md transition-[width] duration-150 ease-linear"
+              className="h-[12px] rounded-[3px]"
               style={{
                 width: `${progress}%`,
-                background: getBarColor(progress),
+                background:
+                  "linear-gradient(to right, #D1D5DB 0%, #D1D5DB 33%, #93C5FD 66%, #3B82F6 100%)",
+                transition: "width 80ms linear",
               }}
             />
           </div>
         </div>
       ) : (
-        <div className="text-center mt-8">
+        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
           <p className="text-2xl font-semibold text-neutral-800">
             Проверка завершена.
           </p>
         </div>
       )}
-    </div>
+    </main>
   );
 }
