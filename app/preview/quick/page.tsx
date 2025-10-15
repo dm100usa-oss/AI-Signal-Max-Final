@@ -1,12 +1,21 @@
 "use client";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function QuickPreviewPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const url = searchParams?.get("url") || "";
+  const [url, setUrl] = useState<string>("");
+
+  // берём url из query вручную (без useSearchParams)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const siteUrl = params.get("url") || "";
+    if (!siteUrl) router.push("/");
+    setUrl(siteUrl);
+  }, [router]);
 
   const steps = [
     "Открыт ли сайт для ИИ",
@@ -28,14 +37,11 @@ export default function QuickPreviewPage() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (!url) {
-      router.push("/");
-      return;
-    }
+    if (!url) return;
 
-    let cumulative = 0;
+    let total = 0;
     steps.forEach((_, i) => {
-      cumulative += timings[i];
+      total += timings[i];
       setTimeout(() => {
         setCurrentStep(i);
         setFilled((prev) => {
@@ -43,16 +49,16 @@ export default function QuickPreviewPage() {
           updated[i] = true;
           return updated;
         });
-      }, cumulative);
+      }, total);
     });
 
-    const finishTime = cumulative + 1500;
-    const redirectTime = finishTime + 1000;
+    const finish = total + 1500;
+    const redirect = finish + 1000;
 
-    const finishTimer = setTimeout(() => setDone(true), finishTime);
+    const finishTimer = setTimeout(() => setDone(true), finish);
     const redirectTimer = setTimeout(() => {
       router.push(`/pay?url=${encodeURIComponent(url)}`);
-    }, redirectTime);
+    }, redirect);
 
     return () => {
       clearTimeout(finishTimer);
@@ -78,7 +84,7 @@ export default function QuickPreviewPage() {
               <p className="text-neutral-800 text-base mb-2">{text}</p>
               <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden">
                 <div
-                  className={`h-2 bg-gradient-to-r from-gray-300 to-blue-600 transition-all`}
+                  className="h-2 bg-gradient-to-r from-gray-300 to-blue-600 transition-all"
                   style={{
                     width: filled[i] ? "100%" : "0%",
                     transition: `width ${timings[i]}ms linear`,
