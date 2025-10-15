@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 export default function QuickPreview() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-  const [isChecking, setIsChecking] = useState(true);
 
   const steps = [
     "Открыт ли сайт для ИИ",
@@ -20,19 +19,12 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  // поочередное появление пунктов
   useEffect(() => {
     if (currentStep < steps.length) {
-      const timer = setTimeout(() => {
-        setCurrentStep((prev) => prev + 1);
-      }, 900);
+      const timer = setTimeout(() => setCurrentStep((prev) => prev + 1), 900);
       return () => clearTimeout(timer);
     } else {
-      // пауза перед переходом к оплате
-      setTimeout(() => {
-        setIsChecking(false);
-        router.push("/api/pay");
-      }, 1000);
+      setTimeout(() => router.push("/api/pay"), 1000);
     }
   }, [currentStep]);
 
