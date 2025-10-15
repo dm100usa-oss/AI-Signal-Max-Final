@@ -1,6 +1,6 @@
 "use client";
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 0 as const;
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,7 +25,7 @@ export default function QuickPreview() {
   ];
 
   useEffect(() => {
-    const durations = [0.9, 1.1, 1.2, 0.8, 1.0, 1.3, 1.4, 1.3]; // всего около 12 секунд
+    const durations = [0.9, 1.1, 1.2, 0.8, 1.0, 1.3, 1.4, 1.3];
     let total = 0;
 
     items.forEach((_, i) => {
