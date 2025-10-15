@@ -1,148 +1,111 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function QuickPreviewPage({ searchParams }: { searchParams: { url?: string } }) {
+export default function QuickPreview() {
   const router = useRouter();
-  const url = searchParams?.url || "";
-
-  const [step, setStep] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState("Starting analysis...");
-  const [redirecting, setRedirecting] = useState(false);
+  const params = useSearchParams();
+  const url = params.get("url") || "";
 
   const steps = [
-    "Connecting to the server",
-    "Reading robots.txt and sitemap.xml",
-    "Checking HTTPS and redirects",
-    "Analyzing meta and OG tags",
-    "Reviewing structured data",
-    "Checking favicon and images",
-    "Testing mobile-friendliness",
-    "Measuring visibility factors",
-    "Calculating AI Visibility Score",
-    "Preparing payment session",
+    "Открыт ли сайт для ИИ",
+    "Понимает ли ИИ, о чём ваш сайт",
+    "Может ли ИИ читать содержание страниц",
+    "Видит ли ИИ заголовки и описания",
+    "Понимает ли ИИ структуру сайта",
+    "Видит ли ИИ изображения на сайте",
+    "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия",
+    "Учитывает ли ИИ ваш сайт при поиске",
+    "Видит ли ИИ ваш сайт среди конкурентов",
+    "Как оценивает ИИ ваш сайт",
   ];
 
-  // запуск имитации анализа
+  const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
+  const totalDuration = durations.reduce((a, b) => a + b, 0) + 2000;
+
+  const [current, setCurrent] = useState<number>(-1);
+  const [done, setDone] = useState(false);
+
   useEffect(() => {
-    if (!url) {
-      router.push("/");
-      return;
-    }
-
-    let i = 0;
-    const stepInterval = setInterval(() => {
-      setStep((prev) => {
-        if (prev < steps.length - 1) {
-          i++;
-          setProgress(Math.min(100, ((i + 1) / steps.length) * 100));
-          return prev + 1;
-        } else {
-          clearInterval(stepInterval);
-          return prev;
-        }
-      });
-    }, 800);
-
-    const timer = setTimeout(async () => {
-      try {
-        setStatus("Redirecting to secure payment...");
-        setRedirecting(true);
-
-        const resp = await fetch("/api/pay", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: "quick", url }),
-        });
-
-        const data = await resp.json();
-        if (data?.url) {
-          window.location.href = data.url;
-        } else {
-          setStatus("Payment session could not be created.");
-          setRedirecting(false);
-        }
-      } catch {
-        setStatus("Error connecting to payment system.");
-        setRedirecting(false);
-      }
-    }, steps.length * 800 + 500);
-
-    return () => {
-      clearInterval(stepInterval);
-      clearTimeout(timer);
-    };
-  }, [url, router]);
+    let time = 0;
+    steps.forEach((_, i) => {
+      setTimeout(() => setCurrent(i), time);
+      time += durations[i];
+    });
+    // финальная надпись
+    setTimeout(() => setDone(true), totalDuration - 2000);
+    // переход к оплате
+    setTimeout(() => {
+      router.push(`/api/pay?mode=quick&url=${encodeURIComponent(url)}`);
+    }, totalDuration);
+  }, []);
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-6">
-      <h1 className="text-2xl font-semibold mb-6">We started checking your website</h1>
+    <main className="min-h-screen bg-gray-50 flex justify-center items-start py-10 px-4">
+      <div className="w-full max-w-2xl bg-white border border-neutral-200 shadow-sm rounded-md p-8">
+        <h1 className="text-center text-xl md:text-2xl font-medium text-neutral-800 mb-8">
+          Мы начали проверку:
+        </h1>
 
-      {!redirecting ? (
-        <>
-          {/* Анимация круга как на Success Page */}
-          <div className="relative w-40 h-40 mb-8">
-            <svg className="transform -rotate-90 w-40 h-40">
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                stroke="#e5e7eb"
-                strokeWidth="10"
-                fill="none"
-              />
-              <circle
-                cx="80"
-                cy="80"
-                r="70"
-                stroke="#3b82f6"
-                strokeWidth="10"
-                fill="none"
-                strokeDasharray={`${2 * Math.PI * 70}`}
-                strokeDashoffset={`${2 * Math.PI * 70 * (1 - progress / 100)}`}
-                strokeLinecap="round"
-                className="transition-all duration-500 ease-linear"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-semibold text-neutral-700">
-                {Math.floor(progress)}%
-              </span>
-            </div>
-          </div>
-
-          <p className="text-neutral-600 mb-8">
-            Please wait while we analyze your site before payment.
-          </p>
-
-          <ul className="text-sm text-neutral-700 max-w-md w-full text-left space-y-2">
-            {steps.map((s, i) => (
-              <li
-                key={i}
-                className={`transition-opacity duration-300 ${
-                  i <= step ? "opacity-100" : "opacity-20"
+        <div className="space-y-5">
+          {steps.map((text, i) => (
+            <div key={i} className="transition-opacity duration-300">
+              <p
+                className={`text-neutral-700 text-base mb-1 ${
+                  i <= current ? "opacity-100" : "opacity-40"
                 }`}
               >
-                {i < step ? "✅" : "⏳"} {s}
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <p className="text-green-600 text-lg font-medium animate-pulse">{status}</p>
-      )}
+                {text}
+              </p>
+              <div className="h-2 w-full bg-gray-300 rounded-[1px] overflow-hidden">
+                <div
+                  className={`h-2 rounded-[1px] bg-gradient-to-r from-gray-300 to-blue-500 transition-all duration-700`}
+                  style={{
+                    width:
+                      i < current
+                        ? "100%"
+                        : i === current
+                        ? "100%"
+                        : "0%",
+                    opacity: i <= current ? 1 : 0.2,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
 
-      <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
-        <br />
-        <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
-        </span>
-      </footer>
+        {done && (
+          <div className="text-center text-xl md:text-2xl font-semibold text-neutral-800 mt-10 fade-in">
+            Проверка завершена.
+          </div>
+        )}
+
+        <footer className="mt-12 text-center text-xs text-neutral-500">
+          © 2025 AI Signal Max. All rights reserved.
+          <br />
+          <span className="opacity-60">
+            Visibility scores are estimated and based on publicly available data. Not legal advice.
+          </span>
+        </footer>
+
+        <style jsx>{`
+          .fade-in {
+            animation: fadeIn 0.8s ease-in;
+          }
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(4px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
+      </div>
     </main>
   );
 }
