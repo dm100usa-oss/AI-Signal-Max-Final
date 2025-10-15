@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function QuickPreview() {
-  const router = useRouter();
   const [siteUrl, setSiteUrl] = useState("");
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -32,98 +30,120 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const durations = [
-    2200, 3000, 2400, 2000, 2600, 1800, 3200, 3000, 3400, 3000,
-  ];
-  const fadeOutDelay = 400;
-  const finalPause = 2000;
+  const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
+  const fadeDelay = 300;
+  const holdAtFull = 300;
+  const redirectDelay = 1000;
 
+  // Анимация шагов
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     let frame: number;
 
     if (index < steps.length) {
       setVisible(true);
-      let start: number | null = null;
+      setProgress(0);
       const duration = durations[index];
+      let start: number | null = null;
+
       const animate = (timestamp: number) => {
         if (!start) start = timestamp;
         const elapsed = timestamp - start;
         const ratio = Math.min(elapsed / duration, 1);
-        const easing = ratio < 1 ? ratio : 1;
-        setProgress(easing * 100);
+        // плавное движение easeInOut
+        const eased =
+          ratio < 0.5 ? 2 * ratio * ratio : -1 + (4 - 2 * ratio) * ratio;
+        setProgress(eased * 100);
+
         if (elapsed < duration) {
           frame = requestAnimationFrame(animate);
         } else {
+          // удерживаем полосу полной ещё немного
+          setProgress(100);
           timeout = setTimeout(() => {
             setVisible(false);
-            setTimeout(() => {
-              setProgress(0);
-              setIndex((prev) => prev + 1);
-            }, fadeOutDelay);
-          }, 300);
+            setTimeout(() => setIndex((prev) => prev + 1), fadeDelay);
+          }, holdAtFull);
         }
       };
+
       frame = requestAnimationFrame(animate);
       return () => {
         cancelAnimationFrame(frame);
         clearTimeout(timeout);
       };
     } else {
-      const t = setTimeout(() => setShowFinal(true), 500);
+      const t = setTimeout(() => setShowFinal(true), 400);
       return () => clearTimeout(t);
     }
   }, [index]);
 
+  // Переход в Stripe Checkout
   useEffect(() => {
     if (showFinal && siteUrl) {
-      const timer = setTimeout(() => {
-        const redirect = `/pay?url=${encodeURIComponent(siteUrl)}`;
-        router.push(redirect);
-      }, finalPause);
+      const timer = setTimeout(async () => {
+        try {
+          const resp = await fetch("/api/pay", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: "quick", url: siteUrl }),
+          });
+          const json = await resp.json();
+          if (json?.url) {
+            window.location.href = json.url;
+          }
+        } catch (err) {
+          console.error("Redirect failed:", err);
+        }
+      }, redirectDelay);
       return () => clearTimeout(timer);
     }
-  }, [showFinal, router, siteUrl]);
+  }, [showFinal, siteUrl]);
+
+  // Плавный переход цвета от серого к синему
+  const getBarColor = (value: number) => {
+    const start = { r: 209, g: 213, b: 219 }; // #D1D5DB
+    const end = { r: 59, g: 130, b: 246 }; // #3B82F6
+    const ratio = value / 100;
+    const r = Math.round(start.r + (end.r - start.r) * ratio);
+    const g = Math.round(start.g + (end.g - start.g) * ratio);
+    const b = Math.round(start.b + (end.b - start.b) * ratio);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center font-sans text-neutral-800">
-      <div className="text-center text-2xl font-semibold text-neutral-400 opacity-60 mb-10 select-none tracking-tight">
-        AI Signal Max
-      </div>
-
+    <div className="flex flex-col items-center justify-center w-full font-sans">
       {!showFinal ? (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-14 text-left transition-all duration-500">
-          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10 text-center">
+        <div className="w-full text-center transition-all duration-500">
+          <p className="text-xl md:text-2xl font-medium text-neutral-800 mb-10">
             Мы начали проверку:
           </p>
 
           <div
-            className={`h-8 flex items-center text-lg text-neutral-700 mb-5 transition-opacity duration-700 ${
+            className={`h-7 flex items-center justify-center text-lg font-medium text-neutral-800 mb-6 transition-opacity duration-400 ${
               visible ? "opacity-100" : "opacity-0"
             }`}
           >
             {steps[index]}
           </div>
 
-          <div className="w-full h-[12px] bg-gray-300 rounded-[3px] overflow-hidden">
+          <div className="w-full h-[8px] bg-gray-200 rounded-md overflow-hidden">
             <div
-              className="h-[12px] rounded-[3px]"
+              className="h-[8px] rounded-md transition-[width] duration-150 ease-linear"
               style={{
                 width: `${progress}%`,
-                background:
-                  "linear-gradient(to right, #D1D5DB 0%, #D1D5DB 33%, #93C5FD 66%, #3B82F6 100%)",
-                transition: "width 80ms linear",
+                background: getBarColor(progress),
               }}
             />
           </div>
         </div>
       ) : (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-xl px-8 py-16 text-center">
+        <div className="text-center mt-8">
           <p className="text-2xl font-semibold text-neutral-800">
             Проверка завершена.
           </p>
         </div>
       )}
-    </main>
+    </div>
   );
 }
