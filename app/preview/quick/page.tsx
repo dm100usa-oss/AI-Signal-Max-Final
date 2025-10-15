@@ -2,12 +2,11 @@
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export default function QuickPreviewPage() {
+export default function QuickPreviewPage({ searchParams }: { searchParams: { url?: string } }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const url = searchParams.get("url");
+  const url = searchParams?.url || "";
 
   const steps = [
     "Открыт ли сайт для ИИ",
@@ -26,19 +25,25 @@ export default function QuickPreviewPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
+  // имитация последовательного анализа
   useEffect(() => {
-    let totalTime = 0;
+    if (!url) {
+      router.push("/");
+      return;
+    }
+
+    let total = 0;
     steps.forEach((_, index) => {
-      totalTime += stepTimings[index];
-      setTimeout(() => setCurrentStep(index + 1), totalTime);
+      total += stepTimings[index];
+      setTimeout(() => setCurrentStep(index + 1), total);
     });
 
-    const finishDelay = totalTime + 2000;
+    const finishDelay = total + 1500;
     const redirectDelay = finishDelay + 1000;
 
     const finishTimer = setTimeout(() => setIsFinished(true), finishDelay);
     const redirectTimer = setTimeout(() => {
-      if (url) router.push(`/pay?url=${encodeURIComponent(url)}`);
+      router.push(`/pay?url=${encodeURIComponent(url)}`);
     }, redirectDelay);
 
     return () => {
@@ -48,19 +53,19 @@ export default function QuickPreviewPage() {
   }, [router, url]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-6">
       <div className="w-full max-w-2xl bg-white border border-neutral-200 shadow-sm rounded-lg px-6 py-12">
-        <h1 className="text-center text-2xl font-medium text-neutral-800 mb-10">
+        <h1 className="text-center text-2xl font-semibold text-neutral-800 mb-10">
           Мы начали проверку:
         </h1>
 
         <div className="space-y-6">
           {steps.slice(0, currentStep).map((step, index) => (
-            <div key={index} className="transition-opacity duration-500">
+            <div key={index}>
               <p className="text-neutral-800 text-base mb-2">{step}</p>
               <div className="w-full h-2 bg-gray-300 rounded-[1px] overflow-hidden">
                 <div
-                  className="h-2 bg-gradient-to-r from-gray-300 to-blue-500 animate-[fill_1s_linear_forwards]"
+                  className="h-2 bg-gradient-to-r from-blue-400 to-blue-600 animate-[fill_1s_linear_forwards]"
                   style={{
                     animationDuration: `${stepTimings[index] / 1000}s`,
                   }}
@@ -87,6 +92,6 @@ export default function QuickPreviewPage() {
           }
         }
       `}</style>
-    </div>
+    </main>
   );
 }
