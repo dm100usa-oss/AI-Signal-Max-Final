@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import TimeProgress from "./TimeProgress";
 import ProgressBar from "./ProgressBar";
+import TimeProgress from "./TimeProgress";
 
 export default function QuickPreview() {
   const router = useRouter();
   const params = useSearchParams();
+
   const [siteUrl, setSiteUrl] = useState("");
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -72,44 +73,52 @@ export default function QuickPreview() {
   });
 
   return (
-    <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-2xl p-8 sm:p-10 transition-all duration-500">
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-800">
-          AI Signal Max
-        </h1>
-        <p className="text-base font-semibold text-neutral-700 mt-2">
-          Быстрая проверка сайта
+    <div className="w-full max-w-2xl px-4 sm:px-6 py-10 text-center text-neutral-800 font-sans">
+      {/* Заголовок бренда — идентичен главной */}
+      <h1 className="text-2xl font-semibold tracking-tight text-neutral-800">
+        AI Signal Max
+      </h1>
+
+      {/* Подзаголовок и информация о проверке */}
+      <p className="text-sm text-neutral-500 mt-1 font-semibold">
+        Быстрая проверка сайта
+      </p>
+      {siteUrl && (
+        <p className="text-sm text-neutral-500 mt-1">
+          {siteUrl} &nbsp; | &nbsp; {date}
         </p>
-        {siteUrl && (
-          <p className="text-sm text-neutral-500 mt-1">
-            {siteUrl} &nbsp; | &nbsp; {date}
-          </p>
-        )}
-      </div>
-
-      {!showFinal ? (
-        <>
-          <p
-            className={`text-lg md:text-xl font-medium text-center text-neutral-700 mb-6 transition-all duration-700 ${
-              fadeHeader ? "opacity-50 text-base" : "opacity-100"
-            }`}
-          >
-            Мы начали проверку
-          </p>
-
-          <div className="text-center text-lg font-semibold text-neutral-800 mb-4">
-            {steps[index]}
-          </div>
-
-          <ProgressBar progress={progress} />
-        </>
-      ) : (
-        <div className="text-center text-xl font-semibold text-neutral-800 py-6">
-          Проверка завершена
-        </div>
       )}
 
-      {!showFinal && <TimeProgress />}
+      {/* Блок проверки */}
+      <div className="mt-10 bg-white border border-neutral-200 shadow-sm rounded-2xl p-8 sm:p-10 transition-all duration-500">
+        {!showFinal ? (
+          <>
+            {/* Надпись “Мы начали проверку” */}
+            <p
+              className={`text-lg md:text-xl font-medium text-neutral-700 mb-6 transition-all duration-700 ${
+                fadeHeader ? "opacity-50 text-base" : "opacity-100"
+              }`}
+            >
+              Мы начали проверку
+            </p>
+
+            {/* Текущий фактор */}
+            <p className="text-lg font-semibold text-neutral-800 mb-4">
+              {steps[index]}
+            </p>
+
+            {/* Полоса проверки */}
+            <ProgressBar progress={progress} />
+
+            {/* Общая полоса времени */}
+            <TimeProgress />
+          </>
+        ) : (
+          <div className="text-xl font-semibold text-neutral-800 py-6">
+            Проверка завершена
+          </div>
+        )}
+      </div>
     </div>
   );
 }
