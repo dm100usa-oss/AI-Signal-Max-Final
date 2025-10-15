@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -31,7 +33,6 @@ export default function QuickPreviewPage() {
       return;
     }
 
-    // simulate step-by-step animation
     const interval = setInterval(() => {
       setStep((prev) => {
         if (prev < steps.length - 1) return prev + 1;
@@ -40,7 +41,6 @@ export default function QuickPreviewPage() {
       });
     }, 800);
 
-    // after animation → call Stripe payment
     const timer = setTimeout(async () => {
       try {
         setStatus("Redirecting to secure payment...");
