@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function QuickPreview() {
+function QuickPreviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
@@ -89,5 +89,13 @@ export default function QuickPreview() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function QuickPreview() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen text-gray-600 text-lg">Загрузка...</div>}>
+      <QuickPreviewContent />
+    </Suspense>
   );
 }
