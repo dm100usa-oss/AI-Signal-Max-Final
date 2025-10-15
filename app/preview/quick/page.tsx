@@ -1,95 +1,78 @@
 "use client";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function QuickPreviewPage() {
+export default function QuickPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const checkoutUrl = `/api/pay?mode=quick&url=${encodeURIComponent(
-    searchParams.get("url") || ""
-  )}`;
+  const url = searchParams.get("url") || "";
 
-  // 10 пунктов быстрой проверки (с оптимизированными таймингами)
-  const steps = [
-    { text: "Открыт ли сайт для ИИ", duration: 1.0 },
-    { text: "Понимает ли ИИ, о чём ваш сайт", duration: 1.3 },
-    { text: "Может ли ИИ читать содержание страниц", duration: 1.0 },
-    { text: "Видит ли ИИ заголовки и описания", duration: 0.8 },
-    { text: "Понимает ли ИИ структуру сайта", duration: 1.0 },
-    { text: "Видит ли ИИ изображения на сайте", duration: 0.8 },
-    { text: "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия", duration: 1.3 },
-    { text: "Учитывает ли ИИ ваш сайт при поиске", duration: 1.3 },
-    { text: "Видит ли ИИ ваш сайт среди конкурентов", duration: 1.6 },
-    { text: "Как оценивает ИИ ваш сайт", duration: 1.4 },
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [done, setDone] = useState(false);
+
+  const items = [
+    "Проверяем robots.txt",
+    "Проверяем sitemap.xml",
+    "Проверяем X-Robots-Tag",
+    "Проверяем meta robots",
+    "Проверяем canonical",
+    "Собираем факторы, снижающие видимость сайта",
+    "Определяем факторы, требующие небольшой доработки",
+    "Формируем факторы, способствующие видимости сайта",
   ];
 
-  const [index, setIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-
-  // Основная логика показа шагов и автоматического перехода
   useEffect(() => {
-    if (index >= steps.length) {
-      // Когда все пункты завершены
-      const timer = setTimeout(() => router.push(checkoutUrl), 2000);
-      return () => clearTimeout(timer);
-    }
+    const durations = [0.9, 1.1, 1.2, 0.8, 1.0, 1.3, 1.4, 1.3]; // всего около 12 секунд
+    let total = 0;
 
-    setProgress(0);
-    const step = steps[index];
-    const start = Date.now();
-    const durationMs = step.duration * 1000;
+    items.forEach((_, i) => {
+      total += durations[i] * 1000;
+      setTimeout(() => setCurrentIndex(i + 1), total);
+    });
 
-    const animate = () => {
-      const elapsed = Date.now() - start;
-      const percent = Math.min((elapsed / durationMs) * 100, 100);
-      setProgress(percent);
-      if (percent < 100) {
-        requestAnimationFrame(animate);
-      } else {
-        setTimeout(() => setIndex((i) => i + 1), 200);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }, [index]);
-
-  const currentStep = steps[index];
+    setTimeout(() => setDone(true), total + 1200);
+  }, []);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-10">
-      <div className="w-full max-w-2xl rounded-xl border border-neutral-200 bg-white p-8 shadow-sm text-center">
-        {index < steps.length ? (
-          <>
-            {/* Заголовок */}
-            <h1 className="mb-6 text-xl md:text-2xl font-medium text-neutral-800">
-              Мы начали проверку:
-            </h1>
+    <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-10">
+        Мы начали проверку:
+      </h1>
 
-            {/* Текущий пункт */}
-            <p className="text-lg md:text-xl text-neutral-800 mb-3">
-              {currentStep.text}
-            </p>
-
-            {/* Анимированная полоса */}
-            <div className="h-[6px] w-full bg-gray-200 rounded-[1px] overflow-hidden">
+      <div className="w-full max-w-xl space-y-5">
+        {items.map((item, index) => (
+          <div key={index} className="space-y-2">
+            <div
+              className={`text-base ${
+                index < currentIndex ? "text-gray-900" : "text-gray-400"
+              } transition-colors duration-300`}
+            >
+              {item}
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-gray-200 overflow-hidden">
               <div
-                className="h-[6px] rounded-[1px] transition-all duration-300"
+                className={`h-full transition-all duration-700 ${
+                  index < currentIndex
+                    ? "bg-gradient-to-r from-gray-400 via-blue-500 to-blue-600"
+                    : "bg-gray-200"
+                }`}
                 style={{
-                  width: `${progress}%`,
-                  background: `linear-gradient(to right, #D1D5DB, #3B82F6)`,
-                  transition: `width ${currentStep.duration}s linear`,
+                  width: index < currentIndex ? "100%" : "0%",
                 }}
               ></div>
             </div>
-          </>
-        ) : (
-          // Финальный экран
-          <h1 className="text-xl md:text-2xl font-semibold text-neutral-800">
-            Проверка завершена.
-          </h1>
-        )}
+          </div>
+        ))}
       </div>
+
+      {done && (
+        <div className="mt-10 text-lg text-gray-900 font-medium transition-opacity duration-700">
+          Проверка завершена.
+        </div>
+      )}
     </main>
   );
 }
