@@ -17,13 +17,23 @@ export default function QuickPreview() {
     "Проверяем X-Robots-Tag",
     "Проверяем meta robots",
     "Проверяем canonical",
-    "Собираем факторы, снижающие видимость сайта",
+    "Проверяем title и meta description",
+    "Проверяем Open Graph и H1",
+    "Проверяем структурированные данные",
+    "Проверяем мобильную адаптацию",
+    "Проверяем HTTPS и SSL",
+    "Проверяем alt-тексты изображений",
+    "Проверяем favicon и страницу 404",
+    "Анализируем факторы, снижающие видимость сайта",
     "Определяем факторы, требующие небольшой доработки",
-    "Формируем факторы, способствующие видимости сайта",
+    "Формируем предварительный результат проверки",
   ];
 
   useEffect(() => {
-    const durations = [0.9, 1.1, 1.2, 0.8, 1.0, 1.3, 1.4, 1.3];
+    const durations = [
+      0.9, 1.0, 1.1, 0.8, 1.0, 1.1, 1.2, 1.0,
+      1.3, 1.6, 1.0, 1.1, 1.4, 1.6, 1.9,
+    ];
     let total = 0;
 
     items.forEach((_, i) => {
@@ -31,8 +41,14 @@ export default function QuickPreview() {
       setTimeout(() => setCurrentIndex(i + 1), total);
     });
 
-    setTimeout(() => setDone(true), total + 1200);
-  }, []);
+    // финальная пауза + переход к оплате
+    setTimeout(() => {
+      setDone(true);
+      setTimeout(() => {
+        router.push(`/pay?url=${encodeURIComponent(url)}`);
+      }, 2800);
+    }, total + 1000);
+  }, [router, url]);
 
   return (
     <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
@@ -55,7 +71,7 @@ export default function QuickPreview() {
               <div
                 className={`h-full transition-all duration-700 ${
                   index < currentIndex
-                    ? "bg-gradient-to-r from-gray-400 via-blue-500 to-blue-600"
+                    ? "bg-gradient-to-r from-gray-400 via-sky-500 to-sky-600"
                     : "bg-gray-200"
                 }`}
                 style={{
@@ -68,7 +84,7 @@ export default function QuickPreview() {
       </div>
 
       {done && (
-        <div className="mt-10 text-lg text-gray-900 font-medium transition-opacity duration-700">
+        <div className="mt-10 text-lg text-gray-900 font-medium transition-opacity duration-700 text-center max-w-md">
           Проверка завершена.
         </div>
       )}
