@@ -17,6 +17,7 @@ export default function QuickPreview() {
     }
   }, []);
 
+  // 10 шагов проверки
   const steps = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
@@ -30,10 +31,11 @@ export default function QuickPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
+  // Время на каждый шаг
   const durations = [1000, 1300, 1000, 900, 1000, 800, 1300, 1300, 1600, 1400];
   const fadeDelay = 300;
-  const holdAtFull = 300;
-  const redirectDelay = 1000;
+  const holdAtFull = 350; // пауза в конце каждого шага
+  const redirectDelay = 1200; // пауза перед оплатой
 
   // Анимация шагов
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function QuickPreview() {
         if (!start) start = timestamp;
         const elapsed = timestamp - start;
         const ratio = Math.min(elapsed / duration, 1);
-        // плавное движение easeInOut
+        // плавная ease-in-out функция
         const eased =
           ratio < 0.5 ? 2 * ratio * ratio : -1 + (4 - 2 * ratio) * ratio;
         setProgress(eased * 100);
@@ -58,7 +60,7 @@ export default function QuickPreview() {
         if (elapsed < duration) {
           frame = requestAnimationFrame(animate);
         } else {
-          // удерживаем полосу полной ещё немного
+          // удерживаем полосу на 100% перед исчезновением
           setProgress(100);
           timeout = setTimeout(() => {
             setVisible(false);
@@ -78,7 +80,7 @@ export default function QuickPreview() {
     }
   }, [index]);
 
-  // Переход в Stripe Checkout
+  // Автоматический переход на оплату (Stripe)
   useEffect(() => {
     if (showFinal && siteUrl) {
       const timer = setTimeout(async () => {
@@ -93,14 +95,14 @@ export default function QuickPreview() {
             window.location.href = json.url;
           }
         } catch (err) {
-          console.error("Redirect failed:", err);
+          console.error("Payment redirect failed:", err);
         }
       }, redirectDelay);
       return () => clearTimeout(timer);
     }
   }, [showFinal, siteUrl]);
 
-  // Плавный переход цвета от серого к синему
+  // Плавный переход цвета серый → синий
   const getBarColor = (value: number) => {
     const start = { r: 209, g: 213, b: 219 }; // #D1D5DB
     const end = { r: 59, g: 130, b: 246 }; // #3B82F6
@@ -127,12 +129,14 @@ export default function QuickPreview() {
             {steps[index]}
           </div>
 
+          {/* Полоса проверки */}
           <div className="w-full h-[8px] bg-gray-200 rounded-md overflow-hidden">
             <div
               className="h-[8px] rounded-md transition-[width] duration-150 ease-linear"
               style={{
                 width: `${progress}%`,
                 background: getBarColor(progress),
+                transition: "width 0.15s linear, background 0.3s ease-out",
               }}
             />
           </div>
