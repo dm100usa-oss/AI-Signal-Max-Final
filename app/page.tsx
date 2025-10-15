@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-/** Only dots animate; text stays stable */
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle">
@@ -25,7 +24,6 @@ function Dots() {
   );
 }
 
-// убираем "Checked website:" если пользователь вставил его из результатов
 const normalizeUrl = (v: string) =>
   v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
@@ -40,7 +38,7 @@ export default function Home() {
 
   const go = useCallback(async (mode: "quick" | "pro") => {
     if (loading) return;
-    const u = normalizeUrl(url); // еще раз чистим на всякий случай
+    const u = normalizeUrl(url);
     if (!isValid(u)) {
       setError("Please enter a valid URL (including http/https).");
       return;
@@ -48,11 +46,9 @@ export default function Home() {
     setError(null);
     setLoading(mode);
 
-    // show “Checking …” at least 2.2s
     const minDuration = 2200;
     const started = Date.now();
 
-    // precheck URL availability (avoid showing Pay on dead sites)
     let status: "ok" | "error" = "ok";
     try {
       const resp = await fetch("/api/precheck", {
@@ -64,6 +60,19 @@ export default function Home() {
       status = json?.ok ? "ok" : "error";
     } catch {
       status = "error";
+    }
+
+    // Run analysis immediately after precheck
+    if (status === "ok") {
+      try {
+        await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: u }),
+        });
+      } catch (err) {
+        console.error("Analyze failed", err);
+      }
     }
 
     const left = Math.max(0, minDuration - (Date.now() - started));
@@ -84,7 +93,6 @@ export default function Home() {
         Check if your website is visible to AI assistants like ChatGPT, Copilot, Gemini, Perplexity, Grok, and others
       </p>
 
-      {/* URL input with clear icon */}
       <div className="mb-2 relative">
         <input
           type="url"
@@ -121,7 +129,6 @@ export default function Home() {
       </div>
       {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
 
-      {/* Quick */}
       <button
         onClick={() => go("quick")}
         disabled={!!loading}
@@ -137,7 +144,6 @@ export default function Home() {
         Instant results, 5-point basic check, simple recommendations
       </p>
 
-      {/* Pro */}
       <button
         onClick={() => go("pro")}
         disabled={!!loading}
