@@ -50,14 +50,9 @@ export default function QuickPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-gray-50">
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-2 text-neutral-900">
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
-
-      {/* Новая строка с URL и датой */}
-      <p className="text-center text-sm text-neutral-500 mb-4">
-        https://example.com | October 16, 2025
-      </p>
 
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
         Проверяем видимость вашего сайта для ChatGPT, Copilot, Gemini и других ИИ-платформ
@@ -66,7 +61,7 @@ export default function QuickPreview() {
       <div className="rounded-md border border-neutral-200 bg-white shadow-sm p-8">
         <div
           key={current}
-          className="text-base text-neutral-800 leading-relaxed transition-opacity duration-700 ease-in mb-8"
+          className="text-2xl font-medium text-neutral-800 transition-opacity duration-700 ease-in mb-8"
         >
           {factors[current]}
         </div>
