@@ -5,26 +5,14 @@ import { getData } from "@/lib/storage";
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const url = searchParams.get("url");
+  const { searchParams } = new URL(req.url);
+  const url = searchParams.get("url");
+  const mode = searchParams.get("mode") || "quick";
+  if (!url) return NextResponse.json({ error: "Missing URL" }, { status: 400 });
 
-    if (!url) {
-      return NextResponse.json({ error: "Missing URL" }, { status: 400 });
-    }
+  const key = `${mode}:${url}`;
+  const data = await getData(key);
+  if (!data) return NextResponse.json({ error: "No data found" }, { status: 404 });
 
-    const data = await getData(url);
-
-    if (!data) {
-      return NextResponse.json({ error: "No data found" }, { status: 404 });
-    }
-
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error("Error in /api/result:", error);
-    return NextResponse.json(
-      { error: "Failed to retrieve data", detail: error.message },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(data);
 }
