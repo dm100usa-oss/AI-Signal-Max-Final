@@ -21,8 +21,25 @@ export default function QuickPreview() {
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [finished, setFinished] = useState(false);
+  const [url, setUrl] = useState("");
+  const [date, setDate] = useState("");
 
   useEffect(() => {
+    // Извлекаем URL из строки запроса
+    const params = new URLSearchParams(window.location.search);
+    const site = params.get("url") || "";
+    setUrl(site);
+
+    // Форматируем текущую дату
+    const now = new Date();
+    const formatted = now.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    setDate(formatted);
+
+    // Таймеры
     const timer = setInterval(() => {
       setProgress((prev) => (prev >= 100 ? 100 : prev + 100 / totalTime));
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
@@ -32,10 +49,7 @@ export default function QuickPreview() {
       setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
     }, (totalTime / factors.length) * 1000);
 
-    const finishTimer = setTimeout(() => {
-      setFinished(true);
-    }, totalTime * 1000);
-
+    const finishTimer = setTimeout(() => setFinished(true), totalTime * 1000);
     const redirectTimer = setTimeout(() => {
       window.location.href = "/pay";
     }, totalTime * 1000 + 2500);
@@ -54,25 +68,39 @@ export default function QuickPreview() {
         AI Signal Max
       </h1>
 
-      <p className="text-center text-neutral-600 mb-8 leading-relaxed">
+      {/* Основное описание */}
+      <p className="text-center text-neutral-600 mb-2 leading-relaxed">
         Проверяем видимость вашего сайта для ChatGPT, Copilot, Gemini и других ИИ-платформ
       </p>
 
-      <div className="rounded-md border border-neutral-200 bg-white shadow-sm p-4">
+      {/* URL и дата */}
+      {(url || date) && (
+        <p className="text-sm text-neutral-400 text-center mb-8">
+          Website: {url || "—"} &nbsp; | &nbsp; Date: {date}
+        </p>
+      )}
+
+      <div className="rounded-md border border-neutral-200 bg-white p-0">
+        {/* Текущий фактор */}
         <div
           key={current}
-          className="text-base font-medium text-neutral-900 transition-opacity duration-700 ease-in mb-4"
+          className="text-base font-medium text-neutral-900 transition-opacity duration-700 ease-in mb-4 mt-6"
         >
           {factors[current]}
         </div>
 
         {/* Верхняя полоса — замена кнопки Quick Check */}
-        <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
+
+        {/* Подпись под синей полосой */}
+        <p className="text-sm text-neutral-600 text-center mt-2 mb-4">
+          Instant results, 5-point basic check, simple recommendations
+        </p>
 
         {/* Нижняя полоса — замена кнопки Full Check */}
         <div className="w-full h-12 rounded-md bg-gray-200 flex items-center justify-center text-neutral-500 text-sm font-medium">
