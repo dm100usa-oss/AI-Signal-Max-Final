@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ProgressBar from "./ProgressBar";
 
 export default function QuickPreview() {
   const router = useRouter();
@@ -10,7 +9,6 @@ export default function QuickPreview() {
   const [index, setIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(18);
   const [showFinal, setShowFinal] = useState(false);
 
   useEffect(() => {
@@ -28,13 +26,13 @@ export default function QuickPreview() {
     "Видит ли ИИ заголовки и описания",
     "Понимает ли ИИ структуру сайта",
     "Видит ли ИИ изображения на сайте",
-    "Считает ли ИИ ваш сайт безопасным",
+    "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия",
     "Учитывает ли ИИ ваш сайт при поиске",
     "Видит ли ИИ ваш сайт среди конкурентов",
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const durations = [2000, 2200, 2100, 2000, 2300, 2100, 2200, 2000, 2300, 2500];
+  const durations = [1800, 2000, 1900, 1800, 2000, 1900, 2000, 1900, 2000, 2200];
   const holdAtFull = 400;
   const fadeOutDelay = 250;
 
@@ -76,80 +74,57 @@ export default function QuickPreview() {
         clearTimeout(timeout2);
       };
     } else {
-      const t = setTimeout(() => setShowFinal(true), 400);
+      const t = setTimeout(() => setShowFinal(true), 500);
       return () => clearTimeout(t);
     }
   }, [index]);
 
   useEffect(() => {
-    if (timeLeft > 0) {
-      const t = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
-      return () => clearTimeout(t);
-    }
-  }, [timeLeft]);
-
-  useEffect(() => {
     if (showFinal && siteUrl) {
       const timer = setTimeout(() => {
         router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
-      }, 2200);
+      }, 1800);
       return () => clearTimeout(timer);
     }
   }, [showFinal, router, siteUrl]);
 
-  const date = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
   return (
-    <div className="w-full text-center">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-800">
-          AI Signal Max
-        </h1>
-        <p className="text-sm text-neutral-500 mt-1 font-semibold">
-          Быстрая проверка сайта
-        </p>
-        {siteUrl && (
-          <p className="text-sm text-neutral-500 mt-1">
-            {siteUrl} • {date}
-          </p>
-        )}
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-neutral-800 font-sans">
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4">
+        AI Signal Max
+      </h1>
+      <p className="text-center text-neutral-600 mb-8 leading-relaxed font-semibold">
+        Быстрая проверка сайта
+      </p>
+
+      <div className="mb-2 relative">
+        <div className="w-full rounded-md border px-4 py-3 text-base border-neutral-300 bg-white text-center text-neutral-700">
+          {visible ? steps[index] : ""}
+        </div>
       </div>
 
-      {!showFinal ? (
-        <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl px-8 py-14 transition-all duration-500">
-          <p
-            className={`text-xl md:text-2xl font-semibold mb-10 text-neutral-700 transition-all duration-1000 ${
-              index > 0 ? "opacity-40 scale-95" : "opacity-100"
-            }`}
-          >
-            Мы начали проверку сайта
-          </p>
+      <div className="w-full h-[44px] mt-4 bg-gray-200 rounded-md overflow-hidden">
+        <div
+          className="h-full transition-all duration-100"
+          style={{
+            width: `${progress}%`,
+            background:
+              "linear-gradient(to right, #D1D5DB 0%, #60A5FA 50%, #3B82F6 100%)",
+          }}
+        />
+      </div>
 
-          <div
-            className={`h-8 flex items-center justify-center text-lg font-semibold text-neutral-800 mb-4 transition-opacity duration-700 ${
-              visible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {steps[index]}
-          </div>
+      <p className="mt-6 text-center text-sm text-neutral-500">
+        Проверка сайта выполняется...
+      </p>
 
-          <ProgressBar progress={progress} />
-
-          <div className="mt-6 text-sm text-neutral-500">
-            Проверка завершится через <span className="font-semibold">{timeLeft}s</span>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl px-8 py-16">
-          <p className="text-2xl font-semibold text-neutral-800">
-            Проверка завершена
-          </p>
-        </div>
-      )}
-    </div>
+      <footer className="mt-12 text-center text-xs text-neutral-500">
+        © 2025 AI Signal Max. All rights reserved.
+        <br />
+        <span className="opacity-60">
+          Visibility scores are estimated and based on publicly available data. Not legal advice.
+        </span>
+      </footer>
+    </main>
   );
 }
