@@ -25,12 +25,11 @@ export default function QuickPreview() {
   const [date, setDate] = useState("");
 
   useEffect(() => {
-    // Извлекаем URL из строки запроса
+    // URL и дата
     const params = new URLSearchParams(window.location.search);
     const site = params.get("url") || "";
     setUrl(site);
 
-    // Форматируем текущую дату
     const now = new Date();
     const formatted = now.toLocaleDateString("en-US", {
       year: "numeric",
@@ -39,17 +38,23 @@ export default function QuickPreview() {
     });
     setDate(formatted);
 
-    // Таймеры
+    // Таймер прогресса
     const timer = setInterval(() => {
       setProgress((prev) => (prev >= 100 ? 100 : prev + 100 / totalTime));
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
+    // Смена факторов
     const factorTimer = setInterval(() => {
       setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
     }, (totalTime / factors.length) * 1000);
 
-    const finishTimer = setTimeout(() => setFinished(true), totalTime * 1000);
+    // Задержка перед "Проверка завершена"
+    const finishTimer = setTimeout(() => {
+      setFinished(true);
+    }, totalTime * 1000 + 600);
+
+    // Переход к оплате
     const redirectTimer = setTimeout(() => {
       window.location.href = "/pay";
     }, totalTime * 1000 + 2500);
@@ -64,11 +69,12 @@ export default function QuickPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+      {/* Заголовок */}
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
 
-      {/* Основное описание */}
+      {/* Подзаголовок */}
       <p className="text-center text-neutral-600 mb-2 leading-relaxed">
         Проверяем видимость вашего сайта для ChatGPT, Copilot, Gemini и других ИИ-платформ
       </p>
@@ -80,16 +86,16 @@ export default function QuickPreview() {
         </p>
       )}
 
-      <div className="rounded-md border border-neutral-200 bg-white p-0 px-4">
+      <div className="rounded-md border border-neutral-200 bg-white p-0 px-3 py-2">
         {/* Текущий фактор */}
         <div
           key={current}
-          className="text-base font-medium text-neutral-900 transition-opacity duration-700 ease-in mb-4 mt-6"
+          className="text-base font-medium text-neutral-900 transition-opacity duration-700 ease-in mb-4 mt-4"
         >
           {factors[current]}
         </div>
 
-        {/* Верхняя полоса — замена кнопки Quick Check */}
+        {/* Верхняя полоса — аналог кнопки Quick Check */}
         <div className="w-full h-[52px] rounded-md overflow-hidden bg-gray-200 mb-5">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
@@ -98,18 +104,34 @@ export default function QuickPreview() {
         </div>
 
         {/* Подпись под синей полосой */}
-        <p className="text-sm text-neutral-600 text-center mt-2 mb-4">
+        <p className="text-sm text-neutral-600 text-center mt-2 mb-6">
           Instant results, 5-point basic check, simple recommendations
         </p>
 
-        {/* Нижняя полоса — замена кнопки Full Check */}
-        <div className="w-full h-[52px] rounded-md bg-gray-200 flex items-center justify-center text-neutral-500 text-sm font-medium">
-          {finished
-            ? "Проверка завершена"
-            : `Проверка завершится через ${timeLeft} сек`}
+        {/* Нижняя полоса — динамическая */}
+        <div className="w-full h-[52px] rounded-md bg-gray-200 relative overflow-hidden flex items-center justify-center text-sm font-medium">
+          {/* Полупрозрачная движущаяся полоса таймера */}
+          {!finished && (
+            <div
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
+              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+            />
+          )}
+
+          {/* Текст поверх */}
+          {finished ? (
+            <span className="text-base text-neutral-700 transition-opacity duration-700 opacity-100 relative z-10">
+              Проверка завершена
+            </span>
+          ) : (
+            <span className="text-neutral-500 relative z-10">
+              Проверка завершится через {timeLeft} сек
+            </span>
+          )}
         </div>
       </div>
 
+      {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
