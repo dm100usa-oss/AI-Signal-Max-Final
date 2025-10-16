@@ -80,7 +80,7 @@ export default function QuickPreview() {
         </p>
       )}
 
-      <div className="rounded-md border border-neutral-200 bg-white p-0">
+      <div className="rounded-md border border-neutral-200 bg-white p-0 px-4">
         {/* Текущий фактор */}
         <div
           key={current}
@@ -90,7 +90,7 @@ export default function QuickPreview() {
         </div>
 
         {/* Верхняя полоса — замена кнопки Quick Check */}
-        <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200">
+        <div className="w-full h-[52px] rounded-md overflow-hidden bg-gray-200 mb-5">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
@@ -103,7 +103,7 @@ export default function QuickPreview() {
         </p>
 
         {/* Нижняя полоса — замена кнопки Full Check */}
-        <div className="w-full h-12 rounded-md bg-gray-200 flex items-center justify-center text-neutral-500 text-sm font-medium">
+        <div className="w-full h-[52px] rounded-md bg-gray-200 flex items-center justify-center text-neutral-500 text-sm font-medium">
           {finished
             ? "Проверка завершена"
             : `Проверка завершится через ${timeLeft} сек`}
