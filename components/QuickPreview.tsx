@@ -23,9 +23,9 @@ export default function QuickPreview() {
   const [finished, setFinished] = useState(false);
   const [url, setUrl] = useState("");
   const [date, setDate] = useState("");
+  const [fade, setFade] = useState(true);
 
   useEffect(() => {
-    // URL и дата
     const params = new URLSearchParams(window.location.search);
     const site = params.get("url") || "";
     setUrl(site);
@@ -38,29 +38,27 @@ export default function QuickPreview() {
     });
     setDate(formatted);
 
-    // Таймер прогресса
-    const timer = setInterval(() => {
+    // Основной таймер
+    const progressTimer = setInterval(() => {
       setProgress((prev) => (prev >= 100 ? 100 : prev + 100 / totalTime));
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
-    // Смена факторов
+    // Смена факторов с мягким проявлением
     const factorTimer = setInterval(() => {
-      setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
+      setFade(false);
+      setTimeout(() => {
+        setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
+        setFade(true);
+      }, 250);
     }, (totalTime / factors.length) * 1000);
 
-    // Задержка перед "Проверка завершена"
-    const finishTimer = setTimeout(() => {
-      setFinished(true);
-    }, totalTime * 1000 + 600);
-
-    // Переход к оплате
-    const redirectTimer = setTimeout(() => {
-      window.location.href = "/pay";
-    }, totalTime * 1000 + 2500);
+    // Завершение
+    const finishTimer = setTimeout(() => setFinished(true), totalTime * 1000 + 600);
+    const redirectTimer = setTimeout(() => (window.location.href = "/pay"), totalTime * 1000 + 2500);
 
     return () => {
-      clearInterval(timer);
+      clearInterval(progressTimer);
       clearInterval(factorTimer);
       clearTimeout(finishTimer);
       clearTimeout(redirectTimer);
@@ -69,58 +67,54 @@ export default function QuickPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
-      {/* Заголовок */}
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
+      <h1 className="text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
 
-      {/* Подзаголовок */}
-      <p className="text-center text-neutral-600 mb-2 leading-relaxed">
+      <p className="text-neutral-600 mb-2 leading-relaxed">
         Проверяем видимость вашего сайта для ChatGPT, Copilot, Gemini и других ИИ-платформ
       </p>
 
-      {/* URL и дата */}
       {(url || date) && (
         <p className="text-sm text-neutral-400 text-center mb-8">
           Website: {url || "—"} &nbsp; | &nbsp; Date: {date}
         </p>
       )}
 
-      <div className="rounded-md border border-neutral-200 bg-white p-0 px-3 py-2">
+      <div className="rounded-md border border-neutral-200 bg-white px-3 py-2">
         {/* Текущий фактор */}
         <div
           key={current}
-          className="text-base font-medium text-neutral-900 transition-opacity duration-700 ease-in mb-4 mt-4"
+          className={`text-[18px] font-semibold text-neutral-900 mb-4 mt-4 transition-opacity duration-500 ${
+            fade ? "opacity-100" : "opacity-0"
+          }`}
         >
           {factors[current]}
         </div>
 
-        {/* Верхняя полоса — аналог кнопки Quick Check */}
+        {/* Верхняя полоса */}
         <div className="w-full h-[52px] rounded-md overflow-hidden bg-gray-200 mb-5">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
+            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-[1200ms] ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        {/* Подпись под синей полосой */}
         <p className="text-sm text-neutral-600 text-center mt-2 mb-6">
           Instant results, 5-point basic check, simple recommendations
         </p>
 
-        {/* Нижняя полоса — динамическая */}
+        {/* Нижняя полоса с плавным движением */}
         <div className="w-full h-[52px] rounded-md bg-gray-200 relative overflow-hidden flex items-center justify-center text-sm font-medium">
-          {/* Полупрозрачная движущаяся полоса таймера */}
           {!finished && (
             <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-[1800ms] ease-linear"
               style={{ width: `${(timeLeft / totalTime) * 100}%` }}
             />
           )}
 
-          {/* Текст поверх */}
           {finished ? (
-            <span className="text-base text-neutral-700 transition-opacity duration-700 opacity-100 relative z-10">
+            <span className="text-[17px] text-neutral-700 font-semibold transition-opacity duration-700 opacity-100 relative z-10">
               Проверка завершена
             </span>
           ) : (
@@ -131,13 +125,11 @@ export default function QuickPreview() {
         </div>
       </div>
 
-      {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data.
-          Not legal advice.
+          Visibility scores are estimated and based on publicly available data. Not legal advice.
         </span>
       </footer>
     </main>
