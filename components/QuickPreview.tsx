@@ -1,28 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import ProgressBar from "./ProgressBar";
 
 export default function QuickPreview() {
-  const router = useRouter();
-  const [siteUrl, setSiteUrl] = useState("");
-  const [index, setIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [visible, setVisible] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(25);
-  const [showFinal, setShowFinal] = useState(false);
-  const [fadeOut, setFadeOut] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const u = params.get("url") || "";
-      setSiteUrl(u);
-    }
-  }, []);
-
-  const steps = [
+  const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
     "Может ли ИИ читать содержание страниц",
@@ -32,158 +13,86 @@ export default function QuickPreview() {
     "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия",
     "Учитывает ли ИИ ваш сайт при поиске",
     "Видит ли ИИ ваш сайт среди конкурентов",
-    "Как оценивает ИИ ваш сайт",
+    "Формируем финальные результаты",
   ];
 
-  const durations = [1000, 1400, 1000, 800, 1000, 800, 1400, 1300, 1600, 1500];
-  const holdAtFull = 400;
-  const fadeOutDelay = 250;
+  const totalTime = 20;
+  const [current, setCurrent] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(totalTime);
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    let frame: number;
-    let timeout1: NodeJS.Timeout;
-    let timeout2: NodeJS.Timeout;
-    let start: number | null = null;
+    const timer = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 100 : prev + 100 / totalTime));
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
 
-    if (index < steps.length) {
-      setVisible(true);
-      const duration = durations[index];
+    const factorTimer = setInterval(() => {
+      setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
+    }, (totalTime / factors.length) * 1000);
 
-      const animate = (timestamp: number) => {
-        if (!start) start = timestamp;
-        const elapsed = timestamp - start;
+    const finishTimer = setTimeout(() => {
+      setFinished(true);
+    }, totalTime * 1000);
 
-        // плавное движение, с лёгким замедлением на больших факторах
-        const ratio = Math.min(elapsed / duration, 1);
-        const easeOut = 1 - Math.pow(1 - ratio, 3);
-        setProgress(easeOut * 100);
+    const redirectTimer = setTimeout(() => {
+      window.location.href = "/pay";
+    }, totalTime * 1000 + 2500);
 
-        if (elapsed < duration) {
-          frame = requestAnimationFrame(animate);
-        } else {
-          setProgress(100);
-          timeout1 = setTimeout(() => {
-            setFadeOut(true);
-            timeout2 = setTimeout(() => {
-              setFadeOut(false);
-              setVisible(false);
-              setProgress(0);
-              setIndex((prev) => prev + 1);
-            }, fadeOutDelay);
-          }, holdAtFull);
-        }
-      };
-
-      frame = requestAnimationFrame(animate);
-      return () => {
-        cancelAnimationFrame(frame);
-        clearTimeout(timeout1);
-        clearTimeout(timeout2);
-      };
-    } else {
-      const t = setTimeout(() => setShowFinal(true), 700);
-      return () => clearTimeout(t);
-    }
-  }, [index]);
-
-  // таймер обратного отсчёта
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const t = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
-      return () => clearTimeout(t);
-    }
-  }, [timeLeft]);
-
-  // переход на оплату
-  useEffect(() => {
-    if (showFinal && siteUrl) {
-      const timer = setTimeout(() => {
-        router.push(`/pay?url=${encodeURIComponent(siteUrl)}`);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [showFinal, router, siteUrl]);
-
-  const date = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+    return () => {
+      clearInterval(timer);
+      clearInterval(factorTimer);
+      clearTimeout(finishTimer);
+      clearTimeout(redirectTimer);
+    };
+  }, []);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center">
-      <h1 className="text-4xl font-semibold tracking-tight mb-2 text-neutral-800">
+      {/* Пара 1: AI Signal Max */}
+      <h1 className="text-4xl font-semibold tracking-tight mb-2">
         AI Signal Max
       </h1>
-      <p className="text-sm text-neutral-600 font-semibold mb-1">
-        Быстрая проверка сайта
-      </p>
-      {siteUrl && (
-        <p className="text-sm text-neutral-500 mb-8">
-          {siteUrl} | {date}
+
+      {/* Пара 2: Быстрая проверка сайта + строка URL */}
+      <div className="text-neutral-600 mb-8">
+        <p className="font-semibold mb-1">Быстрая проверка сайта</p>
+        <p className="text-sm text-neutral-500">
+          https://school.profit-zone.com/ | October 15, 2025
         </p>
-      )}
+      </div>
 
-      {!showFinal ? (
-        <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl px-8 py-14 transition-all duration-500">
-          <p
-            className={`text-2xl font-semibold mb-10 text-neutral-700 transition-opacity duration-700 ${
-              fadeOut ? "opacity-30" : "opacity-100"
-            }`}
-          >
-            Мы начали проверку сайта
-          </p>
+      {/* Пара 3: Факторы (fade-in + увеличенный размер) */}
+      <div
+        key={current}
+        className="border rounded-md px-4 py-6 mb-4 bg-white text-neutral-800 text-2xl font-medium shadow-sm transition-opacity duration-700 ease-in opacity-100"
+      >
+        {factors[current]}
+      </div>
 
-          <div
-            className={`h-8 flex items-center justify-center text-2xl font-semibold text-neutral-800 mb-6 transition-opacity duration-700 ${
-              visible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {steps[index]}
-          </div>
+      {/* Пара 4: Синяя полоса на месте кнопки */}
+      <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-3">
+        <div
+          className="h-full bg-gradient-to-r from-gray-200 via-blue-400 to-blue-600 transition-all duration-1000 ease-linear"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
 
-          <ProgressBar progress={progress} />
+      {/* Пара 5: Таймер или надпись завершения */}
+      <div className="w-full h-12 rounded-md bg-gray-100 flex items-center justify-center text-neutral-500 text-sm font-medium">
+        {finished ? "Проверка завершена" : `Проверка завершится через ${timeLeft} сек`}
+      </div>
 
-          <div
-            className={`mt-6 text-sm text-neutral-500 transition-opacity duration-700 ${
-              fadeOut ? "opacity-30" : "opacity-100"
-            }`}
-          >
-            Проверка завершится через{" "}
-            <span className="font-semibold">{timeLeft}s</span>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl px-8 py-16">
-          <p className="text-2xl font-semibold text-neutral-800 fade-in">
-            Проверка завершена
-          </p>
-        </div>
-      )}
-
+      {/* Пара 6: Дисклеймер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
+          Visibility scores are estimated and based on publicly available data.
+          Not legal advice.
         </span>
       </footer>
-
-      <style jsx>{`
-        .fade-in {
-          animation: fadeIn 0.7s ease-in forwards;
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: scale(0.96);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-      `}</style>
     </main>
   );
 }
