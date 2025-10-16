@@ -34,6 +34,7 @@ export default function QuickPreview_v2() {
     }
   }, []);
 
+  // управление сменой факторов
   useEffect(() => {
     let start: number | null = null;
     let frame: number;
@@ -75,6 +76,7 @@ export default function QuickPreview_v2() {
     }
   }, [currentIndex]);
 
+  // таймер обратного отсчёта
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
@@ -82,6 +84,7 @@ export default function QuickPreview_v2() {
     }
   }, [timeLeft]);
 
+  // автоматический переход
   useEffect(() => {
     if (showFinal && siteUrl) {
       const timer = setTimeout(() => {
@@ -98,48 +101,51 @@ export default function QuickPreview_v2() {
   });
 
   return (
-    <div className="w-full text-center">
-      {/* Верхняя часть */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-semibold text-neutral-800 tracking-tight">
-          AI Signal Max
-        </h1>
-        <p className="text-neutral-600 mt-1 text-base font-semibold">
-          Быстрая проверка сайта
-        </p>
-        {siteUrl && (
-          <p className="text-sm text-neutral-500 mt-1">
-            {siteUrl} • {date}
-          </p>
-        )}
-      </div>
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16">
+      {/* Заголовок как на главной */}
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-800">
+        AI Signal Max
+      </h1>
+      <p className="text-center text-neutral-600 mb-8 leading-relaxed font-semibold">
+        Быстрая проверка сайта
+      </p>
 
-      {/* Основная часть */}
+      {/* Адрес сайта и дата */}
+      {siteUrl && (
+        <p className="text-center text-sm text-neutral-500 mb-8">
+          {siteUrl} • {date}
+        </p>
+      )}
+
+      {/* Центральный блок проверки */}
       {!showFinal ? (
-        <div className="bg-white border border-neutral-200 rounded-xl px-8 py-14 shadow-sm transition-all duration-500">
-          <div className="h-8 flex items-center justify-center text-lg font-medium text-neutral-800 mb-6">
+        <>
+          {/* Фактор в том же месте, где поле ввода */}
+          <div className="mb-4 text-center text-lg font-medium text-neutral-800 h-[24px] flex items-center justify-center">
             {steps[currentIndex]}
           </div>
 
-          <div className="w-full h-[12px] bg-gray-200 rounded-[3px] overflow-hidden mb-6">
+          {/* Полоса проверки — на месте синей кнопки */}
+          <div className="w-full h-[48px] bg-gray-200 rounded-md overflow-hidden mb-4 flex items-center">
             <div
-              className="h-[12px] bg-gradient-to-r from-gray-300 via-blue-400 to-blue-600 rounded-[3px] transition-all duration-100 ease-linear"
+              className="h-full bg-gradient-to-r from-gray-300 via-blue-400 to-blue-600 transition-all duration-100 ease-linear"
               style={{ width: `${progress}%` }}
-            ></div>
+            />
           </div>
 
-          <div className="text-sm text-neutral-500">
+          {/* Таймер — на месте зелёной кнопки */}
+          <div className="w-full h-[44px] bg-gray-100 rounded-md flex items-center justify-center text-neutral-600 text-sm mb-4">
             Проверка завершится через{" "}
-            <span className="font-medium text-neutral-600">{timeLeft}s</span>
+            <span className="font-semibold ml-1">{timeLeft}s</span>
           </div>
-        </div>
+        </>
       ) : (
-        <div className="bg-white border border-neutral-200 rounded-xl px-8 py-16 shadow-sm transition-all">
-          <p className="text-2xl font-semibold text-neutral-800 mb-2">
+        <div className="text-center mt-12">
+          <p className="text-2xl font-semibold text-neutral-800 mb-4">
             Проверка завершена
           </p>
-          <div className="w-full h-[12px] bg-gray-200 rounded-[3px] overflow-hidden mt-4">
-            <div className="h-[12px] w-full bg-blue-600"></div>
+          <div className="w-full h-[48px] bg-gray-200 rounded-md overflow-hidden">
+            <div className="h-full w-full bg-blue-600" />
           </div>
         </div>
       )}
@@ -152,6 +158,6 @@ export default function QuickPreview_v2() {
           Visibility scores are estimated and based on publicly available data. Not legal advice.
         </span>
       </footer>
-    </div>
+    </main>
   );
 }
