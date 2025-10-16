@@ -10,8 +10,8 @@ export const fetchCache = "force-no-store";
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans text-neutral-800">
-      <div className="w-full max-w-2xl px-4 sm:px-6 py-10">
+    <main className="bg-gray-50 font-sans text-neutral-800">
+      <div className="mx-auto max-w-2xl px-6 pt-20 pb-16">
         <QuickPreview />
       </div>
     </main>
