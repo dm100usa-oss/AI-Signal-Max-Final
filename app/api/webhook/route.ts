@@ -37,6 +37,7 @@ export async function POST(req: Request) {
 
       // Retrieve analysis results from Redis
       let data = await getData(`session:${session.id}`);
+      if (!data) data = await getData(`${mode}:${url}`);
       if (!data) data = await getData(url);
 
       if (!data) {
