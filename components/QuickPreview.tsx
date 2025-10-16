@@ -44,7 +44,7 @@ export default function QuickPreview() {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
-    // Смена факторов с мягким проявлением
+    // Смена факторов с плавным проявлением
     const factorTimer = setInterval(() => {
       setFade(false);
       setTimeout(() => {
@@ -82,10 +82,10 @@ export default function QuickPreview() {
       )}
 
       <div className="rounded-md border border-neutral-200 bg-white px-3 py-2">
-        {/* Текущий фактор с фиксированной высотой */}
+        {/* Текущий фактор — фиксированная высота и плавное проявление */}
         <div
           key={current}
-          className={`h-[60px] flex items-center justify-center text-[20px] font-bold text-neutral-900 mb-4 mt-4 transition-opacity duration-500 ${
+          className={`h-[64px] sm:h-[68px] flex items-center justify-center rounded-md bg-neutral-50/50 text-[20px] sm:text-[22px] font-bold text-neutral-900 mb-4 mt-4 transition-opacity duration-500 ${
             fade ? "opacity-100" : "opacity-0"
           }`}
         >
