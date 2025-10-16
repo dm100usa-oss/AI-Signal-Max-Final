@@ -82,10 +82,10 @@ export default function QuickPreview() {
       )}
 
       <div className="rounded-md border border-neutral-200 bg-white px-3 py-2">
-        {/* Текущий фактор */}
+        {/* Текущий фактор с фиксированной высотой */}
         <div
           key={current}
-          className={`text-[18px] font-semibold text-neutral-900 mb-4 mt-4 transition-opacity duration-500 ${
+          className={`h-[60px] flex items-center justify-center text-[20px] font-bold text-neutral-900 mb-4 mt-4 transition-opacity duration-500 ${
             fade ? "opacity-100" : "opacity-0"
           }`}
         >
