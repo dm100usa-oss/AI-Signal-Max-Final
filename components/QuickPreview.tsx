@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 export default function QuickPreview() {
-  // 10 утверждённых факторов
   const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
@@ -17,17 +16,15 @@ export default function QuickPreview() {
     "Формируем финальные результаты",
   ];
 
-  const totalTime = 20; // общее время в секундах
+  const totalTime = 20;
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(totalTime);
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 100;
-        return prev + 100 / totalTime;
-      });
+      setProgress((prev) => (prev >= 100 ? 100 : prev + 100 / totalTime));
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
 
@@ -35,13 +32,18 @@ export default function QuickPreview() {
       setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
     }, (totalTime / factors.length) * 1000);
 
+    const finishTimer = setTimeout(() => {
+      setFinished(true);
+    }, totalTime * 1000);
+
     const redirectTimer = setTimeout(() => {
       window.location.href = "/pay";
-    }, totalTime * 1000 + 500);
+    }, totalTime * 1000 + 2500);
 
     return () => {
       clearInterval(timer);
       clearInterval(factorTimer);
+      clearTimeout(finishTimer);
       clearTimeout(redirectTimer);
     };
   }, []);
@@ -53,27 +55,33 @@ export default function QuickPreview() {
         AI Signal Max
       </h1>
 
-      {/* Пара 2: Быстрая проверка сайта */}
-      <p className="text-neutral-600 font-semibold mb-8">
-        Быстрая проверка сайта
-      </p>
+      {/* Пара 2: Быстрая проверка сайта + строка URL */}
+      <div className="text-neutral-600 mb-8">
+        <p className="font-semibold mb-1">Быстрая проверка сайта</p>
+        <p className="text-sm text-neutral-500">
+          https://school.profit-zone.com/ | October 15, 2025
+        </p>
+      </div>
 
-      {/* Пара 3: Факторы (на месте поля ввода) */}
-      <div className="border rounded-md px-4 py-3 mb-4 bg-white text-neutral-800 text-base font-medium shadow-sm">
+      {/* Пара 3: Факторы (fade-in + увеличенный размер) */}
+      <div
+        key={current}
+        className="border rounded-md px-4 py-6 mb-4 bg-white text-neutral-800 text-2xl font-medium shadow-sm transition-opacity duration-700 ease-in opacity-100"
+      >
         {factors[current]}
       </div>
 
       {/* Пара 4: Синяя полоса на месте кнопки */}
       <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-3">
         <div
-          className="h-full bg-gradient-to-r from-gray-300 via-blue-400 to-blue-600 transition-all duration-1000 ease-linear"
+          className="h-full bg-gradient-to-r from-gray-200 via-blue-400 to-blue-600 transition-all duration-1000 ease-linear"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {/* Пара 5: Светло-серая полоса на месте зелёной кнопки */}
+      {/* Пара 5: Таймер или надпись завершения */}
       <div className="w-full h-12 rounded-md bg-gray-100 flex items-center justify-center text-neutral-500 text-sm font-medium">
-        Проверка завершится через {timeLeft} сек
+        {finished ? "Проверка завершена" : `Проверка завершится через ${timeLeft} сек`}
       </div>
 
       {/* Пара 6: Дисклеймер */}
