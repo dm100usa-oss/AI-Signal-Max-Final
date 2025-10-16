@@ -58,24 +58,24 @@ export default function QuickPreview() {
         Проверяем видимость вашего сайта для ChatGPT, Copilot, Gemini и других ИИ-платформ
       </p>
 
-      <div className="rounded-md border border-neutral-200 bg-white shadow-sm p-6">
+      <div className="rounded-md border border-neutral-200 bg-white shadow-sm p-4">
         <div
           key={current}
-          className="text-base font-medium text-neutral-900 transition-opacity duration-700 ease-in mb-6"
+          className="text-base font-medium text-neutral-900 transition-opacity duration-700 ease-in mb-4"
         >
           {factors[current]}
         </div>
 
         {/* Верхняя полоса — замена кнопки Quick Check */}
-        <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-3">
+        <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className="h-full bg-gradient-to-r from-gray-200 via-blue-500 to-blue-600 transition-all duration-1000 ease-linear"
+            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
 
         {/* Нижняя полоса — замена кнопки Full Check */}
-        <div className="w-full h-12 rounded-md bg-gray-100 flex items-center justify-center text-neutral-500 text-sm font-medium">
+        <div className="w-full h-12 rounded-md bg-gray-200 flex items-center justify-center text-neutral-500 text-sm font-medium">
           {finished
             ? "Проверка завершена"
             : `Проверка завершится через ${timeLeft} сек`}
