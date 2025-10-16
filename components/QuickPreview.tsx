@@ -10,7 +10,7 @@ export default function QuickPreview() {
     "Видит ли ИИ заголовки и описания",
     "Понимает ли ИИ структуру сайта",
     "Видит ли ИИ изображения на сайте",
-    "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия",
+    "Считает ли ИИ ваш сайт безопасным",
     "Учитывает ли ИИ ваш сайт при поиске",
     "Видит ли ИИ ваш сайт среди конкурентов",
     "Формируем финальные результаты",
@@ -32,7 +32,10 @@ export default function QuickPreview() {
       setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
     }, (totalTime / factors.length) * 1000);
 
-    const finishTimer = setTimeout(() => setFinished(true), totalTime * 1000);
+    const finishTimer = setTimeout(() => {
+      setFinished(true);
+    }, totalTime * 1000);
+
     const redirectTimer = setTimeout(() => {
       window.location.href = "/pay";
     }, totalTime * 1000 + 2500);
@@ -47,17 +50,14 @@ export default function QuickPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-gray-50">
-      {/* Заголовок */}
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
 
-      {/* Подзаголовок */}
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
         Проверяем видимость вашего сайта для ChatGPT, Copilot, Gemini и других ИИ-платформ
       </p>
 
-      {/* Блок анализа */}
       <div className="rounded-md border border-neutral-200 bg-white shadow-sm p-8">
         <div
           key={current}
@@ -66,7 +66,6 @@ export default function QuickPreview() {
           {factors[current]}
         </div>
 
-        {/* Прогресс-бар */}
         <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-3">
           <div
             className="h-full bg-gradient-to-r from-gray-200 via-blue-400 to-blue-600 transition-all duration-1000 ease-linear"
@@ -74,7 +73,6 @@ export default function QuickPreview() {
           />
         </div>
 
-        {/* Таймер */}
         <div className="w-full h-12 rounded-md bg-gray-100 flex items-center justify-center text-neutral-500 text-sm font-medium">
           {finished
             ? "Проверка завершена"
@@ -82,7 +80,6 @@ export default function QuickPreview() {
         </div>
       </div>
 
-      {/* Дисклеймер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
