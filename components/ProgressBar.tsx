@@ -38,13 +38,13 @@ export default function ProgressBar({ progress, duration = 2000 }: ProgressBarPr
   }, [progress, duration]);
 
   return (
-    <div className="w-full h-[10px] bg-[#E5E7EB] rounded-[2px] overflow-hidden">
+    <div className="w-full h-[12px] bg-[#E5E7EB] rounded-[2px] overflow-hidden">
       <div
         ref={barRef}
-        className="h-[10px] rounded-[2px]"
+        className="h-[12px] rounded-[2px]"
         style={{
           width: "0%",
-          background: "linear-gradient(to right, #D1D5DB 0%, #60A5FA 50%, #3B82F6 100%)",
+          background: "linear-gradient(to right, #F3F4F6 0%, #93C5FD 50%, #3B82F6 100%)",
           transition: "width 0.1s linear",
         }}
       />
