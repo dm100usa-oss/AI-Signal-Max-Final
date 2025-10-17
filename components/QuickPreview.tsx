@@ -28,6 +28,7 @@ export default function QuickPreview() {
   const [finished, setFinished] = useState(false);
   const [fadeHeader, setFadeHeader] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
+  const [showResultText, setShowResultText] = useState(false); // 🔹 Новое состояние для надписи "Получить результат"
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
@@ -41,11 +42,17 @@ export default function QuickPreview() {
 
     setTimeout(() => setFadeHeader(true), 1500);
 
+    // Когда основное время закончилось
     setTimeout(() => {
       setFinished(true);
+
+      // Показ надписи "Проверка завершена"
       setTimeout(() => setShowFinal(true), 1400);
 
-      // 🔹 Автоматический переход на оплату через Stripe
+      // Через короткую паузу (~800 мс) появляется надпись "Получить результат"
+      setTimeout(() => setShowResultText(true), 2200);
+
+      // 🔹 Автоматический переход на оплату через Stripe (через 4 сек после завершения)
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -91,6 +98,7 @@ export default function QuickPreview() {
       </div>
 
       <div className="rounded-md p-0">
+        {/* Текущий фактор */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p className="text-lg sm:text-xl font-medium text-neutral-900">
             {factors[current]}
@@ -98,11 +106,19 @@ export default function QuickPreview() {
         </div>
 
         {/* Верхняя синяя полоса */}
-        <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
           />
+          {/* 🔹 Надпись "Получить результат" появляется после финала */}
+          {showResultText && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
+                Получить результат
+              </p>
+            </div>
+          )}
         </div>
 
         <p className="text-center text-sm text-neutral-600 mb-4">
@@ -128,12 +144,14 @@ export default function QuickPreview() {
             />
           )}
 
+          {/* Надпись с обратным отсчётом */}
           {!finished && (
             <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
               {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
             </div>
           )}
 
+          {/* Надпись "Проверка завершена" */}
           {finished && showFinal && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
