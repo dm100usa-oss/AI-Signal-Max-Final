@@ -139,10 +139,29 @@ export default function QuickPreview() {
       </div>
 
       <div className="rounded-md p-0">
+        {/* 🔹 Факторы с плавным появлением */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p className="text-lg sm:text-xl font-medium text-neutral-900">
+          <p
+            key={current}
+            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+          >
             {factors[current]}
           </p>
+          <style jsx>{`
+            @keyframes fadeInUp {
+              from {
+                opacity: 0;
+                transform: translateY(10px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            .animate-fadeInUp {
+              animation: fadeInUp 0.8s ease forwards;
+            }
+          `}</style>
         </div>
 
         {/* Верхняя синяя полоса */}
