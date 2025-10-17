@@ -45,18 +45,19 @@ export default function FullPreview() {
   const [progressAudit, setProgressAudit] = useState(0);
   const [progressReport, setProgressReport] = useState(0);
   const [timeLeft, setTimeLeft] = useState(totalTime);
-  const [finished, setFinished] = useState(false);
   const [fadeHeader, setFadeHeader] = useState(false);
-  const [showResultText, setShowResultText] = useState(false);
-  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
 
   useEffect(() => {
+    // 🔹 Появление факторов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
+    // 🔹 Первая полоса (аудит)
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -69,10 +70,7 @@ export default function FullPreview() {
       });
     }, 1000);
 
-    const overallTimer = setInterval(() => {
-      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
-    }, 1000);
-
+    // 🔹 Вторая полоса (отчёты)
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -85,14 +83,18 @@ export default function FullPreview() {
           return Math.min(next, 100);
         });
       }, 1000);
-
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
+    // 🔹 Общий таймер (третья полоса)
+    const overallTimer = setInterval(() => {
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
+    }, 1000);
+
+    // 🔹 Финал
     setTimeout(() => {
       setFinished(true);
-      setTimeout(() => setShowResultText(true), 2000);
-
+      // 🔹 Автоматический переход к оплате
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -109,6 +111,7 @@ export default function FullPreview() {
       }, 4000);
     }, totalTime * 1000);
 
+    // 🔹 Заголовок затухает
     setTimeout(() => setFadeHeader(true), 1500);
 
     return () => {
@@ -128,6 +131,7 @@ export default function FullPreview() {
         {new Date().toLocaleDateString("en-US")}
       </p>
 
+      {/* Заголовок */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -144,6 +148,7 @@ export default function FullPreview() {
       </div>
 
       <div className="rounded-md p-0">
+        {/* Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p
             key={current}
@@ -169,14 +174,14 @@ export default function FullPreview() {
         </div>
 
         {/* Вторая полоса */}
-        <p className="text-center text-sm text-neutral-600 mb-2">
+        <p className="text-center text-lg sm:text-xl text-neutral-700 mb-2 font-medium">
           {reportStage === "audit"
             ? "Аудит 15 ключевых факторов"
             : reportStage === "owner"
             ? "Формируем отчёт для владельца сайта"
             : "Создаём ТЗ для разработчика"}
         </p>
-        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200 mb-6">
           <div
             className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
             style={{ width: `${progressReport}%` }}
@@ -213,7 +218,6 @@ export default function FullPreview() {
         </div>
       </div>
 
-      {/* Глобальные анимации для стабильности сборки */}
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
