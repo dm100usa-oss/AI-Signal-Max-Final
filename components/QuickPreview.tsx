@@ -72,7 +72,8 @@ export default function QuickPreview() {
         Мы начали проверку
       </div>
 
-      <div className="rounded-md border border-neutral-200 p-0 pt-6 pb-2">
+      {/* Основной блок без границ */}
+      <div className="rounded-md p-0">
         {/* Текущий фактор */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p className="text-lg sm:text-xl font-medium text-neutral-900">
@@ -88,9 +89,9 @@ export default function QuickPreview() {
           />
         </div>
 
-        {/* Новый текст под синей полосой */}
+        {/* Обновлённая подпись */}
         <p className="text-center text-sm text-neutral-600 mb-4">
-          Анализ по 10 ключевым факторам
+          Анализ 10 ключевых факторов
         </p>
 
         {/* Нижняя лента — динамическая */}
