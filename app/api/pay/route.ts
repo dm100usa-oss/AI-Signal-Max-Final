@@ -17,7 +17,7 @@ function getBaseUrl(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { mode, url, email } = await req.json();
+    const { mode, url } = await req.json();
 
     if (mode !== "quick" && mode !== "pro") {
       return NextResponse.json({ error: "Invalid mode" }, { status: 400 });
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const tempKey = `pending:${url}`;
     await saveData(tempKey, { score, results, factors });
 
-    // Create Stripe Checkout Session
+    // ✅ Create Stripe Checkout Session (email не передаём — Stripe сам добавит)
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
@@ -57,11 +57,10 @@ export async function POST(req: NextRequest) {
         url
       )}&status=ok&paid=1`,
       cancel_url: `${base}/`,
-      customer_email: mode === "pro" && email ? email : undefined,
-      metadata: { url, mode, email: email || "" },
+      metadata: { url, mode },
     });
 
-    // Rename pending data using session.id
+    // Save results tied to this session
     await saveData(`session:${session.id}`, { url, score, results, factors });
     await saveData(url, { score, results, factors });
 
