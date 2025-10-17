@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// 🔹 Анимация трёх точек (как на главной странице)
+// 🔹 Анимация трёх точек (точно как на главной странице)
 function Dots() {
   return (
-    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400 ml-1">
+    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
@@ -84,6 +84,7 @@ export default function QuickPreview() {
       setTimeout(() => setShowFinal(true), 1400);
       setTimeout(() => setShowResultText(true), 2200);
 
+      // 🔹 Автоматический переход на оплату через Stripe
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -120,16 +121,21 @@ export default function QuickPreview() {
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
-      {/* 🔹 Улучшенное плавное затухание надписи с точками */}
+      {/* 🔹 Надпись с точками без смещения, плавное затухание */}
       <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1500ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
             ? "opacity-40 text-neutral-400 translate-y-[-6px]"
             : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
-        Мы начали проверку
-        {fadeHeader && <Dots />}
+        <span className="flex items-center justify-center">
+          Мы начали проверку
+          {/* Резервируем место под точки, чтобы не было рывка */}
+          <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
+            {fadeHeader && <Dots />}
+          </span>
+        </span>
       </div>
 
       <div className="rounded-md p-0">
