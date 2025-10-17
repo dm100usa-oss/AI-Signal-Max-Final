@@ -25,25 +25,21 @@ export default function QuickPreview() {
   const [showFinal, setShowFinal] = useState(false);
 
   useEffect(() => {
-    // Верхняя полоса — прогресс проверки
     const progressTimer = setInterval(() => {
       setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // Смена факторов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (totalTime / factors.length) * 1000);
 
-    // Исчезновение заголовка
     setTimeout(() => setFadeHeader(true), 1500);
 
-    // Завершение проверки
     setTimeout(() => {
       setFinished(true);
-      setTimeout(() => setShowFinal(true), 1400); // появление финальной надписи
-      setTimeout(() => (window.location.href = "/pay"), 4000); // переход на оплату
+      setTimeout(() => setShowFinal(true), 1400);
+      setTimeout(() => (window.location.href = "/pay"), 4000);
     }, totalTime * 1000);
 
     return () => {
@@ -58,12 +54,10 @@ export default function QuickPreview() {
         AI Signal Max
       </h1>
 
-      {/* Сначала URL и дата */}
       <p className="text-base text-neutral-400 mt-1 mb-2">
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
-      {/* Потом заголовок проверки */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold text-neutral-800 transition-opacity duration-1000 my-6 ${
           fadeHeader ? "opacity-40" : "opacity-100"
@@ -72,16 +66,13 @@ export default function QuickPreview() {
         Мы начали проверку
       </div>
 
-      {/* Основной блок без границ */}
       <div className="rounded-md p-0">
-        {/* Текущий фактор */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p className="text-lg sm:text-xl font-medium text-neutral-900">
             {factors[current]}
           </p>
         </div>
 
-        {/* Верхняя полоса — синяя */}
         <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
@@ -89,14 +80,11 @@ export default function QuickPreview() {
           />
         </div>
 
-        {/* Обновлённая подпись */}
         <p className="text-center text-sm text-neutral-600 mb-4">
           Анализ 10 ключевых факторов
         </p>
 
-        {/* Нижняя лента — динамическая */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-          {/* Движущаяся тёмно-серая полоса поверх светлой подложки */}
           {!finished && (
             <div
               className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
@@ -104,7 +92,6 @@ export default function QuickPreview() {
             />
           )}
 
-          {/* Синее заполнение и финальная надпись */}
           {finished && (
             <div
               className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
@@ -115,14 +102,12 @@ export default function QuickPreview() {
             />
           )}
 
-          {/* Надпись во время проверки */}
           {!finished && (
             <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
               {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
             </div>
           )}
 
-          {/* Финальная надпись */}
           {finished && showFinal && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
@@ -133,7 +118,7 @@ export default function QuickPreview() {
         </div>
       </div>
 
-      <footer className="mt-12 text-center text-xs text-neutral-500">
+      <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
