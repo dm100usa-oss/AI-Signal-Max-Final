@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// 🔹 Анимация трёх точек (точно как на главной)
+// 🔹 Анимация трёх точек (точно как на главной странице)
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
@@ -40,7 +40,7 @@ function Dots() {
   );
 }
 
-export default function ProPreview() {
+export default function ProPreviewPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
@@ -63,9 +63,10 @@ export default function ProPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const totalTime = 44; // общее время всего процесса
-  const auditTime = 30; // первая полоса – аудит факторов
-  const reportTime = 14; // вторая полоса – формирование отчётов
+  const totalTime = 44;
+  const auditTime = 30;
+  const reportTime = 14;
+
   const [current, setCurrent] = useState(0);
   const [progressAudit, setProgressAudit] = useState(0);
   const [progressReport, setProgressReport] = useState(0);
@@ -77,42 +78,41 @@ export default function ProPreview() {
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
 
   useEffect(() => {
-    // Основной прогресс по 15 факторам
+    // 🔹 Анимация факторов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    // Полоса аудита
+    // 🔹 Прогресс первой полосы (аудит)
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => (p >= 100 ? 100 : p + 100 / auditTime));
     }, 1000);
 
-    // Таймер всего процесса
+    // 🔹 Общий таймер (третья полоса)
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // Начало отчёта (вторая полоса)
+    // 🔹 Переход ко второй полосе
     setTimeout(() => {
       setReportStage("owner");
       const reportProgressTimer = setInterval(() => {
         setProgressReport((p) => (p >= 100 ? 100 : p + 100 / reportTime));
       }, 1000);
 
-      // через 6 сек меняем надпись на "Создаём ТЗ для разработчика"
+      // смена надписей
       setTimeout(() => setReportStage("dev"), 6000);
 
-      // конец второй полосы
       setTimeout(() => clearInterval(reportProgressTimer), reportTime * 1000);
     }, auditTime * 1000);
 
-    // Финальная стадия (после общей длительности)
+    // 🔹 Финал
     setTimeout(() => {
       setFinished(true);
       setTimeout(() => setShowFinal(true), 1200);
       setTimeout(() => setShowResultText(true), 2200);
 
-      // Автоматический переход к оплате
+      // 🔹 Переход к оплате
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -123,8 +123,7 @@ export default function ProPreview() {
           const json = await resp.json();
           if (json?.url) router.push(json.url);
           else router.push("/pay");
-        } catch (err) {
-          console.error("Payment redirect failed:", err);
+        } catch {
           router.push("/pay");
         }
       }, 4000);
@@ -142,7 +141,7 @@ export default function ProPreview() {
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Signal Max — Полный аудит
+        AI Signal Max
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
@@ -150,16 +149,16 @@ export default function ProPreview() {
         {new Date().toLocaleDateString("en-US")}
       </p>
 
-      {/* Заголовок с точками */}
+      {/* 🔹 Надпись с точками */}
       <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ${
+        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
             ? "opacity-40 text-neutral-400 translate-y-[-6px]"
             : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
         <span className="flex items-center justify-center">
-          Выполняем аудит
+          Мы начали аудит
           <span className="inline-flex w-[1.7ch] justify-start ml-1">
             {fadeHeader && <Dots />}
           </span>
@@ -167,7 +166,7 @@ export default function ProPreview() {
       </div>
 
       <div className="rounded-md p-0">
-        {/* Факторы */}
+        {/* 🔹 Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p
             key={current}
@@ -192,7 +191,7 @@ export default function ProPreview() {
           `}</style>
         </div>
 
-        {/* Первая зелёная полоса — аудит 15 факторов */}
+        {/* 🔹 Первая зелёная полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-all duration-1000 ease-linear"
@@ -200,7 +199,7 @@ export default function ProPreview() {
           />
         </div>
 
-        {/* Вторая полоса — отчёты */}
+        {/* 🔹 Вторая зелёная полоса (отчёты) */}
         <p className="text-center text-sm text-neutral-600 mb-2">
           {reportStage === "audit"
             ? "Аудит 15 ключевых факторов"
@@ -215,7 +214,7 @@ export default function ProPreview() {
           />
         </div>
 
-        {/* Третья полоса — общий таймер */}
+        {/* 🔹 Третья зелёная полоса (общий таймер) */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <div
@@ -242,7 +241,8 @@ export default function ProPreview() {
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
+          Visibility scores are estimated and based on publicly available data.
+          Not legal advice.
         </span>
       </footer>
     </main>
