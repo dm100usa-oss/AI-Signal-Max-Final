@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function QuickPreview() {
+  const router = useRouter();
+
   const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
@@ -39,14 +42,32 @@ export default function QuickPreview() {
     setTimeout(() => {
       setFinished(true);
       setTimeout(() => setShowFinal(true), 1400);
-      setTimeout(() => (window.location.href = "/pay"), 4000);
+
+      // 🔹 Автоматический переход на оплату
+      setTimeout(async () => {
+        try {
+          const resp = await fetch("/api/pay", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: "quick" }),
+          });
+          const json = await resp.json();
+          if (json?.url) {
+            router.push(json.url);
+          } else {
+            router.push("/pay");
+          }
+        } catch {
+          router.push("/pay");
+        }
+      }, 4000);
     }, totalTime * 1000);
 
     return () => {
       clearInterval(progressTimer);
       clearInterval(factorTimer);
     };
-  }, []);
+  }, [router]);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
