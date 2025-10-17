@@ -59,22 +59,22 @@ export default function QuickPreview() {
       </h1>
 
       {/* Сначала URL и дата */}
-      <p className="text-sm text-neutral-400 mt-1">
+      <p className="text-base text-neutral-400 mt-1 mb-2">
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
       {/* Потом заголовок проверки */}
       <div
-        className={`text-[20px] sm:text-[22px] font-bold text-neutral-800 transition-opacity duration-1000 mb-8 ${
+        className={`text-[22px] sm:text-[24px] font-bold text-neutral-800 transition-opacity duration-1000 my-6 ${
           fadeHeader ? "opacity-40" : "opacity-100"
         }`}
       >
         Мы начали проверку
       </div>
 
-      <div className="rounded-md border border-neutral-200 p-0">
+      <div className="rounded-md border border-neutral-200 p-0 pt-6 pb-2">
         {/* Текущий фактор */}
-        <div className="h-[64px] flex items-center justify-center mb-4 transition-opacity duration-700 ease-in-out">
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p className="text-lg sm:text-xl font-medium text-neutral-900">
             {factors[current]}
           </p>
