@@ -3,6 +3,43 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+// 🔹 Анимация трёх точек (как на главной странице)
+function Dots() {
+  return (
+    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400 ml-1">
+      <span className="dot">.</span>
+      <span className="dot dot2">.</span>
+      <span className="dot dot3">.</span>
+      <style jsx>{`
+        .dot {
+          opacity: 0.2;
+          animation: aiv-dots 1200ms infinite;
+        }
+        .dot2 {
+          animation-delay: 200ms;
+        }
+        .dot3 {
+          animation-delay: 400ms;
+        }
+        @keyframes aiv-dots {
+          0% {
+            opacity: 0.2;
+          }
+          30% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.2;
+          }
+        }
+      `}</style>
+    </span>
+  );
+}
+
 export default function QuickPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -28,7 +65,7 @@ export default function QuickPreview() {
   const [finished, setFinished] = useState(false);
   const [fadeHeader, setFadeHeader] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
-  const [showResultText, setShowResultText] = useState(false); // 🔹 Новое состояние для надписи "Получить результат"
+  const [showResultText, setShowResultText] = useState(false);
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
@@ -42,17 +79,15 @@ export default function QuickPreview() {
 
     setTimeout(() => setFadeHeader(true), 1500);
 
-    // Когда основное время закончилось
     setTimeout(() => {
       setFinished(true);
 
-      // Показ надписи "Проверка завершена"
       setTimeout(() => setShowFinal(true), 1400);
 
-      // Через короткую паузу (~800 мс) появляется надпись "Получить результат"
+      // 🔹 Появление "Получить результат" с fade-in через короткую паузу
       setTimeout(() => setShowResultText(true), 2200);
 
-      // 🔹 Автоматический переход на оплату через Stripe (через 4 сек после завершения)
+      // 🔹 Автоматический переход на оплату
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -89,12 +124,14 @@ export default function QuickPreview() {
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
+      {/* 🔹 Надпись с точками */}
       <div
-        className={`text-[22px] sm:text-[24px] font-bold text-neutral-800 transition-opacity duration-1000 my-6 ${
-          fadeHeader ? "opacity-40" : "opacity-100"
+        className={`text-[22px] sm:text-[24px] font-bold transition-opacity duration-1000 my-6 flex items-center justify-center ${
+          fadeHeader ? "opacity-40 text-neutral-400" : "opacity-100 text-neutral-800"
         }`}
       >
         Мы начали проверку
+        {fadeHeader && <Dots />}
       </div>
 
       <div className="rounded-md p-0">
@@ -111,12 +148,25 @@ export default function QuickPreview() {
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
           />
-          {/* 🔹 Надпись "Получить результат" появляется после финала */}
+          {/* 🔹 Плавное появление текста "Получить результат" */}
           {showResultText && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700 opacity-0 animate-fadeIn">
                 Получить результат
               </p>
+              <style jsx>{`
+                @keyframes fadeIn {
+                  from {
+                    opacity: 0;
+                  }
+                  to {
+                    opacity: 1;
+                  }
+                }
+                .animate-fadeIn {
+                  animation: fadeIn 1s ease forwards;
+                }
+              `}</style>
             </div>
           )}
         </div>
