@@ -39,7 +39,7 @@ function Dots() {
   );
 }
 
-export default function ProPreview() {
+export default function QuickPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
@@ -47,97 +47,68 @@ export default function ProPreview() {
   const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
-    "Понятна ли ИИ структура сайта",
-    "Видит ли ИИ заголовки и описания",
     "Видит ли ИИ содержание страниц",
+    "Видит ли ИИ заголовки и описания",
+    "Понятна ли ИИ структура сайта",
     "Видит ли ИИ изображения на сайте",
-    "Может ли ИИ переходить по ссылкам сайта",
-    "Воспринимает ли ИИ сайт как источник информации",
-    "Считает ли ИИ ваш сайт логичным",
     "Считает ли ИИ ваш сайт безопасным",
-    "Понимает ли ИИ категорию вашего сайта",
     "Учитывает ли ИИ ваш сайт при поиске",
     "Выделяет ли ИИ ваш сайт среди других",
-    "Считает ли ИИ ваш сайт полезным",
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const [currentTop, setCurrentTop] = useState(0);
-  const [currentBottom, setCurrentBottom] = useState(1);
-  const [progressTop, setProgressTop] = useState(0);
-  const [progressBottom, setProgressBottom] = useState(0);
+  const totalTime = 20;
+  const [current, setCurrent] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(totalTime);
   const [finished, setFinished] = useState(false);
-  const [stage, setStage] = useState(0); // 0 — факторы, 1 — формируем отчет, 2 — финальные кнопки
   const [fadeHeader, setFadeHeader] = useState(false);
-
-  // Цвета реальных факторов по результатам проверки
-  const factorColors: Record<string, string> = {
-    Good: "from-green-500 via-green-600 to-green-700",
-    Moderate: "from-yellow-400 via-yellow-500 to-yellow-600",
-    Poor: "from-red-500 via-red-600 to-red-700",
-  };
-
-  // Здесь можно заменить на реальные статусы факторов (Good/Moderate/Poor)
-  const factorStatuses = [
-    "Good", "Moderate", "Good", "Poor", "Moderate",
-    "Good", "Good", "Moderate", "Good", "Poor",
-    "Good", "Moderate", "Good", "Good", "Moderate"
-  ];
+  const [showFinal, setShowFinal] = useState(false);
+  const [showResultText, setShowResultText] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setFadeHeader(true), 1500);
-  }, []);
-
-  useEffect(() => {
-    if (finished) return;
-
-    let indexTop = 0;
-    let indexBottom = 1;
-
-    const topTimer = setInterval(() => {
-      setProgressTop(0);
-      setCurrentTop(indexTop);
-      indexTop += 2;
-      if (indexTop >= factors.length) {
-        clearInterval(topTimer);
-      }
-    }, 4000);
-
-    const bottomTimer = setTimeout(() => {
-      const btmInt = setInterval(() => {
-        setProgressBottom(0);
-        setCurrentBottom(indexBottom);
-        indexBottom += 2;
-        if (indexBottom >= factors.length) {
-          clearInterval(btmInt);
-        }
-      }, 4000);
+    const progressTimer = setInterval(() => {
+      setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    const progressUpdater = setInterval(() => {
-      setProgressTop((p) => (p < 100 ? p + 100 / 40 : 100));
-      setProgressBottom((p) => (p < 100 ? p + 100 / 40 : 100));
-    }, 100);
+    const factorTimer = setInterval(() => {
+      setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
+    }, (totalTime / factors.length) * 1000);
+
+    setTimeout(() => setFadeHeader(true), 1500);
 
     setTimeout(() => {
-      clearInterval(topTimer);
-      clearInterval(bottomTimer);
-      clearInterval(progressUpdater);
-      setStage(1);
-    }, 35000);
+      setFinished(true);
+      setTimeout(() => setShowFinal(true), 1400);
+      setTimeout(() => setShowResultText(true), 2200);
+
+      setTimeout(async () => {
+        try {
+          const resp = await fetch("/api/pay", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: "quick", url }),
+          });
+          const json = await resp.json();
+          if (json?.url) {
+            router.push(json.url);
+          } else {
+            router.push("/pay");
+          }
+        } catch (err) {
+          console.error("Payment redirect failed:", err);
+          router.push("/pay");
+        }
+      }, 4000);
+    }, totalTime * 1000);
 
     return () => {
-      clearInterval(topTimer);
-      clearInterval(bottomTimer);
-      clearInterval(progressUpdater);
+      clearInterval(progressTimer);
+      clearInterval(factorTimer);
     };
-  }, [finished, factors.length]);
+  }, [router, url]);
 
-  const getBarColor = (index: number, progress: number) => {
-    if (progress < 33) return "bg-gray-300";
-    const status = factorStatuses[index];
-    return `bg-gradient-to-r ${factorColors[status]}`;
-  };
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
@@ -149,7 +120,6 @@ export default function ProPreview() {
         {new Date().toLocaleDateString("en-US")}
       </p>
 
-      {/* Заголовок с анимацией */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -158,95 +128,21 @@ export default function ProPreview() {
         }`}
       >
         <span className="flex items-center justify-center">
-          Мы выполняем аудит
+          Мы начали проверку
           <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
             {fadeHeader && <Dots />}
           </span>
         </span>
       </div>
 
-      {/* Основная зона — две полосы */}
-      {stage === 0 && (
-        <div className="space-y-4 mb-6">
-          {/* Верхняя строка */}
-          <div className="flex flex-col items-center">
-            <p
-              key={currentTop}
-              className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp mb-1"
-            >
-              {factors[currentTop]}
-            </p>
-            <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-              <div
-                className={`h-full transition-all duration-700 ease-linear ${getBarColor(
-                  currentTop,
-                  progressTop
-                )}`}
-                style={{ width: `${progressTop}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Нижняя строка */}
-          <div className="flex flex-col items-center">
-            <p
-              key={currentBottom}
-              className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp mb-1"
-            >
-              {factors[currentBottom]}
-            </p>
-            <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-              <div
-                className={`h-full transition-all duration-700 ease-linear ${getBarColor(
-                  currentBottom,
-                  progressBottom
-                )}`}
-                style={{ width: `${progressBottom}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Формирование отчета */}
-      {stage === 1 && (
-        <div className="mt-10 space-y-4">
-          <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-neutral-600 animate-fadeIn">
-                Формируем итоговый отчёт...
-              </p>
-            </div>
-          </div>
-          <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-blue-600 animate-fadeIn">
-                Отчёт готов. Подготавливаем отправку...
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Финальные три зелёные полосы */}
-      {stage === 2 && (
-        <div className="mt-10 space-y-3">
-          {["Отчёты подготовлены", "Аудит завершён", "Получить результат"].map(
-            (text, i) => (
-              <div
-                key={i}
-                className={`relative w-full h-12 rounded-md overflow-hidden bg-green-600 transition-all duration-700 ease-in-out flex items-center justify-center`}
-                style={{
-                  animation: `fadeInRow 0.6s ease forwards`,
-                  animationDelay: `${i * 0.3}s`,
-                }}
-              >
-                <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm">
-                  {text}
-                </p>
-              </div>
-            )
-          )}
+      <div className="rounded-md p-0">
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
+          <p
+            key={current}
+            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+          >
+            {factors[current]}
+          </p>
           <style jsx>{`
             @keyframes fadeInUp {
               from {
@@ -258,25 +154,76 @@ export default function ProPreview() {
                 transform: translateY(0);
               }
             }
-            @keyframes fadeInRow {
-              from {
-                opacity: 0;
-                transform: scale(0.98);
-              }
-              to {
-                opacity: 1;
-                transform: scale(1);
-              }
-            }
             .animate-fadeInUp {
               animation: fadeInUp 0.8s ease forwards;
             }
-            .animate-fadeIn {
-              animation: fadeInUp 1s ease forwards;
-            }
           `}</style>
         </div>
-      )}
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
+            style={{ width: `${progress}%` }}
+          />
+          {showResultText && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700 opacity-0 animate-fadeIn">
+                Получить результат
+              </p>
+              <style jsx>{`
+                @keyframes fadeIn {
+                  from {
+                    opacity: 0;
+                  }
+                  to {
+                    opacity: 1;
+                  }
+                }
+                .animate-fadeIn {
+                  animation: fadeIn 1s ease forwards;
+                }
+              `}</style>
+            </div>
+          )}
+        </div>
+
+        <p className="text-center text-sm text-neutral-600 mb-4">
+          Анализ 10 ключевых факторов
+        </p>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+          {!finished && (
+            <div
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
+              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+            />
+          )}
+
+          {finished && (
+            <div
+              className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
+                showFinal
+                  ? "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-100"
+                  : "bg-gray-200 opacity-0"
+              }`}
+            />
+          )}
+
+          {!finished && (
+            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+              {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
+            </div>
+          )}
+
+          {finished && showFinal && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
+                Проверка завершена
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
@@ -288,29 +235,4 @@ export default function ProPreview() {
       </footer>
     </main>
   );
-
-  // После завершения этапа 1 — показываем зелёные кнопки и переходим к оплате
-  useEffect(() => {
-    if (stage === 1) {
-      const timer = setTimeout(() => {
-        setStage(2);
-        setTimeout(async () => {
-          try {
-            const resp = await fetch("/api/pay", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ mode: "pro", url }),
-            });
-            const json = await resp.json();
-            if (json?.url) router.push(json.url);
-            else router.push("/pay");
-          } catch (err) {
-            console.error("Payment redirect failed:", err);
-            router.push("/pay");
-          }
-        }, 4000);
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [stage, router, url]);
 }
