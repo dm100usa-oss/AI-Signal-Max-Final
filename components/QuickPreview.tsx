@@ -58,24 +58,23 @@ export default function QuickPreview() {
         AI Signal Max
       </h1>
 
-      {/* Верхняя строка — описание проверки */}
+      {/* Сначала URL и дата */}
+      <p className="text-sm text-neutral-400 mt-1">
+        https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
+      </p>
+
+      {/* Потом заголовок проверки */}
       <div
-        className={`text-[20px] sm:text-[22px] font-bold text-neutral-800 transition-opacity duration-1000 ${
+        className={`text-[20px] sm:text-[22px] font-bold text-neutral-800 transition-opacity duration-1000 mb-8 ${
           fadeHeader ? "opacity-40" : "opacity-100"
         }`}
       >
         Мы начали проверку
       </div>
 
-      <p className="text-sm text-neutral-400 mt-1 mb-8">
-        https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
-      </p>
-
       <div className="rounded-md border border-neutral-200 p-0">
         {/* Текущий фактор */}
-        <div
-          className="h-[64px] flex items-center justify-center mb-4 transition-opacity duration-700 ease-in-out"
-        >
+        <div className="h-[64px] flex items-center justify-center mb-4 transition-opacity duration-700 ease-in-out">
           <p className="text-lg sm:text-xl font-medium text-neutral-900">
             {factors[current]}
           </p>
@@ -89,9 +88,9 @@ export default function QuickPreview() {
           />
         </div>
 
-        {/* Текст под синей полосой */}
+        {/* Новый текст под синей полосой */}
         <p className="text-center text-sm text-neutral-600 mb-4">
-          Быстрый результат, 5 факторов проверки, простые рекомендации
+          Анализ по 10 ключевым факторам
         </p>
 
         {/* Нижняя лента — динамическая */}
