@@ -13,7 +13,7 @@ export default function QuickPreview() {
     "Считает ли ИИ ваш сайт безопасным",
     "Учитывает ли ИИ ваш сайт при поиске",
     "Видит ли ИИ ваш сайт среди конкурентов",
-    "Формируем финальные результаты",
+    "Как оценивает ИИ ваш сайт",
   ];
 
   const totalTime = 20;
@@ -21,106 +21,118 @@ export default function QuickPreview() {
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [finished, setFinished] = useState(false);
-  const [url, setUrl] = useState("");
-  const [date, setDate] = useState("");
-  const [fade, setFade] = useState(true);
+  const [fadeHeader, setFadeHeader] = useState(false);
+  const [showFinal, setShowFinal] = useState(false);
+  const [grayFill, setGrayFill] = useState(0);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const site = params.get("url") || "";
-    setUrl(site);
-
-    const now = new Date();
-    const formatted = now.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-    setDate(formatted);
-
-    // Основной таймер
+    // Верхняя полоса — движение
     const progressTimer = setInterval(() => {
-      setProgress((prev) => (prev >= 100 ? 100 : prev + 100 / totalTime));
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // Смена факторов с плавным проявлением
+    // Последовательность факторов
     const factorTimer = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setCurrent((prev) => (prev < factors.length - 1 ? prev + 1 : prev));
-        setFade(true);
-      }, 250);
+      setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (totalTime / factors.length) * 1000);
 
-    // Завершение
-    const finishTimer = setTimeout(() => setFinished(true), totalTime * 1000 + 600);
-    const redirectTimer = setTimeout(() => (window.location.href = "/pay"), totalTime * 1000 + 2500);
+    // Исчезновение заголовка
+    setTimeout(() => setFadeHeader(true), 1500);
+
+    // Завершение проверки
+    setTimeout(() => {
+      setFinished(true);
+      setTimeout(() => setGrayFill(100), 500); // плавное заполнение нижней серой полосы
+      setTimeout(() => setShowFinal(true), 1400); // финальная надпись
+      setTimeout(() => (window.location.href = "/pay"), 4000); // переход к оплате
+    }, totalTime * 1000);
 
     return () => {
       clearInterval(progressTimer);
       clearInterval(factorTimer);
-      clearTimeout(finishTimer);
-      clearTimeout(redirectTimer);
     };
   }, []);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
-      <h1 className="text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
 
-      <p className="text-neutral-600 mb-2 leading-relaxed">
-        Проверяем видимость вашего сайта для ChatGPT, Copilot, Gemini и других ИИ-платформ
+      {/* Верхняя строка — описание проверки */}
+      <div
+        className={`text-[20px] sm:text-[22px] font-bold text-neutral-800 transition-opacity duration-1000 ${
+          fadeHeader ? "opacity-40" : "opacity-100"
+        }`}
+      >
+        Мы начали проверку
+      </div>
+
+      <p className="text-sm text-neutral-400 mt-1 mb-8">
+        https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
-      {(url || date) && (
-        <p className="text-sm text-neutral-400 text-center mb-8">
-          Website: {url || "—"} &nbsp; | &nbsp; Date: {date}
-        </p>
-      )}
-
-      <div className="rounded-md border border-neutral-200 bg-white px-3 py-2">
-        {/* Текущий фактор — фиксированная высота и плавное проявление */}
+      <div className="rounded-md border border-neutral-200 p-0">
+        {/* Текущий фактор */}
         <div
-          key={current}
-          className={`h-[64px] sm:h-[68px] flex items-center justify-center rounded-md bg-neutral-50/50 text-[20px] sm:text-[22px] font-bold text-neutral-900 mb-4 mt-4 transition-opacity duration-500 ${
-            fade ? "opacity-100" : "opacity-0"
-          }`}
+          className="h-[64px] flex items-center justify-center mb-4 transition-opacity duration-700 ease-in-out"
         >
-          {factors[current]}
+          <p className="text-lg sm:text-xl font-medium text-neutral-900">
+            {factors[current]}
+          </p>
         </div>
 
-        {/* Верхняя полоса */}
-        <div className="w-full h-[52px] rounded-md overflow-hidden bg-gray-200 mb-5">
+        {/* Верхняя полоса — синяя */}
+        <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-[1200ms] ease-linear"
+            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
 
-        <p className="text-sm text-neutral-600 text-center mt-2 mb-6">
-          Instant results, 5-point basic check, simple recommendations
+        {/* Текст под синей полосой */}
+        <p className="text-center text-sm text-neutral-600 mb-4">
+          Быстрый результат, 5 факторов проверки, простые рекомендации
         </p>
 
-        {/* Нижняя полоса с плавным движением */}
-        <div className="w-full h-[52px] rounded-md bg-gray-200 relative overflow-hidden flex items-center justify-center text-sm font-medium">
+        {/* Нижняя лента — динамическая */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden">
+          {/* Серое движение */}
           {!finished && (
             <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-[1800ms] ease-linear"
-              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
+              style={{ width: `${grayFill}%` }}
             />
           )}
 
-          {finished ? (
-            <span className="text-[17px] text-neutral-700 font-semibold transition-opacity duration-700 opacity-100 relative z-10">
-              Проверка завершена
-            </span>
-          ) : (
-            <span className="text-neutral-500 relative z-10">
-              Проверка завершится через {timeLeft} сек
-            </span>
+          {/* Синее заполнение и финальная надпись */}
+          {finished && (
+            <div
+              className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
+                showFinal
+                  ? "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-100"
+                  : "bg-gray-200 opacity-0"
+              }`}
+            />
+          )}
+
+          {/* Надпись во время проверки */}
+          {!finished && (
+            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+              {timeLeft > 0
+                ? `Проверка завершится через ${timeLeft} сек`
+                : ""}
+            </div>
+          )}
+
+          {/* Финальная надпись */}
+          {finished && showFinal && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
+                Проверка завершена
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -129,7 +141,8 @@ export default function QuickPreview() {
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
+          Visibility scores are estimated and based on publicly available data.
+          Not legal advice.
         </span>
       </footer>
     </main>
