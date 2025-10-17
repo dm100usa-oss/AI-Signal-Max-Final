@@ -39,7 +39,7 @@ function Dots() {
   );
 }
 
-export default function QuickPreview() {
+export default function ProPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
@@ -47,17 +47,22 @@ export default function QuickPreview() {
   const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
-    "Видит ли ИИ содержание страниц",
-    "Видит ли ИИ заголовки и описания",
     "Понятна ли ИИ структура сайта",
+    "Видит ли ИИ заголовки и описания",
+    "Видит ли ИИ содержание страниц",
     "Видит ли ИИ изображения на сайте",
+    "Может ли ИИ переходить по ссылкам сайта",
+    "Воспринимает ли ИИ сайт как источник информации",
+    "Считает ли ИИ ваш сайт логичным",
     "Считает ли ИИ ваш сайт безопасным",
+    "Понимает ли ИИ категорию вашего сайта",
     "Учитывает ли ИИ ваш сайт при поиске",
     "Выделяет ли ИИ ваш сайт среди других",
+    "Считает ли ИИ ваш сайт полезным",
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const totalTime = 20;
+  const totalTime = 35;
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(totalTime);
@@ -88,7 +93,7 @@ export default function QuickPreview() {
           const resp = await fetch("/api/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "quick", url }),
+            body: JSON.stringify({ mode: "pro", url }),
           });
           const json = await resp.json();
           if (json?.url) {
@@ -112,7 +117,7 @@ export default function QuickPreview() {
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Signal Max
+        AI Signal Max — Полный аудит
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
@@ -128,7 +133,7 @@ export default function QuickPreview() {
         }`}
       >
         <span className="flex items-center justify-center">
-          Мы начали проверку
+          Выполняем аудит
           <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
             {fadeHeader && <Dots />}
           </span>
@@ -188,7 +193,7 @@ export default function QuickPreview() {
         </div>
 
         <p className="text-center text-sm text-neutral-600 mb-4">
-          Анализ 10 ключевых факторов
+          Анализ 15 ключевых факторов
         </p>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
@@ -203,7 +208,7 @@ export default function QuickPreview() {
             <div
               className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
                 showFinal
-                  ? "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-100"
+                  ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700 opacity-100"
                   : "bg-gray-200 opacity-0"
               }`}
             />
@@ -211,14 +216,14 @@ export default function QuickPreview() {
 
           {!finished && (
             <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-              {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
+              {timeLeft > 0 ? `Аудит завершится через ${timeLeft} сек` : ""}
             </div>
           )}
 
           {finished && showFinal && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
-                Проверка завершена
+                Аудит завершён
               </p>
             </div>
           )}
