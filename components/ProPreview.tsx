@@ -73,9 +73,10 @@ export default function FullPreview() {
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [finished, setFinished] = useState(false);
   const [fadeHeader, setFadeHeader] = useState(false);
-  const [showFinal, setShowFinal] = useState(false);
   const [showResultText, setShowResultText] = useState(false);
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
+  const [auditDone, setAuditDone] = useState(false);
+  const [reportsDone, setReportsDone] = useState(false);
 
   useEffect(() => {
     // 🔹 Анимация факторов
@@ -83,9 +84,17 @@ export default function FullPreview() {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    // 🔹 Прогресс первой полосы
+    // 🔹 Первая полоса (аудит)
     const auditProgressTimer = setInterval(() => {
-      setProgressAudit((p) => (p >= 100 ? 100 : p + 100 / auditTime));
+      setProgressAudit((p) => {
+        const next = p + 100 / auditTime;
+        if (next >= 100) {
+          clearInterval(auditProgressTimer);
+          setAuditDone(true);
+          setTimeout(() => setReportStage("owner"), 500);
+        }
+        return Math.min(next, 100);
+      });
     }, 1000);
 
     // 🔹 Общий таймер (третья полоса)
@@ -93,22 +102,28 @@ export default function FullPreview() {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // 🔹 Вторая полоса: смена этапов
+    // 🔹 Вторая полоса (отчёты)
+    const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
-      setReportStage("owner");
       const reportProgressTimer = setInterval(() => {
-        setProgressReport((p) => (p >= 100 ? 100 : p + 100 / reportTime));
+        setProgressReport((p) => {
+          const next = p + 100 / reportTime;
+          if (next >= 100) {
+            clearInterval(reportProgressTimer);
+            setReportsDone(true);
+          }
+          return Math.min(next, 100);
+        });
       }, 1000);
 
+      // смена стадий текста
       setTimeout(() => setReportStage("dev"), 6000);
-      setTimeout(() => clearInterval(reportProgressTimer), reportTime * 1000);
-    }, auditTime * 1000);
+    }, reportStartDelay);
 
     // 🔹 Финал
     setTimeout(() => {
       setFinished(true);
-      setTimeout(() => setShowFinal(true), 1200);
-      setTimeout(() => setShowResultText(true), 2200);
+      setTimeout(() => setShowResultText(true), 2000);
 
       // 🔹 Автоматический переход к оплате
       setTimeout(async () => {
@@ -127,11 +142,11 @@ export default function FullPreview() {
       }, 4000);
     }, totalTime * 1000);
 
+    // 🔹 Заголовок затухает
     setTimeout(() => setFadeHeader(true), 1500);
 
     return () => {
       clearInterval(factorTimer);
-      clearInterval(auditProgressTimer);
       clearInterval(overallTimer);
     };
   }, [router, url]);
@@ -190,11 +205,18 @@ export default function FullPreview() {
         </div>
 
         {/* 🔹 Первая полоса — аудит */}
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-all duration-1000 ease-linear"
+            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
             style={{ width: `${progressAudit}%` }}
           />
+          {auditDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Аудит завершён
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 🔹 Вторая полоса — отчёты */}
@@ -205,35 +227,56 @@ export default function FullPreview() {
             ? "Формируем отчёт для владельца сайта"
             : "Создаём ТЗ для разработчика"}
         </p>
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-all duration-1000 ease-linear"
+            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
             style={{ width: `${progressReport}%` }}
           />
+          {reportsDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Отчёты подготовлены
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 🔹 Третья полоса — таймер */}
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
-            <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
-              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
-            />
-          )}
-          {!finished && (
-            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-              {`Полный аудит завершится через ${timeLeft} сек`}
-            </div>
+            <>
+              <div
+                className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+                style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+              />
+              <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+                {`Полный аудит завершится через ${timeLeft} сек`}
+              </div>
+            </>
           )}
           {finished && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
-                Аудит завершён
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Получить результат
               </p>
             </div>
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 1.2s ease forwards;
+        }
+      `}</style>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
