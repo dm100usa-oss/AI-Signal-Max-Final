@@ -1,3 +1,4 @@
+// app/api/webhook/route.ts
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { getData } from "@/lib/storage";
@@ -26,9 +27,15 @@ export async function POST(req: Request) {
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
+
       const url = session.metadata?.url;
       const mode = session.metadata?.mode || "pro";
-      const email = session.metadata?.email || session.customer_email;
+
+      // ✅ Главное исправление:
+      // теперь webhook сначала берёт email, который пользователь вводит в Stripe Checkout,
+      // а если его нет — из metadata (на случай старых заказов)
+      const email =
+        session.customer_email || session.metadata?.email || "";
 
       if (!url) {
         console.error("Missing URL in metadata");
