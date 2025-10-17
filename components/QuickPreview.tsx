@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function QuickPreview() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const url = searchParams.get("url") || "";
 
   const factors = [
     "Открыт ли сайт для ИИ",
@@ -43,13 +45,13 @@ export default function QuickPreview() {
       setFinished(true);
       setTimeout(() => setShowFinal(true), 1400);
 
-      // 🔹 Автоматический переход на оплату
+      // 🔹 Автоматический переход на оплату через Stripe
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "quick" }),
+            body: JSON.stringify({ mode: "quick", url }),
           });
           const json = await resp.json();
           if (json?.url) {
@@ -57,7 +59,8 @@ export default function QuickPreview() {
           } else {
             router.push("/pay");
           }
-        } catch {
+        } catch (err) {
+          console.error("Payment redirect failed:", err);
           router.push("/pay");
         }
       }, 4000);
@@ -67,7 +70,7 @@ export default function QuickPreview() {
       clearInterval(progressTimer);
       clearInterval(factorTimer);
     };
-  }, [router]);
+  }, [router, url]);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
@@ -94,6 +97,7 @@ export default function QuickPreview() {
           </p>
         </div>
 
+        {/* Верхняя синяя полоса */}
         <div className="w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
@@ -105,6 +109,7 @@ export default function QuickPreview() {
           Анализ 10 ключевых факторов
         </p>
 
+        {/* Нижняя полоса (тайминг) */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <div
