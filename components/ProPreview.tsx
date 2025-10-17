@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+// 🔹 Анимация трёх точек
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
@@ -42,7 +43,7 @@ function Dots() {
 export default function ProPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const url = searchParams.get("url") || "";
+  const url = searchParams.get("url") || "https://example.com";
 
   const factors = [
     "Открыт ли сайт для ИИ",
@@ -63,31 +64,44 @@ export default function ProPreview() {
   ];
 
   const totalTime = 35;
-  const [current, setCurrent] = useState(0);
+  const [currentTop, setCurrentTop] = useState(0);
+  const [currentBottom, setCurrentBottom] = useState(-1);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [finished, setFinished] = useState(false);
-  const [fadeHeader, setFadeHeader] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
-  const [showResultText, setShowResultText] = useState(false);
+  const [stage, setStage] = useState(0); // 0 – идёт аудит, 1–3 финальные зелёные полосы
 
   useEffect(() => {
-    const progressTimer = setInterval(() => {
+    // верхний ряд (1,3,5,7,9,11,13,15)
+    const topInterval = setInterval(() => {
+      setCurrentTop((p) => (p < 7 ? p + 1 : 7));
+    }, 3000);
+
+    // нижний ряд (2,4,6,8,10,12,14)
+    const bottomTimeout = setTimeout(() => {
+      setCurrentBottom(0);
+      const bottomInterval = setInterval(() => {
+        setCurrentBottom((p) => (p < 6 ? p + 1 : 6));
+      }, 3000);
+      return () => clearInterval(bottomInterval);
+    }, 1000);
+
+    // общий прогресс
+    const timer = setInterval(() => {
       setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    const factorTimer = setInterval(() => {
-      setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
-    }, (totalTime / factors.length) * 1000);
-
-    setTimeout(() => setFadeHeader(true), 1500);
-
+    // завершение
     setTimeout(() => {
       setFinished(true);
-      setTimeout(() => setShowFinal(true), 1400);
-      setTimeout(() => setShowResultText(true), 2200);
+      // последовательно показываем три зелёные полосы
+      setTimeout(() => setStage(1), 800);
+      setTimeout(() => setStage(2), 1800);
+      setTimeout(() => setStage(3), 2800);
 
+      // переход к оплате
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -96,140 +110,147 @@ export default function ProPreview() {
             body: JSON.stringify({ mode: "pro", url }),
           });
           const json = await resp.json();
-          if (json?.url) {
-            router.push(json.url);
-          } else {
-            router.push("/pay");
-          }
+          if (json?.url) router.push(json.url);
+          else router.push("/pay");
         } catch (err) {
           console.error("Payment redirect failed:", err);
           router.push("/pay");
         }
-      }, 4000);
+      }, 6000);
     }, totalTime * 1000);
 
     return () => {
-      clearInterval(progressTimer);
-      clearInterval(factorTimer);
+      clearInterval(timer);
+      clearInterval(topInterval);
+      clearTimeout(bottomTimeout);
     };
-  }, [router, url]);
+  }, [router, url, totalTime]);
+
+  // функция появления с анимацией
+  const fadeIn = (visible: boolean) =>
+    visible
+      ? "opacity-100 translate-y-0 transition-all duration-700 ease-out"
+      : "opacity-0 translate-y-2";
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+    <main className="mx-auto max-w-3xl px-6 pt-20 pb-16 text-center bg-white">
+      {/* Заголовок */}
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Signal Max — Полный аудит
+        AI Signal Max
       </h1>
-
-      <p className="text-base text-neutral-400 mt-1 mb-2">
-        {url || "https://example.com"} &nbsp; | &nbsp; Date:{" "}
-        {new Date().toLocaleDateString("en-US")}
+      <p className="text-base text-neutral-400 mt-1 mb-6">
+        {url} &nbsp; | &nbsp; Date: {new Date().toLocaleDateString("en-US")}
       </p>
 
-      <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          fadeHeader
-            ? "opacity-40 text-neutral-400 translate-y-[-6px]"
-            : "opacity-100 text-neutral-800 translate-y-0"
-        }`}
-      >
-        <span className="flex items-center justify-center">
-          Выполняем аудит
-          <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
-            {fadeHeader && <Dots />}
+      {/* Надпись с точками */}
+      {!finished && (
+        <div className="text-[22px] sm:text-[24px] font-bold mb-10 text-neutral-700 flex items-center justify-center">
+          Мы начали аудит
+          <span className="ml-1">
+            <Dots />
           </span>
-        </span>
+        </div>
+      )}
+
+      {/* Два ряда факторов */}
+      <div className="space-y-4 mb-8">
+        {/* Верхний ряд */}
+        <div className="flex flex-wrap justify-center gap-3 text-[15px] sm:text-base text-neutral-900">
+          {factors
+            .filter((_, i) => i % 2 === 0)
+            .map((f, i) => (
+              <span
+                key={i}
+                className={`${fadeIn(i <= currentTop)} bg-neutral-100 rounded-full px-3 py-1`}
+              >
+                {f}
+              </span>
+            ))}
+        </div>
+
+        {/* Верхняя полоса */}
+        <div className="relative w-full h-3 rounded-md overflow-hidden bg-gray-200">
+          <div
+            className="absolute left-0 top-0 h-full bg-gray-400 transition-all duration-1000 ease-linear"
+            style={{ width: finished ? "100%" : `${progress}%` }}
+          ></div>
+        </div>
+
+        {/* Нижний ряд */}
+        <div className="flex flex-wrap justify-center gap-3 text-[15px] sm:text-base text-neutral-900">
+          {factors
+            .filter((_, i) => i % 2 !== 0)
+            .map((f, i) => (
+              <span
+                key={i}
+                className={`${fadeIn(i <= currentBottom)} bg-neutral-100 rounded-full px-3 py-1`}
+              >
+                {f}
+              </span>
+            ))}
+        </div>
+
+        {/* Нижняя полоса */}
+        <div className="relative w-full h-3 rounded-md overflow-hidden bg-gray-200">
+          <div
+            className="absolute left-0 top-0 h-full bg-gray-400 transition-all duration-1000 ease-linear"
+            style={{ width: finished ? "100%" : `${progress}%` }}
+          ></div>
+        </div>
       </div>
 
-      <div className="rounded-md p-0">
-        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p
-            key={current}
-            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-          >
-            {factors[current]}
+      {/* Общая подпись и таймер */}
+      {!finished && (
+        <div className="mb-10">
+          <p className="text-sm text-neutral-600 mb-2">
+            Аудит по 15 ключевым факторам
           </p>
-          <style jsx>{`
-            @keyframes fadeInUp {
-              from {
-                opacity: 0;
-                transform: translateY(10px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
-            }
-            .animate-fadeInUp {
-              animation: fadeInUp 0.8s ease forwards;
-            }
-          `}</style>
-        </div>
-
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
-          <div
-            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
-            style={{ width: `${progress}%` }}
-          />
-          {showResultText && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700 opacity-0 animate-fadeIn">
-                Получить результат
-              </p>
-              <style jsx>{`
-                @keyframes fadeIn {
-                  from {
-                    opacity: 0;
-                  }
-                  to {
-                    opacity: 1;
-                  }
-                }
-                .animate-fadeIn {
-                  animation: fadeIn 1s ease forwards;
-                }
-              `}</style>
-            </div>
-          )}
-        </div>
-
-        <p className="text-center text-sm text-neutral-600 mb-4">
-          Анализ 15 ключевых факторов
-        </p>
-
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-          {!finished && (
+          <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
             <div
               className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
               style={{ width: `${(timeLeft / totalTime) * 100}%` }}
             />
-          )}
-
-          {finished && (
-            <div
-              className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
-                showFinal
-                  ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700 opacity-100"
-                  : "bg-gray-200 opacity-0"
-              }`}
-            />
-          )}
-
-          {!finished && (
-            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-              {timeLeft > 0 ? `Аудит завершится через ${timeLeft} сек` : ""}
+            <div className="absolute inset-0 flex items-center justify-center text-neutral-500 text-sm font-medium">
+              {`Полный аудит завершится через ${timeLeft} сек`}
             </div>
-          )}
-
-          {finished && showFinal && (
-            <div className="absolute inset-0 flex items-center justify-center z-10">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
-                Аудит завершён
-              </p>
-            </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
+      {/* Финальные зелёные полосы */}
+      {finished && (
+        <div className="space-y-3 mt-12">
+          <div
+            className={`h-12 rounded-md flex items-center justify-center font-semibold text-white transition-all duration-700 ${
+              stage >= 1
+                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700 opacity-100"
+                : "bg-gray-200 opacity-0"
+            }`}
+          >
+            {stage >= 1 && "Аудит завершён"}
+          </div>
+          <div
+            className={`h-12 rounded-md flex items-center justify-center font-semibold text-white transition-all duration-700 ${
+              stage >= 2
+                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700 opacity-100"
+                : "bg-gray-200 opacity-0"
+            }`}
+          >
+            {stage >= 2 && "Отчёты подготовлены"}
+          </div>
+          <div
+            className={`h-12 rounded-md flex items-center justify-center font-semibold text-white transition-all duration-700 ${
+              stage >= 3
+                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700 opacity-100"
+                : "bg-gray-200 opacity-0"
+            }`}
+          >
+            {stage >= 3 && "Получить результат"}
+          </div>
+        </div>
+      )}
+
+      {/* Футер */}
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
