@@ -10,32 +10,6 @@ function Dots() {
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
-      <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-        }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
-        @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
-        }
-      `}</style>
     </span>
   );
 }
@@ -79,12 +53,10 @@ export default function FullPreview() {
   const [reportsDone, setReportsDone] = useState(false);
 
   useEffect(() => {
-    // 🔹 Анимация факторов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    // 🔹 Первая полоса (аудит)
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -97,12 +69,10 @@ export default function FullPreview() {
       });
     }, 1000);
 
-    // 🔹 Общий таймер (третья полоса)
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // 🔹 Вторая полоса (отчёты)
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -116,16 +86,13 @@ export default function FullPreview() {
         });
       }, 1000);
 
-      // смена стадий текста
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
-    // 🔹 Финал
     setTimeout(() => {
       setFinished(true);
       setTimeout(() => setShowResultText(true), 2000);
 
-      // 🔹 Автоматический переход к оплате
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -142,7 +109,6 @@ export default function FullPreview() {
       }, 4000);
     }, totalTime * 1000);
 
-    // 🔹 Заголовок затухает
     setTimeout(() => setFadeHeader(true), 1500);
 
     return () => {
@@ -162,7 +128,6 @@ export default function FullPreview() {
         {new Date().toLocaleDateString("en-US")}
       </p>
 
-      {/* 🔹 Заголовок с точками */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -179,7 +144,6 @@ export default function FullPreview() {
       </div>
 
       <div className="rounded-md p-0">
-        {/* 🔹 Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p
             key={current}
@@ -187,24 +151,9 @@ export default function FullPreview() {
           >
             {factors[current]}
           </p>
-          <style jsx>{`
-            @keyframes fadeInUp {
-              from {
-                opacity: 0;
-                transform: translateY(10px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
-            }
-            .animate-fadeInUp {
-              animation: fadeInUp 0.8s ease forwards;
-            }
-          `}</style>
         </div>
 
-        {/* 🔹 Первая полоса — аудит */}
+        {/* Первая полоса */}
         <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
@@ -219,7 +168,7 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* 🔹 Вторая полоса — отчёты */}
+        {/* Вторая полоса */}
         <p className="text-center text-sm text-neutral-600 mb-2">
           {reportStage === "audit"
             ? "Аудит 15 ключевых факторов"
@@ -241,7 +190,7 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* 🔹 Третья полоса — таймер */}
+        {/* Третья полоса */}
         <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <>
@@ -264,7 +213,22 @@ export default function FullPreview() {
         </div>
       </div>
 
-      <style jsx>{`
+      {/* Глобальные анимации для стабильности сборки */}
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s ease forwards;
+        }
+
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -275,6 +239,31 @@ export default function FullPreview() {
         }
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
+        }
+
+        @keyframes aiv-dots {
+          0% {
+            opacity: 0.2;
+          }
+          30% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.2;
+          }
+        }
+        .dot {
+          opacity: 0.2;
+          animation: aiv-dots 1200ms infinite;
+        }
+        .dot2 {
+          animation-delay: 200ms;
+        }
+        .dot3 {
+          animation-delay: 400ms;
         }
       `}</style>
 
