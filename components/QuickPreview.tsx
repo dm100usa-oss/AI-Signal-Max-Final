@@ -23,16 +23,15 @@ export default function QuickPreview() {
   const [finished, setFinished] = useState(false);
   const [fadeHeader, setFadeHeader] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
-  const [grayFill, setGrayFill] = useState(0);
 
   useEffect(() => {
-    // Верхняя полоса — движение
+    // Верхняя полоса — прогресс проверки
     const progressTimer = setInterval(() => {
       setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // Последовательность факторов
+    // Смена факторов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (totalTime / factors.length) * 1000);
@@ -43,9 +42,8 @@ export default function QuickPreview() {
     // Завершение проверки
     setTimeout(() => {
       setFinished(true);
-      setTimeout(() => setGrayFill(100), 500); // плавное заполнение нижней серой полосы
-      setTimeout(() => setShowFinal(true), 1400); // финальная надпись
-      setTimeout(() => (window.location.href = "/pay"), 4000); // переход к оплате
+      setTimeout(() => setShowFinal(true), 1400); // появление финальной надписи
+      setTimeout(() => (window.location.href = "/pay"), 4000); // переход на оплату
     }, totalTime * 1000);
 
     return () => {
@@ -97,12 +95,12 @@ export default function QuickPreview() {
         </p>
 
         {/* Нижняя лента — динамическая */}
-        <div className="relative w-full h-12 rounded-md overflow-hidden">
-          {/* Серое движение */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+          {/* Движущаяся тёмно-серая полоса поверх светлой подложки */}
           {!finished && (
             <div
               className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
-              style={{ width: `${grayFill}%` }}
+              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
             />
           )}
 
@@ -120,9 +118,7 @@ export default function QuickPreview() {
           {/* Надпись во время проверки */}
           {!finished && (
             <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-              {timeLeft > 0
-                ? `Проверка завершится через ${timeLeft} сек`
-                : ""}
+              {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
             </div>
           )}
 
