@@ -44,6 +44,7 @@ export default function ProPreview() {
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
 
+  // 🔹 Все 15 факторов
   const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
@@ -62,6 +63,10 @@ export default function ProPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
+  // 🔹 Нечётные и чётные факторы
+  const topFactors = factors.filter((_, i) => i % 2 === 0);
+  const bottomFactors = factors.filter((_, i) => i % 2 === 1);
+
   const totalTime = 35;
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -69,7 +74,6 @@ export default function ProPreview() {
   const [finished, setFinished] = useState(false);
   const [fadeHeader, setFadeHeader] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
-  const [showResultText, setShowResultText] = useState(false);
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
@@ -78,16 +82,16 @@ export default function ProPreview() {
     }, 1000);
 
     const factorTimer = setInterval(() => {
-      setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
-    }, (totalTime / factors.length) * 1000);
+      setCurrent((p) => (p < topFactors.length - 1 ? p + 1 : p));
+    }, 2500);
 
     setTimeout(() => setFadeHeader(true), 1500);
 
     setTimeout(() => {
       setFinished(true);
-      setTimeout(() => setShowFinal(true), 1400);
-      setTimeout(() => setShowResultText(true), 2200);
+      setTimeout(() => setShowFinal(true), 1200);
 
+      // 🔹 Переход на оплату (mode: "pro")
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -96,11 +100,8 @@ export default function ProPreview() {
             body: JSON.stringify({ mode: "pro", url }),
           });
           const json = await resp.json();
-          if (json?.url) {
-            router.push(json.url);
-          } else {
-            router.push("/pay");
-          }
+          if (json?.url) router.push(json.url);
+          else router.push("/pay");
         } catch (err) {
           console.error("Payment redirect failed:", err);
           router.push("/pay");
@@ -112,19 +113,22 @@ export default function ProPreview() {
       clearInterval(progressTimer);
       clearInterval(factorTimer);
     };
-  }, [router, url]);
+  }, [router, url, totalTime, topFactors.length]);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+      {/* 🔹 Заголовок */}
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Signal Max — Полный аудит
+        AI Signal Max
       </h1>
 
+      {/* 🔹 Адрес и дата */}
       <p className="text-base text-neutral-400 mt-1 mb-2">
         {url || "https://example.com"} &nbsp; | &nbsp; Date:{" "}
         {new Date().toLocaleDateString("en-US")}
       </p>
 
+      {/* 🔹 Основная надпись */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -133,69 +137,57 @@ export default function ProPreview() {
         }`}
       >
         <span className="flex items-center justify-center">
-          Выполняем аудит
+          Мы начали аудит
           <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
             {fadeHeader && <Dots />}
           </span>
         </span>
       </div>
 
+      {/* 🔹 Основные полосы проверки */}
       <div className="rounded-md p-0">
+        {/* Верхний ряд факторов (нечётные) */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p
-            key={current}
+            key={`top-${current}`}
             className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
           >
-            {factors[current]}
+            {topFactors[current]}
           </p>
-          <style jsx>{`
-            @keyframes fadeInUp {
-              from {
-                opacity: 0;
-                transform: translateY(10px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
-            }
-            .animate-fadeInUp {
-              animation: fadeInUp 0.8s ease forwards;
-            }
-          `}</style>
         </div>
 
+        {/* Верхняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
-            style={{ width: `${progress}%` }}
+            className="h-full bg-gray-300 transition-all duration-[2500ms] ease-linear"
+            style={{ width: finished ? "100%" : `${(progress / 100) * 100}%` }}
           />
-          {showResultText && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700 opacity-0 animate-fadeIn">
-                Получить результат
-              </p>
-              <style jsx>{`
-                @keyframes fadeIn {
-                  from {
-                    opacity: 0;
-                  }
-                  to {
-                    opacity: 1;
-                  }
-                }
-                .animate-fadeIn {
-                  animation: fadeIn 1s ease forwards;
-                }
-              `}</style>
-            </div>
-          )}
         </div>
 
+        {/* Нижний ряд факторов (чётные) */}
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
+          <p
+            key={`bottom-${current}`}
+            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+          >
+            {bottomFactors[current] || ""}
+          </p>
+        </div>
+
+        {/* Нижняя полоса */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+          <div
+            className="h-full bg-gray-300 transition-all duration-[2500ms] ease-linear"
+            style={{ width: finished ? "100%" : `${(progress / 100) * 100}%` }}
+          />
+        </div>
+
+        {/* Строка под полосами */}
         <p className="text-center text-sm text-neutral-600 mb-4">
-          Анализ 15 ключевых факторов
+          Аудит по 15 ключевым факторам
         </p>
 
+        {/* Нижняя полоса тайминга */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <div
@@ -204,25 +196,15 @@ export default function ProPreview() {
             />
           )}
 
-          {finished && (
-            <div
-              className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
-                showFinal
-                  ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700 opacity-100"
-                  : "bg-gray-200 opacity-0"
-              }`}
-            />
-          )}
-
           {!finished && (
             <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-              {timeLeft > 0 ? `Аудит завершится через ${timeLeft} сек` : ""}
+              {timeLeft > 0 ? `Полный аудит завершится через ${timeLeft} сек` : ""}
             </div>
           )}
 
           {finished && showFinal && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700 bg-gradient-to-r from-green-500 via-green-600 to-green-700 w-full h-full flex items-center justify-center rounded-md">
                 Аудит завершён
               </p>
             </div>
@@ -230,6 +212,7 @@ export default function ProPreview() {
         </div>
       </div>
 
+      {/* 🔹 Футер */}
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
@@ -238,6 +221,22 @@ export default function ProPreview() {
           Not legal advice.
         </span>
       </footer>
+
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s ease forwards;
+        }
+      `}</style>
     </main>
   );
 }
