@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 
-const QuickPreview = dynamic(() => import("@/components/QuickPreview"), {
+const ProPreview = dynamic(() => import("@/components/ProPreview"), {
   ssr: false,
 });
 
@@ -12,7 +12,7 @@ export default function Page() {
   return (
     <main className="bg-gray-50 font-sans text-neutral-800">
       <div className="mx-auto max-w-2xl px-6 pt-20 pb-16">
-        <QuickPreview />
+        <ProPreview />
       </div>
     </main>
   );
