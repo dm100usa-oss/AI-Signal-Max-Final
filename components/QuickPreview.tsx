@@ -81,13 +81,9 @@ export default function QuickPreview() {
 
     setTimeout(() => {
       setFinished(true);
-
       setTimeout(() => setShowFinal(true), 1400);
-
-      // 🔹 Появление "Получить результат" с fade-in через короткую паузу
       setTimeout(() => setShowResultText(true), 2200);
 
-      // 🔹 Автоматический переход на оплату
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -124,10 +120,12 @@ export default function QuickPreview() {
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
-      {/* 🔹 Надпись с точками */}
+      {/* 🔹 Улучшенное плавное затухание надписи с точками */}
       <div
-        className={`text-[22px] sm:text-[24px] font-bold transition-opacity duration-1000 my-6 flex items-center justify-center ${
-          fadeHeader ? "opacity-40 text-neutral-400" : "opacity-100 text-neutral-800"
+        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1500ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+          fadeHeader
+            ? "opacity-40 text-neutral-400 translate-y-[-6px]"
+            : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
         Мы начали проверку
@@ -135,7 +133,6 @@ export default function QuickPreview() {
       </div>
 
       <div className="rounded-md p-0">
-        {/* Текущий фактор */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p className="text-lg sm:text-xl font-medium text-neutral-900">
             {factors[current]}
@@ -148,7 +145,6 @@ export default function QuickPreview() {
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
             style={{ width: `${progress}%` }}
           />
-          {/* 🔹 Плавное появление текста "Получить результат" */}
           {showResultText && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700 opacity-0 animate-fadeIn">
@@ -194,14 +190,12 @@ export default function QuickPreview() {
             />
           )}
 
-          {/* Надпись с обратным отсчётом */}
           {!finished && (
             <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
               {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
             </div>
           )}
 
-          {/* Надпись "Проверка завершена" */}
           {finished && showFinal && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
