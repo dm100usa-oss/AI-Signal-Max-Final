@@ -70,12 +70,11 @@ export default function FullPreview() {
   const [current, setCurrent] = useState(0);
   const [progressAudit, setProgressAudit] = useState(0);
   const [progressReport, setProgressReport] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(totalTime);
   const [fadeHeader, setFadeHeader] = useState(false);
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [stageText, setStageText] = useState<"audit" | "owner" | "dev" | "done">("audit");
+  const [finalGreen, setFinalGreen] = useState(false);
 
   useEffect(() => {
     // Факторы появляются последовательно
@@ -90,7 +89,6 @@ export default function FullPreview() {
         if (next >= 100) {
           clearInterval(auditProgressTimer);
           setAuditDone(true);
-          setStageText("owner");
         }
         return Math.min(next, 100);
       });
@@ -105,22 +103,16 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
-            setStageText("done");
-          } else if (next >= 50 && stageText !== "dev") {
-            setStageText("dev");
           }
           return Math.min(next, 100);
         });
       }, 1000);
     }, reportStartDelay);
 
-    // Общий таймер
-    const overallTimer = setInterval(() => {
-      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
-    }, 1000);
-
-    // Финал и переход на Stripe
+    // Финал — третья полоса становится зелёной
+    const finalDelay = (auditTime + reportTime) * 1000;
     setTimeout(() => {
+      setFinalGreen(true);
       setFinished(true);
       setTimeout(async () => {
         try {
@@ -136,16 +128,15 @@ export default function FullPreview() {
           router.push("/pay");
         }
       }, 4000);
-    }, totalTime * 1000);
+    }, finalDelay);
 
-    // Плавное затухание заголовка
+    // Заголовок плавно тускнеет
     setTimeout(() => setFadeHeader(true), 1500);
 
     return () => {
       clearInterval(factorTimer);
-      clearInterval(overallTimer);
     };
-  }, [router, url]); // исправлено: без stageText
+  }, [router, url]);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
@@ -158,6 +149,7 @@ export default function FullPreview() {
         {new Date().toLocaleDateString("en-US")}
       </p>
 
+      {/* Заголовок */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -174,7 +166,7 @@ export default function FullPreview() {
       </div>
 
       {/* Факторы */}
-      <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out mb-4">
+      <div className="h-[64px] flex items-center justify-center mb-4 transition-opacity duration-700 ease-in-out">
         <p
           key={current}
           className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
@@ -198,20 +190,6 @@ export default function FullPreview() {
         )}
       </div>
 
-      {/* Надписи стадий */}
-      {stageText !== "done" && (
-        <p
-          key={stageText}
-          className="text-base sm:text-lg font-medium text-neutral-800 mb-4 animate-fadeInUp"
-        >
-          {stageText === "audit"
-            ? "Аудит 15 ключевых факторов"
-            : stageText === "owner"
-            ? "Формируем отчёт для владельца сайта"
-            : "Создаём ТЗ для разработчика"}
-        </p>
-      )}
-
       {/* 2️⃣ Вторая полоса */}
       <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
         <div
@@ -227,24 +205,14 @@ export default function FullPreview() {
         )}
       </div>
 
-      {/* Пустой заполнитель для равного расстояния */}
-      <div className="mb-4 h-[28px]" />
-
       {/* 3️⃣ Третья полоса */}
-      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-        {!finished && (
-          <>
-            <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
-              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
-            />
-            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-              {`Полный аудит завершится через ${timeLeft} сек`}
-            </div>
-          </>
-        )}
+      <div
+        className={`relative w-full h-12 rounded-md overflow-hidden transition-colors duration-1000 ease-in-out ${
+          finalGreen ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : "bg-gray-200"
+        }`}
+      >
         {finished && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
+          <div className="absolute inset-0 flex items-center justify-center">
             <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
               Получить результат
             </p>
@@ -266,7 +234,6 @@ export default function FullPreview() {
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease forwards;
         }
-
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -276,7 +243,7 @@ export default function FullPreview() {
           }
         }
         .animate-fadeIn {
-          animation: fadeIn 1.2s ease forwards;
+          animation: fadeIn 1s ease forwards;
         }
       `}</style>
 
