@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-/** Only dots animate; text stays stable */
+/** Только точки анимируются; текст остаётся стабильным */
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle">
@@ -40,19 +40,19 @@ export default function Home() {
 
   const go = useCallback(async (mode: "quick" | "pro") => {
     if (loading) return;
-    const u = normalizeUrl(url); // еще раз чистим на всякий случай
+    const u = normalizeUrl(url);
     if (!isValid(u)) {
-      setError("Please enter a valid URL (including http/https).");
+      setError("Пожалуйста, введите корректный URL (включая http/https).");
       return;
     }
     setError(null);
     setLoading(mode);
 
-    // show “Checking …” at least 2.2s
+    // отображаем “Проверяем …” минимум 2.2 секунды
     const minDuration = 2200;
     const started = Date.now();
 
-    // precheck URL availability (avoid showing Pay on dead sites)
+    // предварительная проверка доступности сайта
     let status: "ok" | "error" = "ok";
     try {
       const resp = await fetch("/api/precheck", {
@@ -81,10 +81,10 @@ export default function Home() {
         AI Signal Max
       </h1>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Check if your website is visible to AI assistants like ChatGPT, Copilot, Gemini, Perplexity, Grok, and others
+        Проверьте, виден ли ваш сайт для ИИ-ассистентов, таких как ChatGPT, Copilot, Gemini, Perplexity, Grok и других
       </p>
 
-      {/* URL input with clear icon */}
+      {/* Поле ввода URL с кнопкой очистки */}
       <div className="mb-2 relative">
         <input
           type="url"
@@ -111,7 +111,7 @@ export default function Home() {
         {url && (
           <button
             type="button"
-            aria-label="Clear"
+            aria-label="Очистить"
             onClick={clear}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100"
           >
@@ -121,36 +121,36 @@ export default function Home() {
       </div>
       {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
 
-      {/* Quick */}
+      {/* Быстрая проверка */}
       <button
         onClick={() => go("quick")}
         disabled={!!loading}
         className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors"
       >
         {loading === "quick" ? (
-          <span className="inline-flex items-center">Checking<Dots /></span>
+          <span className="inline-flex items-center">Проверяем<Dots /></span>
         ) : (
-          "Quick Check $9.99"
+          "Быстрая проверка $9.99"
         )}
       </button>
       <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
-        Instant results, 5-point basic check, simple recommendations
+        Мгновенный результат, 5 ключевых факторов, краткие рекомендации
       </p>
 
-      {/* Pro */}
+      {/* Полный аудит */}
       <button
         onClick={() => go("pro")}
         disabled={!!loading}
         className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 disabled:opacity-60 transition-colors"
       >
         {loading === "pro" ? (
-          <span className="inline-flex items-center">Checking<Dots /></span>
+          <span className="inline-flex items-center">Проверяем<Dots /></span>
         ) : (
-          "Business Pro Audit $19.99"
+          "Бизнес-аудит Pro $19.99"
         )}
       </button>
       <p className="mt-2 text-center text-sm text-neutral-600">
-        15-point audit, detailed PDF report, dev-ready checklist, results via email
+        15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
