@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+// Анимация трёх точек
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
@@ -36,8 +37,7 @@ export default function FullPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  // 🔹 увеличено общее время проверки
-  const totalTime = 47;
+  const totalTime = 47; // увеличен тайминг на 3 секунды
   const auditTime = 30;
   const reportTime = 14;
 
@@ -50,16 +50,12 @@ export default function FullPreview() {
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
-  const [showMiddleText, setShowMiddleText] = useState(true);
 
   useEffect(() => {
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    setTimeout(() => setFadeHeader(true), 1500);
-
-    // 🔹 Первая полоса (аудит)
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -72,7 +68,6 @@ export default function FullPreview() {
       });
     }, 1000);
 
-    // 🔹 Вторая полоса (отчёты)
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -81,7 +76,6 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
-            setTimeout(() => setShowMiddleText(false), 800);
           }
           return Math.min(next, 100);
         });
@@ -89,12 +83,10 @@ export default function FullPreview() {
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
-    // 🔹 Третья полоса (таймер)
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // 🔹 Финал
     setTimeout(() => {
       setFinished(true);
       setTimeout(async () => {
@@ -113,6 +105,8 @@ export default function FullPreview() {
       }, 4000);
     }, totalTime * 1000);
 
+    setTimeout(() => setFadeHeader(true), 1500);
+
     return () => {
       clearInterval(factorTimer);
       clearInterval(overallTimer);
@@ -130,7 +124,6 @@ export default function FullPreview() {
         {new Date().toLocaleDateString("en-US")}
       </p>
 
-      {/* Заголовок */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -147,7 +140,6 @@ export default function FullPreview() {
       </div>
 
       <div className="rounded-md p-0">
-        {/* Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p
             key={current}
@@ -157,11 +149,16 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* Первая полоса */}
+        {/* Верхняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
-            style={{ width: `${progressAudit}%` }}
+            className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
+              progressAudit < 100 ? "animate-softGreenWave" : ""
+            }`}
+            style={{
+              backgroundSize: "200% 100%",
+              width: `${progressAudit}%`,
+            }}
           />
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -172,25 +169,27 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Надписи и вторая полоса */}
-        <div className="h-[32px] flex items-center justify-center mb-2 transition-opacity duration-700">
-          <p
-            className={`text-sm sm:text-base font-medium text-neutral-600 transition-opacity duration-700 ${
-              showMiddleText ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {reportStage === "audit"
-              ? "Аудит 15 ключевых факторов"
-              : reportStage === "owner"
-              ? "Формируем отчёт для владельца сайта"
-              : "Создаём ТЗ для разработчика"}
-          </p>
-        </div>
+        {/* Надпись между полосами */}
+        <p className="text-center text-sm sm:text-base text-neutral-600 mb-2 font-medium">
+          {reportStage === "audit"
+            ? "Аудит 15 ключевых факторов"
+            : reportStage === "owner"
+            ? "Формируем отчёт для владельца сайта"
+            : "Создаём ТЗ для разработчика"}
+        </p>
 
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+        {/* Средняя полоса */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
           <div
-            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
-            style={{ width: `${progressReport}%` }}
+            className={`h-full transition-[width] duration-1000 ease-linear ${
+              !auditDone && progressReport === 0
+                ? "bg-gradient-to-r from-gray-200 via-blue-100 to-gray-200 animate-softBlueWave"
+                : "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
+            }`}
+            style={{
+              backgroundSize: "200% 100%",
+              width: `${progressReport}%`,
+            }}
           />
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -201,10 +200,10 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Разделитель */}
-        <div className="h-[28px] my-2" />
+        {/* Контейнер-разделитель для равных расстояний */}
+        <div className="h-4"></div>
 
-        {/* Третья полоса (таймер) */}
+        {/* Нижняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <>
@@ -241,6 +240,7 @@ export default function FullPreview() {
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease forwards;
         }
+
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -250,14 +250,21 @@ export default function FullPreview() {
           }
         }
         .animate-fadeIn {
-          animation: fadeIn 1s ease forwards;
+          animation: fadeIn 1.2s ease forwards;
         }
+
         @keyframes aiv-dots {
-          0%, 60%, 100% {
+          0% {
             opacity: 0.2;
           }
           30% {
             opacity: 1;
+          }
+          60% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.2;
           }
         }
         .dot {
@@ -269,6 +276,40 @@ export default function FullPreview() {
         }
         .dot3 {
           animation-delay: 400ms;
+        }
+
+        /* Перелив в верхней полосе (пока идёт аудит) */
+        @keyframes softGreenWave {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+        .animate-softGreenWave {
+          animation: softGreenWave 5s ease-in-out infinite;
+          background-size: 200% 100%;
+        }
+
+        /* Еле заметный перелив для средней полосы */
+        @keyframes softBlueWave {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+        .animate-softBlueWave {
+          animation: softBlueWave 6s ease-in-out infinite;
+          background-size: 200% 100%;
         }
       `}</style>
 
