@@ -3,39 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// Анимация трёх точек
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
-      <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-        }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
-        @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
-        }
-      `}</style>
     </span>
   );
 }
@@ -63,41 +36,54 @@ export default function FullPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const auditTime = 30; // Первая полоса
-  const reportTime = 14; // Вторая полоса
-  const finalDelay = (auditTime + reportTime) * 1000; // Финал после второй
-  const totalTime = auditTime + reportTime + 4; // Общий тайминг
+  const techFactors = [
+    "robots.txt", "sitemap.xml", "meta robots", "canonical", "title tag",
+    "meta description", "open graph", "structured data", "H1 heading", "alt texts",
+    "internal links", "HTTPS", "favicon", "404 page", "organization schema",
+    "x-robots-tag", "indexability", "mobile friendly", "page speed", "content depth",
+    "schema markup", "og:image", "canonical chain", "hreflang", "viewport",
+    "author tag", "breadcrumbs", "json-ld", "structured review", "social meta"
+  ];
+
+  const totalTime = 44;
+  const auditTime = 30;
+  const reportTime = 14;
 
   const [current, setCurrent] = useState(0);
   const [progressAudit, setProgressAudit] = useState(0);
   const [progressReport, setProgressReport] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(totalTime);
   const [fadeHeader, setFadeHeader] = useState(false);
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [finalGreen, setFinalGreen] = useState(false);
-  const [stageText, setStageText] = useState<"audit" | "owner" | "dev" | "done">("audit");
+  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
+  const [techDisplay, setTechDisplay] = useState<string[]>([]);
+  const [showTech, setShowTech] = useState(true);
 
+  // 🔹 Анимации факторов
   useEffect(() => {
-    // 🔹 Факторы появляются постепенно
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    // 🔹 Первая полоса — аудит
+    setTimeout(() => setFadeHeader(true), 1500);
+
+    // 🔹 Прогресс 1-й полосы
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
         if (next >= 100) {
           clearInterval(auditProgressTimer);
           setAuditDone(true);
-          setStageText("owner");
+          setTimeout(() => setReportStage("owner"), 500);
         }
         return Math.min(next, 100);
       });
     }, 1000);
 
-    // 🔹 Вторая полоса — отчёты
+    // 🔹 Прогресс 2-й полосы
+    const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
         setProgressReport((p) => {
@@ -105,18 +91,21 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
-            setStageText("done");
-          } else if (next >= 50 && stageText !== "dev") {
-            setStageText("dev");
+            setShowTech(false); // 🔸 Остановка и исчезновение блока факторов
           }
           return Math.min(next, 100);
         });
       }, 1000);
-    }, auditTime * 1000);
+      setTimeout(() => setReportStage("dev"), 6000);
+    }, reportStartDelay);
 
-    // 🔹 Третья полоса — плавное появление зелёного цвета в конце
+    // 🔹 Таймер
+    const overallTimer = setInterval(() => {
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
+    }, 1000);
+
+    // 🔹 Финал
     setTimeout(() => {
-      setFinalGreen(true);
       setFinished(true);
       setTimeout(async () => {
         try {
@@ -132,15 +121,34 @@ export default function FullPreview() {
           router.push("/pay");
         }
       }, 4000);
-    }, finalDelay);
-
-    // 🔹 Плавное затухание заголовка
-    setTimeout(() => setFadeHeader(true), 1500);
+    }, totalTime * 1000);
 
     return () => {
       clearInterval(factorTimer);
+      clearInterval(overallTimer);
     };
   }, [router, url]);
+
+  // 🔹 Генерация случайных технических факторов
+  useEffect(() => {
+    if (!showTech) return;
+    const interval = setInterval(() => {
+      const count = Math.floor(Math.random() * 4) + 3; // 3–6 факторов
+      const selected = Array.from({ length: count }, () =>
+        techFactors[Math.floor(Math.random() * techFactors.length)]
+      );
+      setTechDisplay(selected);
+    }, 350);
+    return () => clearInterval(interval);
+  }, [showTech]);
+
+  // 🔹 Определение цвета для факторов
+  const getColor = (i: number) => {
+    const r = Math.random();
+    if (r < 0.25) return "text-red-500 opacity-70";
+    if (r < 0.6) return "text-yellow-500 opacity-70";
+    return "text-green-500 opacity-70";
+  };
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
@@ -169,76 +177,83 @@ export default function FullPreview() {
         </span>
       </div>
 
-      {/* Факторы */}
-      <div className="h-[64px] flex items-center justify-center mb-4 transition-opacity duration-700 ease-in-out">
-        <p
-          key={current}
-          className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-        >
-          {factors[current]}
-        </p>
-      </div>
+      <div className="rounded-md p-0">
+        {/* Факторы */}
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
+          <p
+            key={current}
+            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+          >
+            {factors[current]}
+          </p>
+        </div>
 
-      {/* 1️⃣ Первая полоса */}
-      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
-        <div
-          className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
-          style={{ width: `${progressAudit}%` }}
-        />
-        {auditDone && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-              Аудит завершён
-            </p>
-          </div>
-        )}
-      </div>
+        {/* Первая полоса */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+          <div
+            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
+            style={{ width: `${progressAudit}%` }}
+          />
+          {auditDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Аудит завершён
+              </p>
+            </div>
+          )}
+        </div>
 
-      {/* Надписи между 1 и 2 полосой */}
-      {stageText !== "done" && (
-        <p
-          key={stageText}
-          className="text-base sm:text-lg font-medium text-neutral-800 mb-4 animate-fadeInUp"
-        >
-          {stageText === "audit"
+        {/* Надпись и 2-я полоса */}
+        <p className="text-base sm:text-lg text-neutral-700 mb-2 font-medium transition-all duration-700">
+          {reportStage === "audit"
             ? "Аудит 15 ключевых факторов"
-            : stageText === "owner"
+            : reportStage === "owner"
             ? "Формируем отчёт для владельца сайта"
             : "Создаём ТЗ для разработчика"}
         </p>
-      )}
 
-      {/* 2️⃣ Вторая полоса */}
-      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
-        <div
-          className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
-          style={{ width: `${progressReport}%` }}
-        />
-        {reportsDone && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-              Отчёты подготовлены
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+          <div
+            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
+            style={{ width: `${progressReport}%` }}
+          />
+          {reportsDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Отчёты подготовлены
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Разделитель с тех. факторами */}
+        {showTech && (
+          <div className="h-[28px] flex items-center justify-center my-2 transition-opacity duration-700 animate-fadeIn">
+            <p className="text-base text-neutral-400 opacity-80 font-normal font-sans tracking-wide">
+              {techDisplay.map((f, i) => (
+                <span key={i} className={`${getColor(i)} mx-1`}>
+                  {f}
+                </span>
+              ))}
             </p>
           </div>
         )}
-      </div>
 
-      {/* Разделитель между 2 и 3 полосой */}
-      <div className="mb-4 h-[28px]" />
-
-      {/* 3️⃣ Третья полоса */}
-      <div
-        className={`relative w-full h-12 rounded-md overflow-hidden transition-colors duration-1000 ease-in-out ${
-          finalGreen ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : "bg-gray-200"
-        }`}
-      >
-        {finished && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-              Получить результат
-            </p>
-          </div>
-        )}
+        {/* Третья полоса */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mt-2">
+          {!finished && (
+            <div className="absolute inset-0 flex items-center justify-center text-neutral-500 text-sm font-medium">
+              {`Полный аудит завершится через ${timeLeft} сек`}
+            </div>
+          )}
+          {finished && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Получить результат
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       <style jsx global>{`
@@ -265,6 +280,24 @@ export default function FullPreview() {
         }
         .animate-fadeIn {
           animation: fadeIn 1s ease forwards;
+        }
+        @keyframes aiv-dots {
+          0%, 60%, 100% {
+            opacity: 0.2;
+          }
+          30% {
+            opacity: 1;
+          }
+        }
+        .dot {
+          opacity: 0.2;
+          animation: aiv-dots 1200ms infinite;
+        }
+        .dot2 {
+          animation-delay: 200ms;
+        }
+        .dot3 {
+          animation-delay: 400ms;
         }
       `}</style>
 
