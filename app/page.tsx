@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-/** Только точки анимируются; текст остаётся стабильным */
+/** Only dots animate; text stays stable */
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle">
@@ -42,17 +42,15 @@ export default function Home() {
     if (loading) return;
     const u = normalizeUrl(url);
     if (!isValid(u)) {
-      setError("Пожалуйста, введите корректный URL (включая http/https).");
+      setError("Please enter a valid URL (including http/https).");
       return;
     }
     setError(null);
     setLoading(mode);
 
-    // отображаем “Проверяем …” минимум 2.2 секунды
     const minDuration = 2200;
     const started = Date.now();
 
-    // предварительная проверка доступности сайта
     let status: "ok" | "error" = "ok";
     try {
       const resp = await fetch("/api/precheck", {
@@ -84,7 +82,7 @@ export default function Home() {
         Проверьте, виден ли ваш сайт для ИИ-ассистентов, таких как ChatGPT, Copilot, Gemini, Perplexity, Grok и других
       </p>
 
-      {/* Поле ввода URL с кнопкой очистки */}
+      {/* URL input with clear icon */}
       <div className="mb-2 relative">
         <input
           type="url"
@@ -111,7 +109,7 @@ export default function Home() {
         {url && (
           <button
             type="button"
-            aria-label="Очистить"
+            aria-label="Clear"
             onClick={clear}
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100"
           >
@@ -121,32 +119,32 @@ export default function Home() {
       </div>
       {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
 
-      {/* Быстрая проверка */}
+      {/* Quick */}
       <button
         onClick={() => go("quick")}
         disabled={!!loading}
         className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors"
       >
         {loading === "quick" ? (
-          <span className="inline-flex items-center">Проверяем<Dots /></span>
+          <span className="inline-flex items-center">Checking<Dots /></span>
         ) : (
           "Быстрая проверка $9.99"
         )}
       </button>
       <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
-        Мгновенный результат, 5 ключевых факторов, краткие рекомендации
+        Мгновенный результат, 10 ключевых факторов, краткие рекомендации
       </p>
 
-      {/* Полный аудит */}
+      {/* Pro */}
       <button
         onClick={() => go("pro")}
         disabled={!!loading}
         className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 disabled:opacity-60 transition-colors"
       >
         {loading === "pro" ? (
-          <span className="inline-flex items-center">Проверяем<Dots /></span>
+          <span className="inline-flex items-center">Checking<Dots /></span>
         ) : (
-          "Бизнес-аудит Pro $19.99"
+          "Полная проверка $19.99"
         )}
       </button>
       <p className="mt-2 text-center text-sm text-neutral-600">
