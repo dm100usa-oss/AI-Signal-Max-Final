@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// Анимация трёх точек
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
@@ -37,7 +36,7 @@ export default function FullPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const totalTime = 47; // увеличен тайминг на 3 секунды
+  const totalTime = 47;
   const auditTime = 30;
   const reportTime = 14;
 
@@ -62,7 +61,7 @@ export default function FullPreview() {
         if (next >= 100) {
           clearInterval(auditProgressTimer);
           setAuditDone(true);
-          setTimeout(() => setReportStage("owner"), 500);
+          setTimeout(() => setReportStage("owner"), 300);
         }
         return Math.min(next, 100);
       });
@@ -170,20 +169,25 @@ export default function FullPreview() {
         </div>
 
         {/* Надпись между полосами */}
-        <p className="text-center text-sm sm:text-base text-neutral-600 mb-2 font-medium">
-          {reportStage === "audit"
-            ? "Аудит 15 ключевых факторов"
-            : reportStage === "owner"
-            ? "Формируем отчёт для владельца сайта"
-            : "Создаём ТЗ для разработчика"}
-        </p>
+        <div className="h-[32px] flex items-center justify-center mb-2">
+          <p
+            key={reportStage}
+            className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
+          >
+            {reportStage === "audit"
+              ? "Аудит 15 ключевых факторов"
+              : reportStage === "owner"
+              ? "Формируем отчёт для владельца сайта"
+              : "Создаём ТЗ для разработчика"}
+          </p>
+        </div>
 
         {/* Средняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
               !auditDone && progressReport === 0
-                ? "bg-gradient-to-r from-gray-200 via-blue-100 to-gray-200 animate-softBlueWave"
+                ? "bg-gradient-to-r from-blue-100 via-blue-200 to-blue-100 animate-softBlueWave"
                 : "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
             }`}
             style={{
@@ -200,7 +204,7 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Контейнер-разделитель для равных расстояний */}
+        {/* Разделитель */}
         <div className="h-4"></div>
 
         {/* Нижняя полоса */}
@@ -278,7 +282,6 @@ export default function FullPreview() {
           animation-delay: 400ms;
         }
 
-        /* Перелив в верхней полосе (пока идёт аудит) */
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
@@ -295,7 +298,6 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* Еле заметный перелив для средней полосы */
         @keyframes softBlueWave {
           0% {
             background-position: 0% 50%;
@@ -308,7 +310,7 @@ export default function FullPreview() {
           }
         }
         .animate-softBlueWave {
-          animation: softBlueWave 6s ease-in-out infinite;
+          animation: softBlueWave 4s ease-in-out infinite;
           background-size: 200% 100%;
         }
       `}</style>
