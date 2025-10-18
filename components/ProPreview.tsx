@@ -124,8 +124,8 @@ export default function FullPreview() {
       </p>
 
       {/* Дата */}
-      <p className="text-base text-neutral-400 mb-2">
-        Date: {new Date().toLocaleDateString("en-US")}
+      <p className="text-base text-neutral-400 font-mono uppercase mb-2 tracking-widest">
+        DATE: {new Date().toLocaleDateString("en-US")}
       </p>
 
       {/* Заголовок */}
@@ -190,16 +190,24 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* Средняя полоса */}
+        {/* Средняя полоса с серой структурой */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
+          {!auditDone && (
+            <div
+              className="pattern-layer"
+              style={{
+                backgroundSize: "200% 100%",
+                backgroundPosition: `${progressAudit}% 0%`,
+              }}
+            ></div>
+          )}
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
-              !auditDone && progressReport === 0
-                ? "animate-softBlueWave"
-                : "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
+              auditDone
+                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
+                : ""
             }`}
             style={{
-              backgroundSize: "200% 100%",
               width: `${progressReport}%`,
             }}
           />
@@ -212,6 +220,7 @@ export default function FullPreview() {
           )}
         </div>
 
+        {/* Разделитель */}
         <div className="h-4"></div>
 
         {/* Нижняя полоса */}
@@ -289,6 +298,7 @@ export default function FullPreview() {
           animation-delay: 400ms;
         }
 
+        /* Верхняя полоса */
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
@@ -305,24 +315,33 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* Реально видимый мягкий перелив */
-        @keyframes softBlueWave {
+        /* Средняя полоса: структура из 15 сегментов */
+        .pattern-layer {
+          position: absolute;
+          inset: 0;
+          background: repeating-linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0.05) 0px,
+            rgba(0, 0, 0, 0.05) 35px,
+            transparent 70px,
+            transparent 110px,
+            rgba(0, 0, 0, 0.05) 130px,
+            rgba(0, 0, 0, 0.05) 170px,
+            transparent 190px,
+            transparent 240px
+          );
+          background-repeat: repeat;
+          animation: patternMove 10s linear infinite;
+          opacity: 0.4;
+        }
+
+        @keyframes patternMove {
           0% {
             background-position: 0% 0%;
           }
           100% {
-            background-position: 200% 0%;
+            background-position: 100% 0%;
           }
-        }
-        .animate-softBlueWave {
-          background-image: linear-gradient(
-            120deg,
-            rgba(173, 216, 230, 0.15) 0%,
-            rgba(255, 255, 255, 0.3) 50%,
-            rgba(173, 216, 230, 0.15) 100%
-          );
-          background-size: 200% 100%;
-          animation: softBlueWave 6s linear infinite;
         }
       `}</style>
 
