@@ -36,7 +36,8 @@ export default function FullPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const totalTime = 44;
+  // 🔹 увеличено общее время проверки
+  const totalTime = 47;
   const auditTime = 30;
   const reportTime = 14;
 
