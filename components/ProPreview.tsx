@@ -49,25 +49,28 @@ export default function FullPreview() {
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
+  const [stageText, setStageText] = useState("audit");
 
   useEffect(() => {
+    // 🔹 Перебор факторов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
+    // 🔹 Первая полоса — аудит
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
         if (next >= 100) {
           clearInterval(auditProgressTimer);
           setAuditDone(true);
-          setTimeout(() => setReportStage("owner"), 500);
+          setStageText("owner");
         }
         return Math.min(next, 100);
       });
     }, 1000);
 
+    // 🔹 Вторая полоса — отчёты
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -76,17 +79,21 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
+            setStageText("done");
+          } else if (next >= 50 && stageText !== "dev") {
+            setStageText("dev");
           }
           return Math.min(next, 100);
         });
       }, 1000);
-      setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
+    // 🔹 Общий таймер
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
+    // 🔹 Завершение
     setTimeout(() => {
       setFinished(true);
       setTimeout(async () => {
@@ -111,7 +118,7 @@ export default function FullPreview() {
       clearInterval(factorTimer);
       clearInterval(overallTimer);
     };
-  }, [router, url]);
+  }, [router, url, stageText]);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
@@ -140,87 +147,80 @@ export default function FullPreview() {
         </span>
       </div>
 
-      <div className="rounded-md p-0">
-        {/* Факторы */}
-        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p
-            key={current}
-            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-          >
-            {factors[current]}
-          </p>
-        </div>
+      {/* Факторы */}
+      <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out mb-4">
+        <p
+          key={current}
+          className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+        >
+          {factors[current]}
+        </p>
+      </div>
 
-        {/* Первая полоса */}
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
-          <div
-            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
-            style={{ width: `${progressAudit}%` }}
-          />
-          {auditDone && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Аудит завершён
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Текст между первой и второй полосой */}
-        <div className="h-[40px] flex items-center justify-center mb-4 relative overflow-hidden">
-          {reportStage === "audit" && (
-            <p className="text-sm text-neutral-600 animate-fadeInOut">
-              Аудит 15 ключевых факторов
+      {/* Первая полоса */}
+      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div
+          className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
+          style={{ width: `${progressAudit}%` }}
+        />
+        {auditDone && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+              Аудит завершён
             </p>
-          )}
-          {reportStage === "owner" && (
-            <p className="text-xl sm:text-2xl font-medium text-neutral-700 animate-fadeInOut">
-              Формируем отчёт для владельца сайта
-            </p>
-          )}
-          {reportStage === "dev" && (
-            <p className="text-xl sm:text-2xl font-medium text-neutral-700 animate-fadeInOut">
-              Создаём ТЗ для разработчика
-            </p>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
-        {/* Вторая полоса */}
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
-          <div
-            className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
-            style={{ width: `${progressReport}%` }}
-          />
-          {reportsDone && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Отчёты подготовлены
-              </p>
-            </div>
-          )}
-        </div>
+      {/* Надпись между полосами */}
+      {stageText !== "done" && (
+        <p
+          key={stageText}
+          className="text-lg sm:text-xl font-medium text-neutral-800 mb-4 animate-fadeInUp"
+        >
+          {stageText === "audit"
+            ? "Аудит 15 ключевых факторов"
+            : stageText === "owner"
+            ? "Формируем отчёт для владельца сайта"
+            : "Создаём ТЗ для разработчика"}
+        </p>
+      )}
 
-        {/* Третья полоса */}
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-          {!finished && (
-            <>
-              <div
-                className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
-                style={{ width: `${(timeLeft / totalTime) * 100}%` }}
-              />
-              <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-                {`Полный аудит завершится через ${timeLeft} сек`}
-              </div>
-            </>
-          )}
-          {finished && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Получить результат
-              </p>
+      {/* Вторая полоса */}
+      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div
+          className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
+          style={{ width: `${progressReport}%` }}
+        />
+        {reportsDone && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+              Отчёты подготовлены
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Третья полоса */}
+      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+        {!finished && (
+          <>
+            <div
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+            />
+            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+              {`Полный аудит завершится через ${timeLeft} сек`}
             </div>
-          )}
-        </div>
+          </>
+        )}
+        {finished && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
+            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+              Получить результат
+            </p>
+          </div>
+        )}
       </div>
 
       <style jsx global>{`
@@ -248,28 +248,6 @@ export default function FullPreview() {
         }
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
-        }
-
-        @keyframes fadeInOut {
-          0% {
-            opacity: 0;
-            transform: translateY(5px);
-          }
-          10% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          90% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-5px);
-          }
-        }
-        .animate-fadeInOut {
-          animation: fadeInOut 6s ease-in-out forwards;
         }
 
         @keyframes aiv-dots {
