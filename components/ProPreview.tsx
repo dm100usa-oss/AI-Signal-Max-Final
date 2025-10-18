@@ -52,12 +52,10 @@ export default function FullPreview() {
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
 
   useEffect(() => {
-    // 🔹 Появление факторов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    // 🔹 Первая полоса (аудит)
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -70,7 +68,6 @@ export default function FullPreview() {
       });
     }, 1000);
 
-    // 🔹 Вторая полоса (отчёты)
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -86,15 +83,12 @@ export default function FullPreview() {
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
-    // 🔹 Общий таймер (третья полоса)
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // 🔹 Финал
     setTimeout(() => {
       setFinished(true);
-      // 🔹 Автоматический переход к оплате
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -111,7 +105,6 @@ export default function FullPreview() {
       }, 4000);
     }, totalTime * 1000);
 
-    // 🔹 Заголовок затухает
     setTimeout(() => setFadeHeader(true), 1500);
 
     return () => {
@@ -159,7 +152,7 @@ export default function FullPreview() {
         </div>
 
         {/* Первая полоса */}
-        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200 mb-4">
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
             style={{ width: `${progressAudit}%` }}
@@ -173,15 +166,27 @@ export default function FullPreview() {
           )}
         </div>
 
+        {/* Текст между первой и второй полосой */}
+        <div className="h-[40px] flex items-center justify-center mb-4 relative overflow-hidden">
+          {reportStage === "audit" && (
+            <p className="text-sm text-neutral-600 animate-fadeInOut">
+              Аудит 15 ключевых факторов
+            </p>
+          )}
+          {reportStage === "owner" && (
+            <p className="text-xl sm:text-2xl font-medium text-neutral-700 animate-fadeInOut">
+              Формируем отчёт для владельца сайта
+            </p>
+          )}
+          {reportStage === "dev" && (
+            <p className="text-xl sm:text-2xl font-medium text-neutral-700 animate-fadeInOut">
+              Создаём ТЗ для разработчика
+            </p>
+          )}
+        </div>
+
         {/* Вторая полоса */}
-        <p className="text-center text-lg sm:text-xl text-neutral-700 mb-2 font-medium">
-          {reportStage === "audit"
-            ? "Аудит 15 ключевых факторов"
-            : reportStage === "owner"
-            ? "Формируем отчёт для владельца сайта"
-            : "Создаём ТЗ для разработчика"}
-        </p>
-        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200 mb-6">
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear"
             style={{ width: `${progressReport}%` }}
@@ -196,7 +201,7 @@ export default function FullPreview() {
         </div>
 
         {/* Третья полоса */}
-        <div className="relative w-full h-12 flex-shrink-0 rounded-md overflow-hidden bg-gray-200">
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <>
               <div
@@ -243,6 +248,28 @@ export default function FullPreview() {
         }
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
+        }
+
+        @keyframes fadeInOut {
+          0% {
+            opacity: 0;
+            transform: translateY(5px);
+          }
+          10% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          90% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-5px);
+          }
+        }
+        .animate-fadeInOut {
+          animation: fadeInOut 6s ease-in-out forwards;
         }
 
         @keyframes aiv-dots {
