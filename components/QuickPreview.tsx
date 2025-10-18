@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 // 🔹 Анимация трёх точек
 function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
   return (
-    <span className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}>
+    <span className={`inline-flex justify-start tabular-nums align-middle ${colorClass}`}>
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
@@ -80,7 +80,7 @@ export default function QuickPreview() {
 
     // Заголовок: тускнеет и поднимается
     setTimeout(() => setFadeHeader(true), 1500);
-    // Точки появляются чуть позже, когда надпись уже поднялась
+    // Точки появляются чуть позже, как на странице полной проверки
     setTimeout(() => setShowDots(true), 1900);
 
     // Основной процесс
@@ -122,23 +122,25 @@ export default function QuickPreview() {
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
-      {/* 🔹 Заголовок с синхронным движением и точками */}
-      <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          fadeHeader
-            ? "opacity-40 text-neutral-400 translate-y-[-6px]"
-            : "opacity-100 text-neutral-800 translate-y-0"
-        }`}
-      >
-        <span className="flex items-center justify-center">
+      {/* 🔹 Заголовок с плавным движением и точками (точно как на pro) */}
+      <div className="my-6 flex items-center justify-center">
+        <div
+          className={`flex items-center justify-center text-[22px] sm:text-[24px] font-bold transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform ${
+            fadeHeader
+              ? "opacity-60 text-neutral-400 translate-y-[-6px]"
+              : "opacity-100 text-neutral-800 translate-y-0"
+          }`}
+        >
           Мы начали проверку
-          {showDots && (
-            <span className="inline-flex w-[1.7ch] justify-start ml-1">
-              <Dots colorClass="text-neutral-400 absolute left-0" />
-              <Dots colorClass="text-blue-400/70 absolute left-0" />
-            </span>
-          )}
-        </span>
+          <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
+            {showDots && (
+              <>
+                <Dots colorClass="text-neutral-400" />
+                <Dots colorClass="text-blue-400/70 absolute" />
+              </>
+            )}
+          </span>
+        </div>
       </div>
 
       <div className="rounded-md p-0">
