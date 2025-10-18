@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-function Dots() {
+// 🔹 Анимация трёх точек
+function Dots({ colorClass = "text-white" }: { colorClass?: string }) {
   return (
-    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-white">
+    <span className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}>
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
@@ -48,9 +49,7 @@ export default function FullPreview() {
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [reportStage, setReportStage] = useState<
-    "audit" | "owner" | "dev" | "final"
-  >("audit");
+  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
 
   useEffect(() => {
     const factorTimer = setInterval(() => {
@@ -78,7 +77,6 @@ export default function FullPreview() {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
           }
-          // 🔹 За 1 секунду до конца переключаем на финальную надпись
           if (next >= 100 - 100 / reportTime) {
             setReportStage("final");
           }
@@ -145,7 +143,7 @@ export default function FullPreview() {
         <span className="flex items-center justify-center">
           Мы начали полный аудит
           <span className="inline-flex w-[1.7ch] justify-start ml-1">
-            {fadeHeader && <Dots />}
+            {fadeHeader && <Dots colorClass="text-green-400/70" />}
           </span>
         </span>
       </div>
@@ -153,10 +151,7 @@ export default function FullPreview() {
       <div className="rounded-md p-0">
         {/* Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p
-            key={current}
-            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-          >
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
             {factors[current]}
           </p>
         </div>
@@ -183,10 +178,7 @@ export default function FullPreview() {
 
         {/* Надпись между полосами */}
         <div className="h-[32px] flex items-center justify-center mb-2">
-          <p
-            key={reportStage}
-            className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
-          >
+          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
             {reportStage === "final"
               ? "Отчёт для владельца • ТЗ для разработчика"
               : reportStage === "audit"
@@ -207,13 +199,9 @@ export default function FullPreview() {
           )}
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
-              auditDone
-                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
-                : ""
+              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
             }`}
-            style={{
-              width: `${progressReport}%`,
-            }}
+            style={{ width: `${progressReport}%` }}
           />
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
@@ -242,7 +230,7 @@ export default function FullPreview() {
           {finished && (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
-                Получить результат <Dots />
+                Получить результат <Dots colorClass="text-white" />
               </p>
             </div>
           )}
