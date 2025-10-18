@@ -80,7 +80,7 @@ export default function QuickPreview() {
 
     // Заголовок: тускнеет и поднимается
     setTimeout(() => setFadeHeader(true), 1500);
-    // Точки появляются чуть позже, когда надпись уже на месте
+    // Точки появляются чуть позже, когда надпись уже поднялась
     setTimeout(() => setShowDots(true), 1900);
 
     // Основной процесс
@@ -132,14 +132,12 @@ export default function QuickPreview() {
       >
         <span className="flex items-center justify-center">
           Мы начали проверку
-          <span className="inline-flex w-[1.7ch] justify-start ml-1 relative">
-            {showDots && (
-              <>
-                <Dots colorClass="text-neutral-400 absolute left-0" />
-                <Dots colorClass="text-blue-400/70 absolute left-0" />
-              </>
-            )}
-          </span>
+          {showDots && (
+            <span className="inline-flex w-[1.7ch] justify-start ml-1">
+              <Dots colorClass="text-neutral-400 absolute left-0" />
+              <Dots colorClass="text-blue-400/70 absolute left-0" />
+            </span>
+          )}
         </span>
       </div>
 
