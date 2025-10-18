@@ -119,13 +119,11 @@ export default function FullPreview() {
       </h1>
 
       {/* URL */}
-      <p className="text-base text-neutral-400 mt-1">
-        {url || "https://example.com"}
-      </p>
+      <p className="text-base text-neutral-400 mt-1">{url || "https://example.com"}</p>
 
-      {/* Дата */}
-      <p className="text-base text-neutral-400 font-mono uppercase mb-2 tracking-widest">
-        DATE: {new Date().toLocaleDateString("en-US")}
+      {/* Дата (маленькие буквы, моноширинный шрифт) */}
+      <p className="text-base text-neutral-400 font-mono lowercase mb-2">
+        date: {new Date().toLocaleDateString("en-US")}
       </p>
 
       {/* Заголовок */}
@@ -148,10 +146,7 @@ export default function FullPreview() {
       <div className="rounded-md p-0">
         {/* Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p
-            key={current}
-            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-          >
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
             {factors[current]}
           </p>
         </div>
@@ -178,10 +173,7 @@ export default function FullPreview() {
 
         {/* Надпись между полосами */}
         <div className="h-[32px] flex items-center justify-center mb-2">
-          <p
-            key={reportStage}
-            className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
-          >
+          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
             {reportStage === "audit"
               ? "Аудит 15 ключевых факторов"
               : reportStage === "owner"
@@ -190,22 +182,19 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* Средняя полоса с серой структурой */}
+        {/* Средняя полоса с тенью */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
+          {/* Серая "тень", синхронная с верхней */}
           {!auditDone && (
             <div
-              className="pattern-layer"
-              style={{
-                backgroundSize: "200% 100%",
-                backgroundPosition: `${progressAudit}% 0%`,
-              }}
-            ></div>
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+              style={{ width: `${progressAudit}%` }}
+            />
           )}
+          {/* Настоящая зелёная полоса после завершения */}
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
-              auditDone
-                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
-                : ""
+              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
             }`}
             style={{
               width: `${progressReport}%`,
@@ -298,7 +287,6 @@ export default function FullPreview() {
           animation-delay: 400ms;
         }
 
-        /* Верхняя полоса */
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
@@ -313,35 +301,6 @@ export default function FullPreview() {
         .animate-softGreenWave {
           animation: softGreenWave 5s ease-in-out infinite;
           background-size: 200% 100%;
-        }
-
-        /* Средняя полоса: структура из 15 сегментов */
-        .pattern-layer {
-          position: absolute;
-          inset: 0;
-          background: repeating-linear-gradient(
-            to right,
-            rgba(0, 0, 0, 0.05) 0px,
-            rgba(0, 0, 0, 0.05) 35px,
-            transparent 70px,
-            transparent 110px,
-            rgba(0, 0, 0, 0.05) 130px,
-            rgba(0, 0, 0, 0.05) 170px,
-            transparent 190px,
-            transparent 240px
-          );
-          background-repeat: repeat;
-          animation: patternMove 10s linear infinite;
-          opacity: 0.4;
-        }
-
-        @keyframes patternMove {
-          0% {
-            background-position: 0% 0%;
-          }
-          100% {
-            background-position: 100% 0%;
-          }
         }
       `}</style>
 
