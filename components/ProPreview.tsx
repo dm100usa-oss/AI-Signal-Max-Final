@@ -36,15 +36,6 @@ export default function FullPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const techFactors = [
-    "robots.txt", "sitemap.xml", "meta robots", "canonical", "title tag",
-    "meta description", "open graph", "structured data", "H1 heading", "alt texts",
-    "internal links", "HTTPS", "favicon", "404 page", "organization schema",
-    "x-robots-tag", "indexability", "mobile friendly", "page speed", "content depth",
-    "schema markup", "og:image", "canonical chain", "hreflang", "viewport",
-    "author tag", "breadcrumbs", "json-ld", "structured review", "social meta"
-  ];
-
   const totalTime = 44;
   const auditTime = 30;
   const reportTime = 14;
@@ -58,18 +49,19 @@ export default function FullPreview() {
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
-  const [techDisplay, setTechDisplay] = useState<string[]>([]);
-  const [showTech, setShowTech] = useState(true);
+  const [showMiddleText, setShowMiddleText] = useState(true);
 
-  // 🔹 Анимации факторов
+  // 🔹 Основная логика
   useEffect(() => {
+    // Факторы
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
+    // Заголовок
     setTimeout(() => setFadeHeader(true), 1500);
 
-    // 🔹 Прогресс 1-й полосы
+    // Первая полоса
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -82,7 +74,7 @@ export default function FullPreview() {
       });
     }, 1000);
 
-    // 🔹 Прогресс 2-й полосы
+    // Вторая полоса
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -91,7 +83,9 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
-            setShowTech(false); // 🔸 Остановка и исчезновение блока факторов
+            setTimeout(() => {
+              setShowMiddleText(false); // скрыть надпись перед третьей полосой
+            }, 800);
           }
           return Math.min(next, 100);
         });
@@ -99,12 +93,12 @@ export default function FullPreview() {
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
-    // 🔹 Таймер
+    // Таймер
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // 🔹 Финал
+    // Финал
     setTimeout(() => {
       setFinished(true);
       setTimeout(async () => {
@@ -128,27 +122,6 @@ export default function FullPreview() {
       clearInterval(overallTimer);
     };
   }, [router, url]);
-
-  // 🔹 Генерация случайных технических факторов
-  useEffect(() => {
-    if (!showTech) return;
-    const interval = setInterval(() => {
-      const count = Math.floor(Math.random() * 4) + 3; // 3–6 факторов
-      const selected = Array.from({ length: count }, () =>
-        techFactors[Math.floor(Math.random() * techFactors.length)]
-      );
-      setTechDisplay(selected);
-    }, 350);
-    return () => clearInterval(interval);
-  }, [showTech]);
-
-  // 🔹 Определение цвета для факторов
-  const getColor = (i: number) => {
-    const r = Math.random();
-    if (r < 0.25) return "text-red-500 opacity-70";
-    if (r < 0.6) return "text-yellow-500 opacity-70";
-    return "text-green-500 opacity-70";
-  };
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
@@ -203,14 +176,20 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Надпись и 2-я полоса */}
-        <p className="text-base sm:text-lg text-neutral-700 mb-2 font-medium transition-all duration-700">
-          {reportStage === "audit"
-            ? "Аудит 15 ключевых факторов"
-            : reportStage === "owner"
-            ? "Формируем отчёт для владельца сайта"
-            : "Создаём ТЗ для разработчика"}
-        </p>
+        {/* Контейнер с надписью и вторая полоса */}
+        <div className="h-[32px] flex items-center justify-center mb-2 transition-opacity duration-700">
+          <p
+            className={`text-base sm:text-lg font-medium text-neutral-700 transition-opacity duration-700 ${
+              showMiddleText ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {reportStage === "audit"
+              ? "Аудит 15 ключевых факторов"
+              : reportStage === "owner"
+              ? "Формируем отчёт для владельца сайта"
+              : "Создаём ТЗ для разработчика"}
+          </p>
+        </div>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
@@ -226,21 +205,11 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Разделитель с тех. факторами */}
-        {showTech && (
-          <div className="h-[28px] flex items-center justify-center my-2 transition-opacity duration-700 animate-fadeIn">
-            <p className="text-base text-neutral-400 opacity-80 font-normal font-sans tracking-wide">
-              {techDisplay.map((f, i) => (
-                <span key={i} className={`${getColor(i)} mx-1`}>
-                  {f}
-                </span>
-              ))}
-            </p>
-          </div>
-        )}
+        {/* Разделитель (пустой, фикс. высота) */}
+        <div className="h-[28px] my-2" />
 
         {/* Третья полоса */}
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mt-2">
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <div className="absolute inset-0 flex items-center justify-center text-neutral-500 text-sm font-medium">
               {`Полный аудит завершится через ${timeLeft} сек`}
