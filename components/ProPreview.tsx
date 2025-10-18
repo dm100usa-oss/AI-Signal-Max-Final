@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 function Dots() {
   return (
-    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
+    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-white">
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
@@ -48,7 +48,9 @@ export default function FullPreview() {
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
+  const [reportStage, setReportStage] = useState<
+    "audit" | "owner" | "dev" | "final"
+  >("audit");
 
   useEffect(() => {
     const factorTimer = setInterval(() => {
@@ -75,6 +77,10 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
+          }
+          // 🔹 За 1 секунду до конца переключаем на финальную надпись
+          if (next >= 100 - 100 / reportTime) {
+            setReportStage("final");
           }
           return Math.min(next, 100);
         });
@@ -118,7 +124,7 @@ export default function FullPreview() {
         AI Signal Max
       </h1>
 
-      {/* URL + дата в одной строке, как в быстрой проверке */}
+      {/* URL + дата */}
       <p className="text-base text-neutral-400 mt-1 mb-2">
         {url} &nbsp; | &nbsp; Date:{" "}
         {new Date().toLocaleDateString("en-US", {
@@ -132,7 +138,7 @@ export default function FullPreview() {
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
-            ? "opacity-40 text-neutral-400 translate-y-[-6px]"
+            ? "opacity-60 text-neutral-400 translate-y-[-6px]"
             : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
@@ -144,11 +150,13 @@ export default function FullPreview() {
         </span>
       </div>
 
-      {/* Основная часть */}
       <div className="rounded-md p-0">
         {/* Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
+          <p
+            key={current}
+            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+          >
             {factors[current]}
           </p>
         </div>
@@ -175,8 +183,13 @@ export default function FullPreview() {
 
         {/* Надпись между полосами */}
         <div className="h-[32px] flex items-center justify-center mb-2">
-          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
-            {reportStage === "audit"
+          <p
+            key={reportStage}
+            className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
+          >
+            {reportStage === "final"
+              ? "Отчёт для владельца • ТЗ для разработчика"
+              : reportStage === "audit"
               ? "Аудит 15 ключевых факторов"
               : reportStage === "owner"
               ? "Формируем отчёт для владельца сайта"
@@ -184,19 +197,19 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* Средняя полоса с тенью */}
+        {/* Средняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
-          {/* Серая "тень", синхронная с верхней */}
           {!auditDone && (
             <div
               className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
               style={{ width: `${progressAudit}%` }}
             />
           )}
-          {/* Настоящая зелёная полоса после завершения */}
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
-              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
+              auditDone
+                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
+                : ""
             }`}
             style={{
               width: `${progressReport}%`,
@@ -211,7 +224,6 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Разделитель */}
         <div className="h-4"></div>
 
         {/* Нижняя полоса */}
@@ -229,8 +241,8 @@ export default function FullPreview() {
           )}
           {finished && (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Получить результат
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
+                Получить результат <Dots />
               </p>
             </div>
           )}
