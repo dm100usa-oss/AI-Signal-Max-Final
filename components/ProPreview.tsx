@@ -51,17 +51,14 @@ export default function FullPreview() {
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev">("audit");
   const [showMiddleText, setShowMiddleText] = useState(true);
 
-  // 🔹 Основная логика
   useEffect(() => {
-    // Факторы
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    // Заголовок
     setTimeout(() => setFadeHeader(true), 1500);
 
-    // Первая полоса
+    // 🔹 Первая полоса (аудит)
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -74,7 +71,7 @@ export default function FullPreview() {
       });
     }, 1000);
 
-    // Вторая полоса
+    // 🔹 Вторая полоса (отчёты)
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -83,9 +80,7 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
-            setTimeout(() => {
-              setShowMiddleText(false); // скрыть надпись перед третьей полосой
-            }, 800);
+            setTimeout(() => setShowMiddleText(false), 800);
           }
           return Math.min(next, 100);
         });
@@ -93,12 +88,12 @@ export default function FullPreview() {
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
-    // Таймер
+    // 🔹 Третья полоса (таймер)
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
-    // Финал
+    // 🔹 Финал
     setTimeout(() => {
       setFinished(true);
       setTimeout(async () => {
@@ -176,10 +171,10 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Контейнер с надписью и вторая полоса */}
+        {/* Надписи и вторая полоса */}
         <div className="h-[32px] flex items-center justify-center mb-2 transition-opacity duration-700">
           <p
-            className={`text-base sm:text-lg font-medium text-neutral-700 transition-opacity duration-700 ${
+            className={`text-sm sm:text-base font-medium text-neutral-600 transition-opacity duration-700 ${
               showMiddleText ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -205,15 +200,21 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Разделитель (пустой, фикс. высота) */}
+        {/* Разделитель */}
         <div className="h-[28px] my-2" />
 
-        {/* Третья полоса */}
+        {/* Третья полоса (таймер) */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
-            <div className="absolute inset-0 flex items-center justify-center text-neutral-500 text-sm font-medium">
-              {`Полный аудит завершится через ${timeLeft} сек`}
-            </div>
+            <>
+              <div
+                className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+                style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+              />
+              <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+                {`Полный аудит завершится через ${timeLeft} сек`}
+              </div>
+            </>
           )}
           {finished && (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
