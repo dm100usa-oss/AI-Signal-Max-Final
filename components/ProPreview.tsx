@@ -220,6 +220,9 @@ export default function FullPreview() {
           )}
         </div>
 
+        {/* 🟩 Пустой заполнитель — обеспечивает равное расстояние */}
+        <div className="mb-4 h-[28px]" />
+
         {/* 3️⃣ Третья полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
