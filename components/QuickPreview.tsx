@@ -64,6 +64,7 @@ export default function QuickPreview() {
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const [finished, setFinished] = useState(false);
   const [fadeHeader, setFadeHeader] = useState(false);
+  const [showDots, setShowDots] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
   const [showResultText, setShowResultText] = useState(false);
 
@@ -77,8 +78,12 @@ export default function QuickPreview() {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (totalTime / factors.length) * 1000);
 
+    // Заголовок: тускнеет и поднимается
     setTimeout(() => setFadeHeader(true), 1500);
+    // Точки появляются чуть позже, когда надпись уже на месте
+    setTimeout(() => setShowDots(true), 1900);
 
+    // Основной процесс
     setTimeout(() => {
       setFinished(true);
       setTimeout(() => setShowFinal(true), 1400);
@@ -93,13 +98,9 @@ export default function QuickPreview() {
             body: JSON.stringify({ mode: "quick", url }),
           });
           const json = await resp.json();
-          if (json?.url) {
-            router.push(json.url);
-          } else {
-            router.push("/pay");
-          }
-        } catch (err) {
-          console.error("Payment redirect failed:", err);
+          if (json?.url) router.push(json.url);
+          else router.push("/pay");
+        } catch {
           router.push("/pay");
         }
       }, 4000);
@@ -121,7 +122,7 @@ export default function QuickPreview() {
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
-      {/* 🔹 Заголовок с двумя слоями точек */}
+      {/* 🔹 Заголовок с синхронным движением и точками */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -131,8 +132,8 @@ export default function QuickPreview() {
       >
         <span className="flex items-center justify-center">
           Мы начали проверку
-          <span className="inline-flex ml-1 relative">
-            {fadeHeader && (
+          <span className="inline-flex w-[1.7ch] justify-start ml-1 relative">
+            {showDots && (
               <>
                 <Dots colorClass="text-neutral-400 absolute left-0" />
                 <Dots colorClass="text-blue-400/70 absolute left-0" />
