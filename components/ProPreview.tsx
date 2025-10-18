@@ -63,9 +63,10 @@ export default function FullPreview() {
     "Как оценивает ИИ ваш сайт",
   ];
 
-  const totalTime = 44;
-  const auditTime = 30;
-  const reportTime = 14;
+  const auditTime = 30; // Первая полоса
+  const reportTime = 14; // Вторая полоса
+  const finalDelay = (auditTime + reportTime) * 1000; // Финал после второй
+  const totalTime = auditTime + reportTime + 4; // Общий тайминг
 
   const [current, setCurrent] = useState(0);
   const [progressAudit, setProgressAudit] = useState(0);
@@ -75,27 +76,28 @@ export default function FullPreview() {
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
   const [finalGreen, setFinalGreen] = useState(false);
+  const [stageText, setStageText] = useState<"audit" | "owner" | "dev" | "done">("audit");
 
   useEffect(() => {
-    // Факторы появляются последовательно
+    // 🔹 Факторы появляются постепенно
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
-    // Первая полоса — аудит
+    // 🔹 Первая полоса — аудит
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
         if (next >= 100) {
           clearInterval(auditProgressTimer);
           setAuditDone(true);
+          setStageText("owner");
         }
         return Math.min(next, 100);
       });
     }, 1000);
 
-    // Вторая полоса — отчёты
-    const reportStartDelay = auditTime * 1000;
+    // 🔹 Вторая полоса — отчёты
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
         setProgressReport((p) => {
@@ -103,14 +105,16 @@ export default function FullPreview() {
           if (next >= 100) {
             clearInterval(reportProgressTimer);
             setReportsDone(true);
+            setStageText("done");
+          } else if (next >= 50 && stageText !== "dev") {
+            setStageText("dev");
           }
           return Math.min(next, 100);
         });
       }, 1000);
-    }, reportStartDelay);
+    }, auditTime * 1000);
 
-    // Финал — третья полоса становится зелёной
-    const finalDelay = (auditTime + reportTime) * 1000;
+    // 🔹 Третья полоса — плавное появление зелёного цвета в конце
     setTimeout(() => {
       setFinalGreen(true);
       setFinished(true);
@@ -130,7 +134,7 @@ export default function FullPreview() {
       }, 4000);
     }, finalDelay);
 
-    // Заголовок плавно тускнеет
+    // 🔹 Плавное затухание заголовка
     setTimeout(() => setFadeHeader(true), 1500);
 
     return () => {
@@ -190,6 +194,20 @@ export default function FullPreview() {
         )}
       </div>
 
+      {/* Надписи между 1 и 2 полосой */}
+      {stageText !== "done" && (
+        <p
+          key={stageText}
+          className="text-base sm:text-lg font-medium text-neutral-800 mb-4 animate-fadeInUp"
+        >
+          {stageText === "audit"
+            ? "Аудит 15 ключевых факторов"
+            : stageText === "owner"
+            ? "Формируем отчёт для владельца сайта"
+            : "Создаём ТЗ для разработчика"}
+        </p>
+      )}
+
       {/* 2️⃣ Вторая полоса */}
       <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
         <div
@@ -204,6 +222,9 @@ export default function FullPreview() {
           </div>
         )}
       </div>
+
+      {/* Разделитель между 2 и 3 полосой */}
+      <div className="mb-4 h-[28px]" />
 
       {/* 3️⃣ Третья полоса */}
       <div
