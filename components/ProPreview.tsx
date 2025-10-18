@@ -118,11 +118,17 @@ export default function FullPreview() {
         AI Signal Max
       </h1>
 
-      <p className="text-base text-neutral-400 mt-1 mb-2">
-        {url || "https://example.com"} &nbsp; | &nbsp; Date:{" "}
-        {new Date().toLocaleDateString("en-US")}
+      {/* URL */}
+      <p className="text-base text-neutral-400 mt-1">
+        {url || "https://example.com"}
       </p>
 
+      {/* Дата */}
+      <p className="text-base text-neutral-400 mb-2">
+        Date: {new Date().toLocaleDateString("en-US")}
+      </p>
+
+      {/* Заголовок */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -138,7 +144,9 @@ export default function FullPreview() {
         </span>
       </div>
 
+      {/* Основная часть */}
       <div className="rounded-md p-0">
+        {/* Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p
             key={current}
@@ -187,7 +195,7 @@ export default function FullPreview() {
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
               !auditDone && progressReport === 0
-                ? "bg-gradient-to-r from-blue-100 via-blue-200 to-blue-100 animate-softBlueWave"
+                ? "animate-softBlueWave"
                 : "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
             }`}
             style={{
@@ -204,7 +212,6 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Разделитель */}
         <div className="h-4"></div>
 
         {/* Нижняя полоса */}
@@ -298,20 +305,24 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
+        /* Реально видимый мягкий перелив */
         @keyframes softBlueWave {
           0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
+            background-position: 0% 0%;
           }
           100% {
-            background-position: 0% 50%;
+            background-position: 200% 0%;
           }
         }
         .animate-softBlueWave {
-          animation: softBlueWave 4s ease-in-out infinite;
+          background-image: linear-gradient(
+            120deg,
+            rgba(173, 216, 230, 0.15) 0%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(173, 216, 230, 0.15) 100%
+          );
           background-size: 200% 100%;
+          animation: softBlueWave 6s linear infinite;
         }
       `}</style>
 
