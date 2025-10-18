@@ -16,7 +16,7 @@ function Dots() {
 export default function FullPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const url = searchParams.get("url") || "";
+  const url = searchParams.get("url") || "https://example.com";
 
   const factors = [
     "Открыт ли сайт для ИИ",
@@ -118,12 +118,14 @@ export default function FullPreview() {
         AI Signal Max
       </h1>
 
-      {/* URL */}
-      <p className="text-base text-neutral-400 mt-1">{url || "https://example.com"}</p>
-
-      {/* Дата (маленькие буквы, моноширинный шрифт) */}
-      <p className="text-base text-neutral-400 font-mono lowercase mb-2">
-        date: {new Date().toLocaleDateString("en-US")}
+      {/* URL + дата в одной строке, как в быстрой проверке */}
+      <p className="text-base text-neutral-400 mt-1 mb-2">
+        {url} &nbsp; | &nbsp; Date:{" "}
+        {new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
       </p>
 
       {/* Заголовок */}
