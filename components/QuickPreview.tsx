@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// 🔹 Анимация трёх точек (точно как на главной странице)
-function Dots() {
+// 🔹 Анимация трёх точек
+function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
   return (
-    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle text-neutral-400">
+    <span className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}>
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
@@ -121,7 +121,7 @@ export default function QuickPreview() {
         https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
       </p>
 
-      {/* 🔹 Надпись с точками без смещения, плавное затухание */}
+      {/* 🔹 Заголовок с двумя слоями точек */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -131,9 +131,13 @@ export default function QuickPreview() {
       >
         <span className="flex items-center justify-center">
           Мы начали проверку
-          {/* Резервируем место под точки, чтобы не было рывка */}
-          <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
-            {fadeHeader && <Dots />}
+          <span className="inline-flex ml-1 relative">
+            {fadeHeader && (
+              <>
+                <Dots colorClass="text-neutral-400 absolute left-0" />
+                <Dots colorClass="text-blue-400/70 absolute left-0" />
+              </>
+            )}
           </span>
         </span>
       </div>
@@ -141,10 +145,7 @@ export default function QuickPreview() {
       <div className="rounded-md p-0">
         {/* 🔹 Факторы с плавным появлением */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p
-            key={current}
-            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-          >
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
             {factors[current]}
           </p>
           <style jsx>{`
@@ -172,8 +173,9 @@ export default function QuickPreview() {
           />
           {showResultText && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700 opacity-0 animate-fadeIn">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center">
                 Получить результат
+                <Dots colorClass="text-white ml-1" />
               </p>
               <style jsx>{`
                 @keyframes fadeIn {
@@ -192,9 +194,7 @@ export default function QuickPreview() {
           )}
         </div>
 
-        <p className="text-center text-sm text-neutral-600 mb-4">
-          Анализ 10 ключевых факторов
-        </p>
+        <p className="text-center text-sm text-neutral-600 mb-4">Анализ 10 ключевых факторов</p>
 
         {/* Нижняя полоса (тайминг) */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
@@ -235,8 +235,7 @@ export default function QuickPreview() {
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data.
-          Not legal advice.
+          Visibility scores are estimated and based on publicly available data. Not legal advice.
         </span>
       </footer>
     </main>
