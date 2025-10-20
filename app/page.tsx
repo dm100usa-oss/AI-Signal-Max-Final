@@ -25,7 +25,7 @@ function Dots() {
   );
 }
 
-// убираем "Checked website:" если пользователь вставил его из результатов
+// normalize pasted URLs
 const normalizeUrl = (v: string) =>
   v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
@@ -111,7 +111,7 @@ export default function Home() {
             type="button"
             aria-label="Clear"
             onClick={clear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 cursor-pointer"
           >
             ×
           </button>
@@ -123,7 +123,7 @@ export default function Home() {
       <button
         onClick={() => go("quick")}
         disabled={!!loading}
-        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors"
+        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors cursor-pointer"
       >
         {loading === "quick" ? (
           <span className="inline-flex items-center">Checking<Dots /></span>
@@ -139,7 +139,7 @@ export default function Home() {
       <button
         onClick={() => go("pro")}
         disabled={!!loading}
-        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 disabled:opacity-60 transition-colors"
+        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 disabled:opacity-60 transition-colors cursor-pointer"
       >
         {loading === "pro" ? (
           <span className="inline-flex items-center">Checking<Dots /></span>
@@ -147,9 +147,22 @@ export default function Home() {
           "Полная проверка $19.99"
         )}
       </button>
-      <p className="mt-2 text-center text-sm text-neutral-600">
+      <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
+
+      {/* Stars */}
+      <div className="flex justify-center mt-2 mb-8 space-x-1 text-yellow-400">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <span
+            key={i}
+            onClick={() => router.push("/reviews")}
+            className="cursor-pointer hover:text-yellow-500 transition-colors text-2xl"
+          >
+            ★
+          </span>
+        ))}
+      </div>
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
