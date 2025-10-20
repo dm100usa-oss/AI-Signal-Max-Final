@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Star } from "lucide-react";
 
 /** Only dots animate; text stays stable */
 function Dots() {
@@ -26,6 +25,7 @@ function Dots() {
   );
 }
 
+// normalize pasted URLs
 const normalizeUrl = (v: string) =>
   v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
@@ -151,15 +151,22 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Premium stars */}
-      <div className="flex justify-center mt-2 mb-8 space-x-2">
+      {/* Stars */}
+      <div className="flex justify-center mt-2 mb-8 space-x-1">
         {[1, 2, 3, 4, 5].map((i) => (
-          <Star
+          <span
             key={i}
             onClick={() => router.push("/reviews")}
-            className="w-7 h-7 text-yellow-400 drop-shadow-sm hover:text-yellow-500 hover:scale-105 transition-transform cursor-pointer"
-            fill="currentColor"
-          />
+            className="cursor-pointer text-2xl transition-transform hover:scale-110"
+            style={{
+              color: "#facc15",
+              textShadow:
+                "0 0 2px rgba(0,0,0,0.25), 0 0 6px rgba(255,215,0,0.6), 0 0 12px rgba(255,215,0,0.4)",
+              filter: "brightness(1.1)",
+            }}
+          >
+            ★
+          </span>
         ))}
       </div>
 
