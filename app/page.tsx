@@ -32,6 +32,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
   const [fadeOut, setFadeOut] = useState(false);
+  const [animateStars, setAnimateStars] = useState(false);
 
   const isValid = (u: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/i.test(u.trim());
 
@@ -46,7 +47,11 @@ export default function Home() {
       setError(null);
       setLoading(mode);
 
-      // запускаем fade-out
+      // запускаем анимацию звёзд (двойной прокат)
+      setAnimateStars(true);
+
+      // первый и второй прокат занимают ~1.5 c, затем fade-out
+      await new Promise((r) => setTimeout(r, 1600));
       setFadeOut(true);
 
       const minDuration = 2200;
@@ -66,8 +71,7 @@ export default function Home() {
       }
 
       const left = Math.max(0, minDuration - (Date.now() - started));
-      await new Promise((r) => setTimeout(r, left + 350)); // ждём анимацию
-
+      await new Promise((r) => setTimeout(r, left + 400)); // ждём анимацию
       const q = new URLSearchParams({ url: u, status }).toString();
       router.push(`/preview/${mode}?${q}`);
     },
@@ -78,7 +82,7 @@ export default function Home() {
 
   return (
     <main
-      className={`mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-300 ${
+      className={`mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-400 ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
@@ -156,7 +160,7 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Gold stars with clean darker hover tone */}
+      {/* Gold stars with double wave light animation */}
       <div className="flex justify-center mb-10 space-x-2">
         <style jsx>{`
           .star {
@@ -164,16 +168,26 @@ export default function Home() {
             -webkit-text-stroke: 0.8px #eab308;
             transition: color 0.25s ease;
           }
-          .star:hover {
-            color: #f5b300; /* чистый тёплый тон */
+          .wave {
+            animation: waveLight 1.6s ease-in-out forwards;
+          }
+          @keyframes waveLight {
+            0%, 100% { color: #facc15; }
+            10%, 40% { color: #f5d437; }
+            50%, 60% { color: #ffe760; }
+            80% { color: #facc15; }
           }
         `}</style>
 
         {[1, 2, 3, 4, 5].map((i) => (
           <span
             key={i}
-            onClick={() => router.push("/reviews")}
-            className="star cursor-pointer text-[26px] select-none transition-transform hover:scale-105"
+            className={`star text-[26px] select-none ${
+              animateStars ? "wave" : ""
+            }`}
+            style={{
+              animationDelay: animateStars ? `${i * 0.12}s` : "0s",
+            }}
           >
             ★
           </span>
