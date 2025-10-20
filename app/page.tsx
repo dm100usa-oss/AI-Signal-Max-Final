@@ -34,7 +34,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
   const [animating, setAnimating] = useState(false);
-  const [activeStars, setActiveStars] = useState<number[]>([]);
+  const [wave, setWave] = useState(false);
 
   const isValid = (u: string) =>
     /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/i.test(u.trim());
@@ -74,23 +74,21 @@ export default function Home() {
 
   const clear = () => setUrl("");
 
-  const handleStarsClick = () => {
+  const handleStarsClick = async () => {
     if (animating) return;
     setAnimating(true);
-    const sequence = async () => {
-      for (let wave = 0; wave < 2; wave++) {
-        for (let i = 1; i <= 5; i++) {
-          setActiveStars([i]);
-          await new Promise((r) => setTimeout(r, 200)); // немного длиннее между звёздами
-        }
-        setActiveStars([]);
-        await new Promise((r) => setTimeout(r, 400)); // пауза между волнами
-      }
-      document.body.style.transition = "opacity 0.6s ease";
-      document.body.style.opacity = "0";
-      setTimeout(() => router.push("/reviews"), 600);
-    };
-    sequence();
+
+    // запускаем эффект дважды
+    for (let i = 0; i < 2; i++) {
+      setWave(true);
+      await new Promise((r) => setTimeout(r, 1600));
+      setWave(false);
+      await new Promise((r) => setTimeout(r, 300));
+    }
+
+    document.body.style.transition = "opacity 0.6s ease";
+    document.body.style.opacity = "0";
+    setTimeout(() => router.push("/reviews"), 600);
   };
 
   return (
@@ -171,34 +169,41 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Animated gold stars */}
+      {/* Gold stars with moving gradient */}
       <div className="flex justify-center mb-10 space-x-2">
+        <style jsx>{`
+          .star {
+            font-size: 26px;
+            color: #facc15;
+            -webkit-text-stroke: 0.8px #eab308;
+            transition: transform 0.2s ease;
+            background: linear-gradient(90deg, #facc15 20%, #fff6b7 40%, #facc15 60%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+          .star:hover {
+            transform: scale(1.05);
+          }
+          .wave {
+            animation: waveShift 1.6s linear infinite;
+          }
+          @keyframes waveShift {
+            from { background-position: 200% center; }
+            to { background-position: -200% center; }
+          }
+        `}</style>
+
         {[1, 2, 3, 4, 5].map((i) => (
           <span
             key={i}
             onClick={handleStarsClick}
-            className={`cursor-pointer text-[26px] transition-all duration-300 select-none
-              ${activeStars.includes(i)
-                ? "text-yellow-300 glow"
-                : "text-yellow-400 hover:text-yellow-500"}
-            `}
-            style={{
-              textShadow:
-                activeStars.includes(i)
-                  ? "0 0 6px rgba(255,230,150,0.9), 0 0 12px rgba(255,200,80,0.6)"
-                  : "0.5px 0.5px 2px rgba(180,120,0,0.4)",
-            }}
+            className={`star cursor-pointer select-none ${wave ? "wave" : ""}`}
           >
             ★
           </span>
         ))}
       </div>
-
-      <style jsx>{`
-        .glow {
-          transition: text-shadow 0.3s ease, color 0.3s ease;
-        }
-      `}</style>
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
