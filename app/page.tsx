@@ -150,13 +150,19 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Clean gold stars */}
+      {/* Gradient gold stars */}
       <div className="flex justify-center mb-10 space-x-2">
         {[1, 2, 3, 4, 5].map((i) => (
           <span
             key={i}
             onClick={() => router.push("/reviews")}
-            className="cursor-pointer text-[26px] text-yellow-400 hover:text-yellow-500 transition-transform hover:scale-105 select-none"
+            className="cursor-pointer text-xl select-none transition-transform duration-200 hover:scale-105"
+            style={{
+              background: "linear-gradient(to bottom, #fcd34d 0%, #fbbf24 80%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "0 1px 1px rgba(0,0,0,0.25)",
+            }}
           >
             ★
           </span>
