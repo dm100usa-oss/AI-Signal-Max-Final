@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"; // добавляем только эту строку
+
 // app/api/result/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getData } from "@/lib/storage";
