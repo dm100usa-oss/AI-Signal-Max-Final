@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Star } from "lucide-react";
 
 /** Only dots animate; text stays stable */
 function Dots() {
@@ -25,7 +26,6 @@ function Dots() {
   );
 }
 
-// normalize pasted URLs
 const normalizeUrl = (v: string) =>
   v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
@@ -82,7 +82,7 @@ export default function Home() {
         Проверьте, виден ли ваш сайт для ИИ-ассистентов, таких как ChatGPT, Copilot, Gemini, Perplexity, Grok и других
       </p>
 
-      {/* URL input with clear icon */}
+      {/* URL input */}
       <div className="mb-2 relative">
         <input
           type="url"
@@ -151,16 +151,15 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Stars */}
-      <div className="flex justify-center mt-2 mb-8 space-x-1 text-yellow-400">
+      {/* Premium stars */}
+      <div className="flex justify-center mt-2 mb-8 space-x-2">
         {[1, 2, 3, 4, 5].map((i) => (
-          <span
+          <Star
             key={i}
             onClick={() => router.push("/reviews")}
-            className="cursor-pointer hover:text-yellow-500 transition-colors text-2xl"
-          >
-            ★
-          </span>
+            className="w-7 h-7 text-yellow-400 drop-shadow-sm hover:text-yellow-500 hover:scale-105 transition-transform cursor-pointer"
+            fill="currentColor"
+          />
         ))}
       </div>
 
