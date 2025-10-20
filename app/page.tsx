@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
+/** Only dots animate; text stays stable */
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle">
@@ -24,69 +25,79 @@ function Dots() {
   );
 }
 
-const normalizeUrl = (v: string) => v.replace(/^\s*checked\s+website:\s*/i, "").trim();
+const normalizeUrl = (v: string) =>
+  v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
 export default function Home() {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
-  const [fadeOut, setFadeOut] = useState(false);
-  const [animateStars, setAnimateStars] = useState(false);
+  const [animating, setAnimating] = useState(false);
+  const [activeStars, setActiveStars] = useState<number[]>([]);
 
-  const isValid = (u: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/i.test(u.trim());
+  const isValid = (u: string) =>
+    /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/i.test(u.trim());
 
-  const go = useCallback(
-    async (mode: "quick" | "pro") => {
-      if (loading) return;
-      const u = normalizeUrl(url);
-      if (!isValid(u)) {
-        setError("Please enter a valid URL (including http/https).");
-        return;
-      }
-      setError(null);
-      setLoading(mode);
+  const go = useCallback(async (mode: "quick" | "pro") => {
+    if (loading) return;
+    const u = normalizeUrl(url);
+    if (!isValid(u)) {
+      setError("Please enter a valid URL (including http/https).");
+      return;
+    }
+    setError(null);
+    setLoading(mode);
 
-      // запускаем анимацию звёзд (двойной прокат)
-      setAnimateStars(true);
+    const minDuration = 2200;
+    const started = Date.now();
 
-      // первый и второй прокат занимают ~1.5 c, затем fade-out
-      await new Promise((r) => setTimeout(r, 1600));
-      setFadeOut(true);
+    let status: "ok" | "error" = "ok";
+    try {
+      const resp = await fetch("/api/precheck", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: u }),
+      });
+      const json = await resp.json();
+      status = json?.ok ? "ok" : "error";
+    } catch {
+      status = "error";
+    }
 
-      const minDuration = 2200;
-      const started = Date.now();
+    const left = Math.max(0, minDuration - (Date.now() - started));
+    await new Promise((r) => setTimeout(r, left));
 
-      let status: "ok" | "error" = "ok";
-      try {
-        const resp = await fetch("/api/precheck", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: u }),
-        });
-        const json = await resp.json();
-        status = json?.ok ? "ok" : "error";
-      } catch {
-        status = "error";
-      }
-
-      const left = Math.max(0, minDuration - (Date.now() - started));
-      await new Promise((r) => setTimeout(r, left + 400)); // ждём анимацию
-      const q = new URLSearchParams({ url: u, status }).toString();
-      router.push(`/preview/${mode}?${q}`);
-    },
-    [url, loading, router]
-  );
+    const q = new URLSearchParams({ url: u, status }).toString();
+    router.push(`/preview/${mode}?${q}`);
+  }, [url, loading, router]);
 
   const clear = () => setUrl("");
 
+  const handleStarsClick = () => {
+    if (animating) return;
+    setAnimating(true);
+    const sequence = async () => {
+      for (let wave = 0; wave < 2; wave++) {
+        for (let i = 1; i <= 5; i++) {
+          setActiveStars((prev) => [...prev, i]);
+          await new Promise((r) => setTimeout(r, 120));
+        }
+        setActiveStars([]);
+        await new Promise((r) => setTimeout(r, 200));
+      }
+      document.body.style.transition = "opacity 0.6s ease";
+      document.body.style.opacity = "0";
+      setTimeout(() => router.push("/reviews"), 600);
+    };
+    sequence();
+  };
+
   return (
-    <main
-      className={`mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-400 ${
-        fadeOut ? "opacity-0" : "opacity-100"
-      }`}
-    >
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4">AI Signal Max</h1>
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-700">
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4">
+        AI Signal Max
+      </h1>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
         Проверьте, виден ли ваш сайт для ИИ-ассистентов, таких как ChatGPT, Copilot, Gemini, Perplexity, Grok и других
       </p>
@@ -160,33 +171,20 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Gold stars with double wave light animation */}
+      {/* Animated gold stars */}
       <div className="flex justify-center mb-10 space-x-2">
-        <style jsx>{`
-          .star {
-            color: #facc15;
-            -webkit-text-stroke: 0.8px #eab308;
-            transition: color 0.25s ease;
-          }
-          .wave {
-            animation: waveLight 1.6s ease-in-out forwards;
-          }
-          @keyframes waveLight {
-            0%, 100% { color: #facc15; }
-            10%, 40% { color: #f5d437; }
-            50%, 60% { color: #ffe760; }
-            80% { color: #facc15; }
-          }
-        `}</style>
-
         {[1, 2, 3, 4, 5].map((i) => (
           <span
             key={i}
-            className={`star text-[26px] select-none ${
-              animateStars ? "wave" : ""
-            }`}
+            onClick={handleStarsClick}
+            className={`cursor-pointer text-[26px] transition-all select-none 
+              ${activeStars.includes(i)
+                ? "text-yellow-400 drop-shadow-[0_0_3px_rgba(255,204,0,0.9)] scale-110"
+                : "text-yellow-400 hover:text-yellow-500 hover:scale-105"}
+            `}
             style={{
-              animationDelay: animateStars ? `${i * 0.12}s` : "0s",
+              textShadow:
+                "0.5px 0.5px 2px rgba(180,120,0,0.4), -0.5px -0.5px 2px rgba(255,255,180,0.3)",
             }}
           >
             ★
