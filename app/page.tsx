@@ -80,11 +80,11 @@ export default function Home() {
     const sequence = async () => {
       for (let wave = 0; wave < 2; wave++) {
         for (let i = 1; i <= 5; i++) {
-          setActiveStars((prev) => [...prev, i]);
-          await new Promise((r) => setTimeout(r, 120));
+          setActiveStars([i]);
+          await new Promise((r) => setTimeout(r, 200)); // немного длиннее между звёздами
         }
         setActiveStars([]);
-        await new Promise((r) => setTimeout(r, 200));
+        await new Promise((r) => setTimeout(r, 400)); // пауза между волнами
       }
       document.body.style.transition = "opacity 0.6s ease";
       document.body.style.opacity = "0";
@@ -177,20 +177,28 @@ export default function Home() {
           <span
             key={i}
             onClick={handleStarsClick}
-            className={`cursor-pointer text-[26px] transition-all select-none 
+            className={`cursor-pointer text-[26px] transition-all duration-300 select-none
               ${activeStars.includes(i)
-                ? "text-yellow-400 drop-shadow-[0_0_3px_rgba(255,204,0,0.9)] scale-110"
-                : "text-yellow-400 hover:text-yellow-500 hover:scale-105"}
+                ? "text-yellow-300 glow"
+                : "text-yellow-400 hover:text-yellow-500"}
             `}
             style={{
               textShadow:
-                "0.5px 0.5px 2px rgba(180,120,0,0.4), -0.5px -0.5px 2px rgba(255,255,180,0.3)",
+                activeStars.includes(i)
+                  ? "0 0 6px rgba(255,230,150,0.9), 0 0 12px rgba(255,200,80,0.6)"
+                  : "0.5px 0.5px 2px rgba(180,120,0,0.4)",
             }}
           >
             ★
           </span>
         ))}
       </div>
+
+      <style jsx>{`
+        .glow {
+          transition: text-shadow 0.3s ease, color 0.3s ease;
+        }
+      `}</style>
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
