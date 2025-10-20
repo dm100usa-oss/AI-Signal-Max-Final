@@ -25,7 +25,6 @@ function Dots() {
   );
 }
 
-// normalize pasted URLs
 const normalizeUrl = (v: string) =>
   v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
@@ -147,23 +146,17 @@ export default function Home() {
           "Полная проверка $19.99"
         )}
       </button>
-      <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
+      <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Stars */}
-      <div className="flex justify-center mt-2 mb-8 space-x-1">
+      {/* Clean gold stars */}
+      <div className="flex justify-center mb-10 space-x-2">
         {[1, 2, 3, 4, 5].map((i) => (
           <span
             key={i}
             onClick={() => router.push("/reviews")}
-            className="cursor-pointer text-2xl transition-transform hover:scale-110"
-            style={{
-              color: "#facc15",
-              textShadow:
-                "0 0 2px rgba(0,0,0,0.25), 0 0 6px rgba(255,215,0,0.6), 0 0 12px rgba(255,215,0,0.4)",
-              filter: "brightness(1.1)",
-            }}
+            className="cursor-pointer text-[26px] text-yellow-400 hover:text-yellow-500 transition-transform hover:scale-105 select-none"
           >
             ★
           </span>
