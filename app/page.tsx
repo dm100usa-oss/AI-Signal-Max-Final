@@ -150,17 +150,24 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Gold stars with subtle darker edges */}
+      {/* Gold stars with darker edge and hover tone */}
       <div className="flex justify-center mb-10 space-x-2">
+        <style jsx>{`
+          .star {
+            color: #facc15;
+            -webkit-text-stroke: 0.8px #eab308;
+            transition: color 0.2s ease;
+          }
+          .star:hover {
+            color: #eab308;
+          }
+        `}</style>
+
         {[1, 2, 3, 4, 5].map((i) => (
           <span
             key={i}
             onClick={() => router.push("/reviews")}
-            className="cursor-pointer text-[26px] select-none transition-transform hover:scale-105"
-            style={{
-              color: "#facc15",
-              WebkitTextStroke: "0.8px #eab308",
-            }}
+            className="star cursor-pointer text-[26px] select-none transition-transform hover:scale-105"
           >
             ★
           </span>
