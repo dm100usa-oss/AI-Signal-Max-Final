@@ -150,18 +150,16 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Premium gold stars with subtle edge depth */}
+      {/* Gold stars with subtle darker edges */}
       <div className="flex justify-center mb-10 space-x-2">
         {[1, 2, 3, 4, 5].map((i) => (
           <span
             key={i}
             onClick={() => router.push("/reviews")}
-            className="cursor-pointer text-lg select-none transition-transform duration-200 hover:scale-105"
+            className="cursor-pointer text-[26px] select-none transition-transform hover:scale-105"
             style={{
-              background: "radial-gradient(circle at 40% 35%, #facc15 0%, #eab308 80%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              textShadow: "0 1px 1px rgba(0,0,0,0.15)",
+              color: "#facc15",
+              WebkitTextStroke: "0.8px #eab308",
             }}
           >
             ★
