@@ -111,10 +111,10 @@ export default function ReviewsPage() {
 
       {/* Текст приглашения */}
       <p
-        className="text-center leading-relaxed text-[17px] mb-6"
+        className="text-center leading-relaxed text-[16px] mb-6"
         style={{ color: "#475569" }}
       >
-        Поделитесь своим мнением, расскажите о себе или своей компании, вашу
+        Поделитесь своим мнением. Расскажите о себе или своей компании. Вашу
         историю увидят тысячи пользователей по всему миру.
       </p>
 
@@ -167,8 +167,8 @@ export default function ReviewsPage() {
 
             {/* Лайки, дизлайки, ответ */}
             <div className="flex items-center space-x-6 mt-3 text-sm text-neutral-500">
-              <button className="flex items-center space-x-1 hover:text-blue-600 transition-colors">
-                {/* Палец вверх (наш SVG) */}
+              <button className="flex items-center justify-center space-x-1 hover:text-blue-600 transition-colors">
+                {/* Новый палец вверх */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -176,17 +176,17 @@ export default function ReviewsPage() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.8"
+                  strokeWidth="1.6"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <path d="M14 9V5a3 3 0 0 0-6 0v4H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h9l5-9V9h-4z" />
+                  <path d="M7 22V9a2 2 0 0 1 2-2h3l1-5 7 7v13H7z" />
                 </svg>
                 <span>{r.likes}</span>
               </button>
 
-              <button className="flex items-center space-x-1 hover:text-rose-600 transition-colors">
-                {/* Палец вниз (наш SVG) */}
+              <button className="flex items-center justify-center space-x-1 hover:text-rose-600 transition-colors">
+                {/* Новый палец вниз */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -194,11 +194,11 @@ export default function ReviewsPage() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.8"
+                  strokeWidth="1.6"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <path d="M10 15v4a3 3 0 0 0 6 0v-4h4a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-9l-5 9v2h4z" />
+                  <path d="M17 2v13a2 2 0 0 1-2 2h-3l-1 5-7-7V2h13z" />
                 </svg>
               </button>
 
