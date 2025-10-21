@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { validateReviewToken, removeReviewToken } from "@/lib/reviews";
 
-export const dynamic = "force-dynamic"; // чтобы не кэшировалось Vercel
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
@@ -18,12 +18,13 @@ export async function GET(req: Request) {
       return NextResponse.json({ ok: false, error: "invalid_or_expired" }, { status: 403 });
     }
 
-    // Удаляем токен сразу после проверки, чтобы использовать можно было один раз
+    // одноразовое использование
     await removeReviewToken(token);
-
     return NextResponse.json({ ok: true, message: "token_valid" });
-  } catch (error: any) {
-    console.error("Validate token error:", error);
-    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+  } catch (e: any) {
+    return NextResponse.json(
+      { ok: false, error: e?.message || "server_error" },
+      { status: 500 }
+    );
   }
 }
