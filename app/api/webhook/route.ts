@@ -1,9 +1,9 @@
-// app/api/webhook/route.ts
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { getData } from "@/lib/storage";
 import { generatePDF } from "@/lib/generatePDF";
 import { sendReportEmail } from "@/lib/email";
+import { createReviewToken } from "@/lib/reviews"; // 🔹 добавлено
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
@@ -76,6 +76,10 @@ export async function POST(req: Request) {
         data: baseData,
       });
 
+      // 🔹 Генерируем токен для страницы отзывов
+      const reviewTokenKey = await createReviewToken(session.id);
+      console.log("Review token created:", reviewTokenKey);
+
       if (email) {
         await sendReportEmail({
           to: email,
@@ -85,6 +89,7 @@ export async function POST(req: Request) {
           developerBuffer,
           score,
           results,
+          // можно позже добавить reviewTokenKey в письмо
         });
         console.log(`Email sent to ${email}`);
       } else {
