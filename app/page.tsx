@@ -121,7 +121,7 @@ export default function Home() {
         AI Signal Max
       </h1>
       <p className="text-center text-base text-neutral-700 mb-8 lowercase font-medium tracking-tight">
-        ваше конкурентное преимущество
+        новое конкурентное преимущество
       </p>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
         Проверьте как ИИ ассистенты видят и оценивают ваш сайт: ChatGPT · Copilot · Gemini · Perplexity · Grok и другие
