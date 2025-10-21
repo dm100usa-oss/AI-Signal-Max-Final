@@ -73,7 +73,7 @@ export default function ReviewsPage() {
         className="text-2xl font-semibold text-center mb-2"
         style={{ color: "#9ca3af" }}
       >
-        Reviews & Stories
+        Отзывы и Истории
       </h1>
 
       {/* Звёзды под заголовком */}
@@ -114,7 +114,7 @@ export default function ReviewsPage() {
               <span className="font-semibold text-gray-800">{r.name}</span>
               <span className="text-neutral-400 text-sm">· {r.date}</span>
             </div>
-            <p className="text-gray-700 leading-relaxed text-[15px]">
+            <p className="text-gray-700 leading-relaxed text-[15px] text-justify">
               {r.text}
             </p>
           </div>
