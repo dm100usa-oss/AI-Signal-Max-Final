@@ -31,13 +31,34 @@ export default function ReviewsPage() {
     },
   ];
 
+  const renderStars = (rating: number) => {
+    const full = Math.floor(rating);
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <span
+          key={i}
+          className={`inline-block text-[22px] ${
+            i <= full ? "text-yellow-400" : "text-transparent"
+          }`}
+          style={{
+            WebkitTextStroke: "1px #facc15",
+          }}
+        >
+          ★
+        </span>
+      );
+    }
+    return stars;
+  };
+
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700">
-      <h1 className="text-2xl font-semibold text-center mb-2">
+      <h1 className="text-2xl font-semibold text-center mb-2 text-gray-900">
         Reviews & Stories
       </h1>
 
-      <p className="text-center text-gray-700 mb-8">
+      <p className="text-center text-gray-700 mb-8 text-lg">
         ★★★★★ 4.9 (128)
       </p>
 
@@ -51,14 +72,16 @@ export default function ReviewsPage() {
         {reviews.map((r, i) => (
           <div
             key={i}
-            className="bg-white rounded-xl shadow-sm p-6 text-left"
+            className="bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
           >
-            <p className="text-yellow-500 mb-2">
-              {"★★★★★".slice(0, r.rating)}
+            <div className="flex items-center justify-start space-x-2 mb-3">
+              <div className="flex">{renderStars(r.rating)}</div>
+              <span className="font-semibold text-gray-800">{r.name}</span>
+              <span className="text-neutral-400 text-sm">· {r.date}</span>
+            </div>
+            <p className="text-gray-700 leading-relaxed text-[15px]">
+              {r.text}
             </p>
-            <p className="font-semibold text-gray-800">{r.name}</p>
-            <p className="text-sm text-neutral-500 mb-3">{r.date}</p>
-            <p className="text-gray-700 leading-relaxed">{r.text}</p>
           </div>
         ))}
       </div>
@@ -66,10 +89,9 @@ export default function ReviewsPage() {
       <div className="mt-12 text-center">
         <button
           onClick={() => router.push("/")}
-          className="px-6 py-2 rounded-2xl text-white"
+          className="px-6 py-2 rounded-2xl text-white shadow-sm"
           style={{
-            background:
-              "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
+            background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
           }}
         >
           Back to Home
