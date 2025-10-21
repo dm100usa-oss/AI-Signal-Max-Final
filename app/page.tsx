@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 /** Only dots animate; text stays stable */
@@ -35,6 +35,28 @@ export default function Home() {
   const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
   const [animating, setAnimating] = useState(false);
   const [wave, setWave] = useState(false);
+
+  // 🔹 Рейтинг и количество отзывов (динамическая загрузка)
+  const [rating, setRating] = useState<number>(4.9);
+  const [reviews, setReviews] = useState<number>(128);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const resp = await fetch("/api/reviews/stats");
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data?.rating && data?.reviews) {
+            setRating(data.rating);
+            setReviews(data.reviews);
+          }
+        }
+      } catch {
+        // если API ещё не подключено, просто остаются значения по умолчанию
+      }
+    }
+    fetchStats();
+  }, []);
 
   const isValid = (u: string) =>
     /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/i.test(u.trim());
@@ -102,7 +124,7 @@ export default function Home() {
         ваше конкурентное преимущество
       </p>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Проверьте, как ИИ ассистенты видят и оценивают ваш сайт: ChatGPT, Copilot, Gemini, Perplexity, Grok и другие
+        Проверьте как ИИ ассистенты видят и оценивают ваш сайт: ChatGPT · Copilot · Gemini · Perplexity · Grok и другие
       </p>
 
       {/* URL input */}
@@ -215,7 +237,7 @@ export default function Home() {
           ))}
         </div>
         <p className="text-sm text-neutral-700 font-medium tracking-tight">
-          4.9 <span className="opacity-70">(128)</span>
+          {rating.toFixed(1)} <span className="opacity-70">({reviews})</span>
         </p>
       </div>
 
