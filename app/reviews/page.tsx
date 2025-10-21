@@ -174,7 +174,7 @@ export default function ReviewsPage() {
                     style={{
                       color: "#eab308",
                       fontWeight: "600",
-                      transform: "scale(1.2)",
+                      transform: "scale(1.3)",
                       display: "inline-block",
                     }}
                   >
@@ -211,9 +211,11 @@ export default function ReviewsPage() {
 
       {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
-        <p>© 2025 AI Signal Max. All rights reserved.</p>
-        <p>Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.</p>
-        <p>Не являются юридической консультацией.</p>
+        <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
+        <p className="opacity-60">
+          Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.
+        </p>
+        <p className="opacity-60">Не являются юридической консультацией.</p>
       </footer>
     </main>
   );
