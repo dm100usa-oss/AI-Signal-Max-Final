@@ -172,7 +172,7 @@ export default function ReviewsPage() {
                 <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center">
                   <span
                     style={{
-                      color: "#d4a100",
+                      color: "#eab308",
                       fontWeight: "600",
                       transform: "scale(1.2)",
                       display: "inline-block",
@@ -197,7 +197,7 @@ export default function ReviewsPage() {
         ))}
       </div>
 
-      {/* Фиксированная кнопка */}
+      {/* Фиксированная кнопка (всегда видна) */}
       <button
         onClick={handleBack}
         className="fixed bottom-6 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
