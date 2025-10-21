@@ -39,38 +39,41 @@ export default function Home() {
   const isValid = (u: string) =>
     /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/i.test(u.trim());
 
-  const go = useCallback(async (mode: "quick" | "pro") => {
-    if (loading) return;
-    const u = normalizeUrl(url);
-    if (!isValid(u)) {
-      setError("Введите корректный адрес сайта (включая http или https).");
-      return;
-    }
-    setError(null);
-    setLoading(mode);
+  const go = useCallback(
+    async (mode: "quick" | "pro") => {
+      if (loading) return;
+      const u = normalizeUrl(url);
+      if (!isValid(u)) {
+        setError("Введите корректный адрес сайта (включая http или https).");
+        return;
+      }
+      setError(null);
+      setLoading(mode);
 
-    const minDuration = 2200;
-    const started = Date.now();
+      const minDuration = 2200;
+      const started = Date.now();
 
-    let status: "ok" | "error" = "ok";
-    try {
-      const resp = await fetch("/api/precheck", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: u }),
-      });
-      const json = await resp.json();
-      status = json?.ok ? "ok" : "error";
-    } catch {
-      status = "error";
-    }
+      let status: "ok" | "error" = "ok";
+      try {
+        const resp = await fetch("/api/precheck", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: u }),
+        });
+        const json = await resp.json();
+        status = json?.ok ? "ok" : "error";
+      } catch {
+        status = "error";
+      }
 
-    const left = Math.max(0, minDuration - (Date.now() - started));
-    await new Promise((r) => setTimeout(r, left));
+      const left = Math.max(0, minDuration - (Date.now() - started));
+      await new Promise((r) => setTimeout(r, left));
 
-    const q = new URLSearchParams({ url: u, status }).toString();
-    router.push(`/preview/${mode}?${q}`);
-  }, [url, loading, router]);
+      const q = new URLSearchParams({ url: u, status }).toString();
+      router.push(`/preview/${mode}?${q}`);
+    },
+    [url, loading, router]
+  );
 
   const clear = () => setUrl("");
 
@@ -92,9 +95,12 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-700">
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4">
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-2">
         AI Signal Max
       </h1>
+      <p className="text-center text-base text-neutral-700 mb-8 lowercase font-medium tracking-tight">
+        новое конкурентное преимущество
+      </p>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
         Проверьте, виден ли ваш сайт для ИИ-ассистентов.  
         Например: ChatGPT, Copilot, Gemini, Perplexity, Grok и другие.
@@ -109,14 +115,17 @@ export default function Home() {
           value={url}
           onChange={(e) => setUrl(normalizeUrl(e.target.value))}
           onPaste={(e) => {
-            const pasted = (e.clipboardData || (window as any).clipboardData).getData("text");
+            const pasted =
+              (e.clipboardData || (window as any).clipboardData).getData("text");
             const cleaned = normalizeUrl(pasted);
             if (cleaned !== pasted) {
               e.preventDefault();
               setUrl(cleaned);
             }
           }}
-          onKeyDown={(e) => { if (e.key === "Enter") go("quick"); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") go("quick");
+          }}
           className={[
             "w-full rounded-md border px-4 py-3 pr-12 text-base outline-none",
             error
@@ -146,7 +155,7 @@ export default function Home() {
         {loading === "quick" ? (
           <span className="inline-flex items-center">Проверяем<Dots /></span>
         ) : (
-          "Быстрая проверка $9.99"
+          "Быстрая проверка $5.99"
         )}
       </button>
       <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
@@ -169,41 +178,46 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Gold stars */}
-      <div className="flex justify-center mb-10 space-x-2">
-        <style jsx>{`
-          .star {
-            font-size: 26px;
-            color: #facc15;
-            -webkit-text-stroke: 0.8px #eab308;
-            transition: transform 0.2s ease, filter 0.2s ease;
-            background: linear-gradient(90deg, #facc15 0%, #eab308 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-          }
-          .star:hover {
-            transform: scale(1.05);
-            filter: brightness(1.15);
-          }
-          .wave {
-            animation: waveShift 1.6s linear infinite;
-          }
-          @keyframes waveShift {
-            from { background-position: 200% center; }
-            to { background-position: -200% center; }
-          }
-        `}</style>
+      {/* Gold stars + rating */}
+      <div className="flex flex-col items-center mb-10">
+        <div className="flex justify-center space-x-2 mb-2">
+          <style jsx>{`
+            .star {
+              font-size: 26px;
+              color: #facc15;
+              -webkit-text-stroke: 0.8px #eab308;
+              transition: transform 0.2s ease, filter 0.2s ease;
+              background: linear-gradient(90deg, #facc15 0%, #eab308 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+            }
+            .star:hover {
+              transform: scale(1.05);
+              filter: brightness(1.15);
+            }
+            .wave {
+              animation: waveShift 1.6s linear infinite;
+            }
+            @keyframes waveShift {
+              from { background-position: 200% center; }
+              to { background-position: -200% center; }
+            }
+          `}</style>
 
-        {[1, 2, 3, 4, 5].map((i) => (
-          <span
-            key={i}
-            onClick={handleStarsClick}
-            className={`star cursor-pointer select-none ${wave ? "wave" : ""}`}
-          >
-            ★
-          </span>
-        ))}
+          {[1, 2, 3, 4, 5].map((i) => (
+            <span
+              key={i}
+              onClick={handleStarsClick}
+              className={`star cursor-pointer select-none ${wave ? "wave" : ""}`}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+        <p className="text-sm text-neutral-700 font-medium tracking-tight">
+          4.9 <span className="opacity-70">(128)</span>
+        </p>
       </div>
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
