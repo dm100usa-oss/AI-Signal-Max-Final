@@ -78,7 +78,6 @@ export default function Home() {
     if (animating) return;
     setAnimating(true);
 
-    // запускаем эффект дважды
     for (let i = 0; i < 2; i++) {
       setWave(true);
       await new Promise((r) => setTimeout(r, 1600));
@@ -97,7 +96,7 @@ export default function Home() {
         AI Signal Max
       </h1>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Проверьте, виден ли ваш сайт для ИИ-ассистентов, таких как ChatGPT, Copilot, Gemini, Perplexity, Grok и других
+        Проверьте, насколько ваш сайт виден для ИИ-ассистентов: ChatGPT, Copilot, Gemini, Perplexity, Grok и других.
       </p>
 
       {/* URL input */}
@@ -169,7 +168,7 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Gold stars with moving gradient */}
+      {/* Gold stars */}
       <div className="flex justify-center mb-10 space-x-2">
         <style jsx>{`
           .star {
