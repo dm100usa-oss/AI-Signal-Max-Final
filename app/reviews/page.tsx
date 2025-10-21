@@ -56,6 +56,7 @@ export default function ReviewsPage() {
           style={{
             fontSize: "18px",
             WebkitTextStroke: "0.8px #eab308",
+            marginRight: "2px",
           }}
         >
           ★
@@ -69,9 +70,9 @@ export default function ReviewsPage() {
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700">
       {/* Заголовок */}
       <h1 className="text-2xl font-semibold text-center mb-2">
-        <span style={{ color: "#2563eb" }}>reviews</span>{" "}
+        <span style={{ color: "#2563eb" }}>Reviews</span>{" "}
         <span style={{ color: "#4b5563" }}>&</span>{" "}
-        <span style={{ color: "#10b981" }}>stories</span>
+        <span style={{ color: "#10b981" }}>Stories</span>
       </h1>
 
       {/* Звёзды под заголовком */}
@@ -82,7 +83,7 @@ export default function ReviewsPage() {
             fontSize: "22px",
             color: "#facc15",
             WebkitTextStroke: "0.8px #eab308",
-            letterSpacing: "2px",
+            letterSpacing: "3px",
           }}
         >
           ★★★★★
