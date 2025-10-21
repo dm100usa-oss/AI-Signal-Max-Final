@@ -11,7 +11,6 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     document.body.style.opacity = "1";
-    // Будущее подключение API
     async function fetchStats() {
       try {
         const resp = await fetch("/api/reviews/stats");
@@ -22,9 +21,7 @@ export default function ReviewsPage() {
             setReviewsCount(data.reviews);
           }
         }
-      } catch {
-        // если API недоступно, оставляем значения по умолчанию
-      }
+      } catch {}
     }
     fetchStats();
   }, []);
@@ -107,14 +104,14 @@ export default function ReviewsPage() {
         >
           ★★★★★
         </span>{" "}
-        <span className="text-gray-700">
+        <span className="text-gray-700 ml-[6px]">
           {rating.toFixed(1)} ({reviewsCount})
         </span>
       </p>
 
       {/* Текст приглашения */}
       <p
-        className="text-center leading-relaxed text-[16px] mb-6"
+        className="text-center leading-relaxed text-[17px] mb-6"
         style={{ color: "#475569" }}
       >
         Поделитесь своим мнением, расскажите о себе или своей компании, вашу
@@ -156,7 +153,12 @@ export default function ReviewsPage() {
               <div className="flex">{renderStars(r.rating)}</div>
               <span className="font-semibold text-gray-800">{r.name}</span>
               <span className="text-neutral-400 text-sm">
-                · {new Date(r.date).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}
+                ·{" "}
+                {new Date(r.date).toLocaleDateString("ru-RU", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
               </span>
             </div>
             <p className="text-gray-700 leading-relaxed text-[15px] text-justify">
@@ -166,12 +168,40 @@ export default function ReviewsPage() {
             {/* Лайки, дизлайки, ответ */}
             <div className="flex items-center space-x-6 mt-3 text-sm text-neutral-500">
               <button className="flex items-center space-x-1 hover:text-blue-600 transition-colors">
-                <span>👍</span>
+                {/* Палец вверх (наш SVG) */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M14 9V5a3 3 0 0 0-6 0v4H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h9l5-9V9h-4z" />
+                </svg>
                 <span>{r.likes}</span>
               </button>
+
               <button className="flex items-center space-x-1 hover:text-rose-600 transition-colors">
-                <span>👎</span>
+                {/* Палец вниз (наш SVG) */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M10 15v4a3 3 0 0 0 6 0v-4h4a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-9l-5 9v2h4z" />
+                </svg>
               </button>
+
               <button className="hover:text-blue-600 transition-colors">
                 Ответить
               </button>
@@ -194,11 +224,11 @@ export default function ReviewsPage() {
 
       {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. Все права защищены.
+        © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Оценки видимости рассчитаны приблизительно на основе открытых данных.
-          Не являются юридической консультацией.
+          Показатели видимости рассчитаны приблизительно и основаны на
+          общедоступных данных. Не являются юридической консультацией.
         </span>
       </footer>
     </main>
