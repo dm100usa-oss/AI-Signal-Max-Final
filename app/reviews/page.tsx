@@ -69,30 +69,11 @@ export default function ReviewsPage() {
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700">
       {/* Заголовок */}
-      <h1 className="text-2xl font-semibold text-center mb-2">
-        <span
-          style={{
-            color: "#2563eb",
-            WebkitTextStroke: "0.4px #1e3a8a",
-          }}
-        >
-          Reviews
-        </span>{" "}
-        <span
-          style={{
-            color: "#9ca3af",
-          }}
-        >
-          &
-        </span>{" "}
-        <span
-          style={{
-            color: "#10b981",
-            WebkitTextStroke: "0.4px #065f46",
-          }}
-        >
-          Stories
-        </span>
+      <h1
+        className="text-2xl font-semibold text-center mb-2"
+        style={{ color: "#9ca3af" }}
+      >
+        Reviews & Stories
       </h1>
 
       {/* Звёзды под заголовком */}
@@ -100,10 +81,10 @@ export default function ReviewsPage() {
         <span
           className="inline-block"
           style={{
-            fontSize: "22px",
+            fontSize: "18px",
             color: "#facc15",
             WebkitTextStroke: "0.8px #eab308",
-            letterSpacing: "3px",
+            letterSpacing: "2px",
           }}
         >
           ★★★★★
