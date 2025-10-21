@@ -70,9 +70,29 @@ export default function ReviewsPage() {
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700">
       {/* Заголовок */}
       <h1 className="text-2xl font-semibold text-center mb-2">
-        <span style={{ color: "#2563eb" }}>Reviews</span>{" "}
-        <span style={{ color: "#4b5563" }}>&</span>{" "}
-        <span style={{ color: "#10b981" }}>Stories</span>
+        <span
+          style={{
+            color: "#2563eb",
+            WebkitTextStroke: "0.4px #1e3a8a",
+          }}
+        >
+          Reviews
+        </span>{" "}
+        <span
+          style={{
+            color: "#9ca3af",
+          }}
+        >
+          &
+        </span>{" "}
+        <span
+          style={{
+            color: "#10b981",
+            WebkitTextStroke: "0.4px #065f46",
+          }}
+        >
+          Stories
+        </span>
       </h1>
 
       {/* Звёзды под заголовком */}
@@ -98,7 +118,7 @@ export default function ReviewsPage() {
       >
         Поделитесь своим мнением. <br />
         Расскажите о себе или своей компании. <br />
-        Вашу историю увидят тысячи людей по всему миру.
+        Вашу историю увидят тысячи пользователей по всему миру.
       </p>
 
       {/* Список отзывов */}
