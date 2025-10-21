@@ -105,13 +105,14 @@ export default function ReviewsPage() {
           ★★★★★
         </span>{" "}
         <span className="text-gray-700 ml-[6px]">
-          {rating.toFixed(1)} ({reviewsCount})
+          {rating.toFixed(1)}{" "}
+          <span className="text-neutral-500">({reviewsCount})</span>
         </span>
       </p>
 
       {/* Текст приглашения */}
       <p
-        className="text-center leading-relaxed text-[16px] mb-6"
+        className="text-center leading-relaxed text-[16px] mb-10"
         style={{ color: "#475569" }}
       >
         Поделитесь своим мнением, расскажите о себе или своей компании, вашу
