@@ -116,7 +116,7 @@ export default function ReviewsPage() {
         style={{ color: "#475569" }}
       >
         Поделитесь своим мнением, расскажите о себе или своей компании, вашу
-        историю увидят тысячи пользователей по всему миру.
+        историю увидят тысячи пользователей по всему миру
       </p>
 
       {/* Кнопки сортировки */}
@@ -210,13 +210,10 @@ export default function ReviewsPage() {
       </button>
 
       {/* Футер */}
-      <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
-        <br />
-        <span className="opacity-60">
-          Показатели видимости рассчитаны приблизительно и основаны на
-          общедоступных данных. Не являются юридической консультацией.
-        </span>
+      <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
+        <p>© 2025 AI Signal Max. All rights reserved.</p>
+        <p>Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.</p>
+        <p>Не являются юридической консультацией.</p>
       </footer>
     </main>
   );
