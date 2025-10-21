@@ -98,12 +98,11 @@ export default function Home() {
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-2">
         AI Signal Max
       </h1>
-      <p className="text-center text-base text-neutral-700 mb-8 lowercase font-medium tracking-tight">
-        новое конкурентное преимущество
+      <p className="text-center text-base text-neutral-700 mb-2 lowercase font-medium tracking-tight">
+        ваше конкурентное преимущество
       </p>
-      <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Проверьте, виден ли ваш сайт для ИИ-ассистентов.  
-        Например: ChatGPT, Copilot, Gemini, Perplexity, Grok и другие.
+      <p className="text-center text-lg text-neutral-800 font-medium tracking-tight mb-8 lowercase">
+        проверьте, как ии ассистенты видят и оценивают ваш сайт: chatgpt, copilot, gemini, perplexity, grok и другие
       </p>
 
       {/* URL input */}
