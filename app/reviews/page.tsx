@@ -114,7 +114,7 @@ export default function ReviewsPage() {
         className="text-center leading-relaxed text-[16px] mb-6"
         style={{ color: "#475569" }}
       >
-        Поделитесь своим мнением. Расскажите о себе или своей компании. Вашу
+        Поделитесь своим мнением, расскажите о себе или своей компании, вашу
         историю увидят тысячи пользователей по всему миру.
       </p>
 
@@ -165,18 +165,23 @@ export default function ReviewsPage() {
               {r.text}
             </p>
 
-            {/* Лайки, дизлайки, ответ */}
-            <div className="flex items-center space-x-6 mt-3 text-sm text-neutral-500">
-              <button className="flex items-center justify-center space-x-1 hover:text-blue-600 transition-colors">
-                <span style={{ color: "#6b7280", fontSize: "16px" }}>👍</span>
-                <span className="text-center">{r.likes}</span>
-              </button>
-              <button className="flex items-center justify-center space-x-1 hover:text-rose-600 transition-colors">
-                <span style={{ color: "#6b7280", fontSize: "16px" }}>👎</span>
-              </button>
-              <button className="hover:text-blue-600 transition-colors">
-                Ответить
-              </button>
+            {/* Лайки / дизлайки / ответ */}
+            <div className="grid grid-cols-3 items-center text-center mt-4 text-sm text-neutral-600 w-[140px]">
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center">
+                  <span style={{ color: "#eab308", fontWeight: "600" }}>+</span>
+                </div>
+              </div>
+              <span className="text-center font-medium">{r.likes}</span>
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center">
+                  <span style={{ color: "#111111", fontWeight: "600" }}>−</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3 text-sm text-blue-600 hover:underline cursor-pointer w-fit">
+              Ответить
             </div>
           </div>
         ))}
