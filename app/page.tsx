@@ -43,7 +43,7 @@ export default function Home() {
     if (loading) return;
     const u = normalizeUrl(url);
     if (!isValid(u)) {
-      setError("Please enter a valid URL (including http/https).");
+      setError("Введите корректный адрес сайта (включая http или https).");
       return;
     }
     setError(null);
@@ -96,7 +96,8 @@ export default function Home() {
         AI Signal Max
       </h1>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Проверьте, насколько ваш сайт виден для ИИ-ассистентов: ChatGPT, Copilot, Gemini, Perplexity, Grok и других.
+        Проверьте, виден ли ваш сайт для ИИ-ассистентов.  
+        Например: ChatGPT, Copilot, Gemini, Perplexity, Grok и другие.
       </p>
 
       {/* URL input */}
@@ -143,7 +144,7 @@ export default function Home() {
         className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors cursor-pointer"
       >
         {loading === "quick" ? (
-          <span className="inline-flex items-center">Checking<Dots /></span>
+          <span className="inline-flex items-center">Проверяем<Dots /></span>
         ) : (
           "Быстрая проверка $9.99"
         )}
@@ -159,7 +160,7 @@ export default function Home() {
         className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 disabled:opacity-60 transition-colors cursor-pointer"
       >
         {loading === "pro" ? (
-          <span className="inline-flex items-center">Checking<Dots /></span>
+          <span className="inline-flex items-center">Проверяем<Dots /></span>
         ) : (
           "Полная проверка $19.99"
         )}
@@ -175,14 +176,15 @@ export default function Home() {
             font-size: 26px;
             color: #facc15;
             -webkit-text-stroke: 0.8px #eab308;
-            transition: transform 0.2s ease;
-            background: linear-gradient(90deg, #facc15 20%, #fff6b7 40%, #facc15 60%);
+            transition: transform 0.2s ease, filter 0.2s ease;
+            background: linear-gradient(90deg, #facc15 0%, #eab308 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
           }
           .star:hover {
             transform: scale(1.05);
+            filter: brightness(1.15);
           }
           .wave {
             animation: waveShift 1.6s linear infinite;
@@ -208,7 +210,7 @@ export default function Home() {
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
+          Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической консультацией.
         </span>
       </footer>
     </main>
