@@ -76,10 +76,6 @@ export async function POST(req: Request) {
         data: baseData,
       });
 
-      // 🔹 Генерируем токен для страницы отзывов
-      const reviewTokenKey = await createReviewToken(session.id);
-      console.log("Review token created:", reviewTokenKey);
-
       if (email) {
         await sendReportEmail({
           to: email,
@@ -89,12 +85,15 @@ export async function POST(req: Request) {
           developerBuffer,
           score,
           results,
-          // можно позже добавить reviewTokenKey в письмо
         });
         console.log(`Email sent to ${email}`);
       } else {
         console.warn(`No email found for ${url}`);
       }
+
+      // 🔹 создаём токен для раздела отзывов
+      const tokenKey = await createReviewToken(session.id);
+      console.log("Review token created:", tokenKey);
 
       console.log(`Webhook processed successfully for ${url}`);
     }
