@@ -112,7 +112,7 @@ export default function ReviewsPage() {
 
       {/* Текст приглашения */}
       <p
-        className="text-center leading-relaxed text-[16px] mb-10"
+        className="text-center leading-relaxed text-[16px] mb-14"
         style={{ color: "#475569" }}
       >
         Поделитесь своим мнением, расскажите о себе или своей компании, вашу
@@ -170,7 +170,16 @@ export default function ReviewsPage() {
             <div className="grid grid-cols-3 items-center text-center mt-4 text-sm text-neutral-600 w-[140px]">
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center">
-                  <span style={{ color: "#eab308", fontWeight: "600" }}>+</span>
+                  <span
+                    style={{
+                      color: "#d4a100",
+                      fontWeight: "600",
+                      transform: "scale(1.2)",
+                      display: "inline-block",
+                    }}
+                  >
+                    +
+                  </span>
                 </div>
               </div>
               <span className="text-center font-medium">{r.likes}</span>
