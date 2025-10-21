@@ -168,40 +168,12 @@ export default function ReviewsPage() {
             {/* Лайки, дизлайки, ответ */}
             <div className="flex items-center space-x-6 mt-3 text-sm text-neutral-500">
               <button className="flex items-center justify-center space-x-1 hover:text-blue-600 transition-colors">
-                {/* Новый палец вверх */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M7 22V9a2 2 0 0 1 2-2h3l1-5 7 7v13H7z" />
-                </svg>
-                <span>{r.likes}</span>
+                <span style={{ color: "#6b7280", fontSize: "16px" }}>👍</span>
+                <span className="text-center">{r.likes}</span>
               </button>
-
               <button className="flex items-center justify-center space-x-1 hover:text-rose-600 transition-colors">
-                {/* Новый палец вниз */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M17 2v13a2 2 0 0 1-2 2h-3l-1 5-7-7V2h13z" />
-                </svg>
+                <span style={{ color: "#6b7280", fontSize: "16px" }}>👎</span>
               </button>
-
               <button className="hover:text-blue-600 transition-colors">
                 Ответить
               </button>
