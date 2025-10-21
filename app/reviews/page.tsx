@@ -1,13 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function ReviewsPage() {
   const router = useRouter();
+  const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
     document.body.style.opacity = "1";
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      setShowButton(scrollY > height * 0.2); // появляется после 20% прокрутки
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const reviews = [
@@ -66,8 +76,14 @@ export default function ReviewsPage() {
     return stars;
   };
 
+  const handleBack = () => {
+    document.body.style.transition = "opacity 0.6s ease";
+    document.body.style.opacity = "0";
+    setTimeout(() => router.push("/"), 600);
+  };
+
   return (
-    <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700">
+    <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
       {/* Заголовок */}
       <h1
         className="text-2xl font-semibold text-center mb-2"
@@ -121,18 +137,19 @@ export default function ReviewsPage() {
         ))}
       </div>
 
-      {/* Кнопка возврата */}
-      <div className="mt-12 text-center">
+      {/* Плавающая кнопка */}
+      {showButton && (
         <button
-          onClick={() => router.push("/")}
-          className="px-6 py-2 rounded-2xl text-white shadow-sm"
+          onClick={handleBack}
+          className="fixed bottom-6 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
           style={{
             background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
+            opacity: 0.95,
           }}
         >
-          Вернуться на главную
+          На главную
         </button>
-      </div>
+      )}
 
       {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
