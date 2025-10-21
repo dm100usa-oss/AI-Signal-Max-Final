@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server";
 import { validateReviewToken, removeReviewToken } from "@/lib/reviews";
 
+export const dynamic = "force-dynamic"; // чтобы не кэшировалось Vercel
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -12,17 +14,16 @@ export async function GET(req: Request) {
     }
 
     const valid = await validateReviewToken(token);
-
     if (!valid) {
-      return NextResponse.json({ ok: false, error: "invalid_token" }, { status: 403 });
+      return NextResponse.json({ ok: false, error: "invalid_or_expired" }, { status: 403 });
     }
 
-    // Делает токен одноразовым
+    // Удаляем токен сразу после проверки, чтобы использовать можно было один раз
     await removeReviewToken(token);
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("Validate token error:", err);
+    return NextResponse.json({ ok: true, message: "token_valid" });
+  } catch (error: any) {
+    console.error("Validate token error:", error);
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
 }
