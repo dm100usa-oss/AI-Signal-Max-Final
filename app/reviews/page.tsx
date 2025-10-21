@@ -1,16 +1,22 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ReviewsPage() {
   const router = useRouter();
+  const params = useSearchParams();
+  const token = params.get("token"); // токен из ссылки (если есть)
+
   const [sortMode, setSortMode] = useState<"new" | "popular">("new");
   const [rating, setRating] = useState<number>(4.9);
   const [reviewsCount, setReviewsCount] = useState<number>(128);
+  const [canInteract, setCanInteract] = useState(false); // можно ли ставить лайки/отправлять отзывы
 
   useEffect(() => {
     document.body.style.opacity = "1";
+
+    // Проверяем статистику
     async function fetchStats() {
       try {
         const resp = await fetch("/api/reviews/stats");
@@ -23,8 +29,20 @@ export default function ReviewsPage() {
         }
       } catch {}
     }
+
+    // Проверяем токен (доступ после оплаты)
+    async function validate() {
+      if (!token) return;
+      try {
+        const resp = await fetch(`/api/reviews/validate?token=${token}`);
+        const data = await resp.json();
+        if (data.ok) setCanInteract(true);
+      } catch {}
+    }
+
     fetchStats();
-  }, []);
+    validate();
+  }, [token]);
 
   const reviews = [
     {
@@ -91,7 +109,6 @@ export default function ReviewsPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
-      {/* Звёзды, рейтинг и количество */}
       <p className="text-center mb-8 text-lg">
         <span
           className="inline-block"
@@ -110,16 +127,13 @@ export default function ReviewsPage() {
         </span>
       </p>
 
-      {/* Текст приглашения */}
       <p
         className="text-center leading-relaxed text-[16px] mb-14"
         style={{ color: "#475569" }}
       >
-        Поделитесь своим мнением, расскажите о себе или своей компании, вашу
-        историю увидят тысячи пользователей по всему миру
+        Поделитесь своим мнением, расскажите о себе или своей компании, вашу историю увидят тысячи пользователей по всему миру
       </p>
 
-      {/* Кнопки сортировки */}
       <div className="flex justify-center space-x-4 mt-6 mb-10 text-sm font-medium">
         <button
           onClick={() => setSortMode("new")}
@@ -143,7 +157,6 @@ export default function ReviewsPage() {
         </button>
       </div>
 
-      {/* Список отзывов */}
       <div className="space-y-6">
         {sortedReviews.map((r, i) => (
           <div
@@ -166,8 +179,11 @@ export default function ReviewsPage() {
               {r.text}
             </p>
 
-            {/* Лайки / дизлайки / ответ */}
-            <div className="grid grid-cols-3 items-center text-center mt-4 text-sm text-neutral-600 w-[140px]">
+            <div
+              className={`grid grid-cols-3 items-center text-center mt-4 text-sm text-neutral-600 w-[140px] ${
+                canInteract ? "" : "opacity-50 cursor-not-allowed"
+              }`}
+            >
               <div className="flex items-center justify-center">
                 <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center">
                   <span
@@ -190,14 +206,15 @@ export default function ReviewsPage() {
               </div>
             </div>
 
-            <div className="mt-3 text-sm text-blue-600 hover:underline cursor-pointer w-fit">
-              Ответить
-            </div>
+            {canInteract && (
+              <div className="mt-3 text-sm text-blue-600 hover:underline cursor-pointer w-fit">
+                Ответить
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Фиксированная кнопка (всегда видна) */}
       <button
         onClick={handleBack}
         className="fixed bottom-6 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
@@ -209,7 +226,6 @@ export default function ReviewsPage() {
         На главную
       </button>
 
-      {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
         <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
         <p className="opacity-60">
