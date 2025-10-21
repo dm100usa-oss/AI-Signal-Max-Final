@@ -1,22 +1,21 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function ReviewsPage() {
+function ReviewsContent() {
   const router = useRouter();
   const params = useSearchParams();
-  const token = params.get("token"); // токен из ссылки (если есть)
+  const token = params.get("token");
 
   const [sortMode, setSortMode] = useState<"new" | "popular">("new");
   const [rating, setRating] = useState<number>(4.9);
   const [reviewsCount, setReviewsCount] = useState<number>(128);
-  const [canInteract, setCanInteract] = useState(false); // можно ли ставить лайки/отправлять отзывы
+  const [canInteract, setCanInteract] = useState(false);
 
   useEffect(() => {
     document.body.style.opacity = "1";
 
-    // Проверяем статистику
     async function fetchStats() {
       try {
         const resp = await fetch("/api/reviews/stats");
@@ -30,7 +29,6 @@ export default function ReviewsPage() {
       } catch {}
     }
 
-    // Проверяем токен (доступ после оплаты)
     async function validate() {
       if (!token) return;
       try {
@@ -234,5 +232,13 @@ export default function ReviewsPage() {
         <p className="opacity-60">Не являются юридической консультацией.</p>
       </footer>
     </main>
+  );
+}
+
+export default function ReviewsPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-neutral-500">Загрузка...</div>}>
+      <ReviewsContent />
+    </Suspense>
   );
 }
