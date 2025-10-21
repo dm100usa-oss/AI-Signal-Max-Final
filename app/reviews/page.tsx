@@ -12,22 +12,34 @@ export default function ReviewsPage() {
 
   const reviews = [
     {
-      name: "Michael S.",
-      date: "October 18, 2025",
+      name: "Сергей К.",
+      date: "18 октября 2025",
       rating: 5,
-      text: "Accurate and fast. The report helped me understand why my site wasn’t visible in ChatGPT.",
+      text: "Не знал, что у сайта может быть «видимость для ИИ». После проверки понял, почему ChatGPT не находил мой бизнес. Очень полезно — теперь хотя бы ясно, с чего начинать.",
     },
     {
-      name: "Anna R.",
-      date: "October 14, 2025",
+      name: "Елена М.",
+      date: "16 октября 2025",
       rating: 5,
-      text: "Very clear explanations. I fixed several issues immediately after the report.",
+      text: "Прошла полную проверку и получила готовое техническое задание для разработчика. Чётко, по пунктам, с пояснениями. Это реально сэкономило время и деньги — раньше на это ушли бы недели.",
     },
     {
-      name: "Carlos M.",
-      date: "October 12, 2025",
+      name: "Андрей П.",
+      date: "14 октября 2025",
       rating: 4,
-      text: "Helpful overview, though I’d like to see deeper analysis for structured data.",
+      text: "Интересная идея — измерять, как ИИ видит сайт. Сделал оценку сам, всё просто. Потом отправил отчёт друзьям-владельцам сайтов как подарок. Все были удивлены результатами.",
+    },
+    {
+      name: "Марина С.",
+      date: "11 октября 2025",
+      rating: 5,
+      text: "Обратилась в AI Signal Max, потому что потеряла контакт со старым разработчиком. Тут сразу разобрали, что мешает видимости сайта. Приятно, когда работаешь с теми, кто реально понимает, что делает.",
+    },
+    {
+      name: "Алексей Г.",
+      date: "15 октября 2025",
+      rating: 5,
+      text: "Занимаюсь интернет-маркетингом и помогаю компаниям выстраивать digital-присутствие. Когда узнал про AI Signal Max, решил проверить, насколько мои сайты видны для ИИ-платформ. После полной проверки получил подробный отчёт и готовое ТЗ для разработчиков — сразу внёс нужные правки. Теперь проекты клиентов лучше индексируются нейросетями. Если интересно — вот мой сайт brandpoint.pro и один из кейсов coffeehub.store.",
     },
   ];
 
@@ -38,11 +50,12 @@ export default function ReviewsPage() {
       stars.push(
         <span
           key={i}
-          className={`inline-block text-[22px] ${
+          className={`inline-block ${
             i <= full ? "text-yellow-400" : "text-transparent"
           }`}
           style={{
-            WebkitTextStroke: "1px #facc15",
+            fontSize: "18px",
+            WebkitTextStroke: "0.8px #eab308",
           }}
         >
           ★
@@ -54,20 +67,40 @@ export default function ReviewsPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700">
-      <h1 className="text-2xl font-semibold text-center mb-2 text-gray-900">
-        Reviews & Stories
+      {/* Заголовок */}
+      <h1 className="text-2xl font-semibold text-center mb-2">
+        <span style={{ color: "#2563eb" }}>reviews</span>{" "}
+        <span style={{ color: "#4b5563" }}>&</span>{" "}
+        <span style={{ color: "#10b981" }}>stories</span>
       </h1>
 
-      <p className="text-center text-gray-700 mb-8 text-lg">
-        ★★★★★ 4.9 (128)
+      {/* Звёзды под заголовком */}
+      <p className="text-center mb-8 text-lg">
+        <span
+          className="inline-block"
+          style={{
+            fontSize: "22px",
+            color: "#facc15",
+            WebkitTextStroke: "0.8px #eab308",
+            letterSpacing: "2px",
+          }}
+        >
+          ★★★★★
+        </span>{" "}
+        <span className="text-gray-700">4.9 (128)</span>
       </p>
 
-      <p className="text-center text-neutral-600 leading-relaxed mb-12">
-        Share your thoughts. <br />
-        Tell us about yourself or your company. <br />
-        Your story will be seen by thousands of people around the world.
+      {/* Три строки вступления */}
+      <p
+        className="text-center leading-relaxed mb-12 text-[16px]"
+        style={{ color: "#475569" }}
+      >
+        Поделитесь своим мнением. <br />
+        Расскажите о себе или своей компании. <br />
+        Вашу историю увидят тысячи людей по всему миру.
       </p>
 
+      {/* Список отзывов */}
       <div className="space-y-6">
         {reviews.map((r, i) => (
           <div
@@ -86,6 +119,7 @@ export default function ReviewsPage() {
         ))}
       </div>
 
+      {/* Кнопка возврата */}
       <div className="mt-12 text-center">
         <button
           onClick={() => router.push("/")}
@@ -94,16 +128,17 @@ export default function ReviewsPage() {
             background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
           }}
         >
-          Back to Home
+          Вернуться на главную
         </button>
       </div>
 
+      {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
+        © 2025 AI Signal Max. Все права защищены.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data.
-          Not legal advice.
+          Оценки видимости рассчитаны приблизительно на основе открытых данных.
+          Не являются юридической консультацией.
         </span>
       </footer>
     </main>
