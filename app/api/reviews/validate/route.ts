@@ -1,30 +1,25 @@
 import { NextResponse } from "next/server";
-import { validateReviewToken, removeReviewToken } from "@/lib/reviews";
+import { validateReviewToken } from "@/lib/reviews";
 
-/**
- * Проверка токена доступа к отзывам
- * GET /api/reviews/validate?token=abc123
- */
-export async function GET(req: Request) {
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");
 
     if (!token) {
-      return NextResponse.json({ ok: false, error: "missing_token" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "missing_token" });
     }
 
     const valid = await validateReviewToken(token);
     if (!valid) {
-      return NextResponse.json({ ok: false, error: "invalid_token" }, { status: 403 });
+      return NextResponse.json({ ok: false, error: "invalid_token" });
     }
 
-    // Удаляем токен, чтобы сделать его одноразовым
-    await removeReviewToken(token);
-
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("Validate token error:", err);
-    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+  } catch (e) {
+    console.error("Validate token error:", e);
+    return NextResponse.json({ ok: false, error: "server_error" });
   }
 }
