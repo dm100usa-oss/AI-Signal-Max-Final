@@ -13,6 +13,44 @@ export default function ReviewsPageWrapper() {
   );
 }
 
+function Dots() {
+  return (
+    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-baseline">
+      <span className="dot">.</span>
+      <span className="dot dot2">.</span>
+      <span className="dot dot3">.</span>
+      <style jsx>{`
+        .dot {
+          opacity: 0.2;
+          animation: aiv-dots 1200ms infinite;
+          position: relative;
+          top: 2px;
+        }
+        .dot2 {
+          animation-delay: 200ms;
+        }
+        .dot3 {
+          animation-delay: 400ms;
+        }
+        @keyframes aiv-dots {
+          0% {
+            opacity: 0.2;
+          }
+          30% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.2;
+          }
+        }
+      `}</style>
+    </span>
+  );
+}
+
 function ReviewsPage() {
   const router = useRouter();
   const params = useSearchParams();
@@ -45,12 +83,11 @@ function ReviewsPage() {
     fetchStats();
   }, []);
 
-  // Плавное скрытие карточки "Спасибо!"
   useEffect(() => {
     if (showSuccess) {
       const timer = setTimeout(() => {
         setShowSuccess(false);
-      }, 4000); // карточка держится дольше
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, [showSuccess]);
@@ -117,7 +154,6 @@ function ReviewsPage() {
     e.preventDefault();
     setStatus("loading");
 
-    // имитация реальной задержки 2 сек
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     try {
@@ -146,36 +182,6 @@ function ReviewsPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
-      <style jsx>{`
-        .dots {
-          display: inline-flex;
-          margin-left: 4px;
-        }
-        .dot {
-          width: 4px;
-          height: 4px;
-          margin: 0 1px;
-          background-color: white;
-          border-radius: 50%;
-          opacity: 0;
-          animation: blink 1.2s infinite;
-        }
-        .dot:nth-child(2) {
-          animation-delay: 0.2s;
-        }
-        .dot:nth-child(3) {
-          animation-delay: 0.4s;
-        }
-        @keyframes blink {
-          0%, 80%, 100% {
-            opacity: 0;
-          }
-          40% {
-            opacity: 1;
-          }
-        }
-      `}</style>
-
       {/* Рейтинг и количество */}
       <p className="text-center mb-8 text-lg">
         <span
@@ -195,7 +201,6 @@ function ReviewsPage() {
         </span>
       </p>
 
-      {/* Форма добавления */}
       {isAddMode && !hideForm && (
         <div className="mb-12">
           {showSuccess ? (
@@ -234,14 +239,10 @@ function ReviewsPage() {
                   className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
                 >
                   {status === "loading" ? (
-                    <>
+                    <span className="inline-flex items-center">
                       Отправка
-                      <span className="dots">
-                        <span className="dot"></span>
-                        <span className="dot"></span>
-                        <span className="dot"></span>
-                      </span>
-                    </>
+                      <Dots />
+                    </span>
                   ) : (
                     "Отправить"
                   )}
@@ -257,7 +258,6 @@ function ReviewsPage() {
         </div>
       )}
 
-      {/* Карточка "Спасибо!" после исчезновения формы */}
       {isAddMode && hideForm && showSuccess && (
         <div
           className={`bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 mb-12 ${
@@ -268,7 +268,6 @@ function ReviewsPage() {
         </div>
       )}
 
-      {/* Текст и сортировка */}
       <p
         className="text-center leading-relaxed text-[16px] mb-14"
         style={{ color: "#475569" }}
@@ -299,7 +298,6 @@ function ReviewsPage() {
         </button>
       </div>
 
-      {/* Список отзывов */}
       <div className="space-y-6">
         {sortedReviews.map((r, i) => (
           <div
@@ -325,7 +323,6 @@ function ReviewsPage() {
         ))}
       </div>
 
-      {/* Кнопка "На главную" */}
       <button
         onClick={handleBack}
         className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
@@ -337,7 +334,6 @@ function ReviewsPage() {
         На главную
       </button>
 
-      {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
         <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
         <p className="opacity-60">
