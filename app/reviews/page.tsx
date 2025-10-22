@@ -22,10 +22,12 @@ function ReviewsPage() {
   const [reviewsCount, setReviewsCount] = useState<number>(128);
   const [reviews, setReviews] = useState<any[]>([]);
 
+  type Status = "idle" | "loading" | "success" | "error";
+  const [status, setStatus] = useState<Status>("idle");
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [name, setName] = useState("");
   const [text, setText] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     async function fetchReviews() {
@@ -162,7 +164,7 @@ function ReviewsPage() {
                 />
                 <button
                   type="submit"
-                  disabled={status === ("loading" as typeof status)}
+                  disabled={status === "loading"}
                   className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {status === "loading" ? (
