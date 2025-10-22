@@ -1,13 +1,21 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ReviewsPage() {
   const router = useRouter();
+  const params = useSearchParams();
+  const isAddMode = params.get("add") === "true";
+
   const [sortMode, setSortMode] = useState<"new" | "popular">("new");
   const [rating, setRating] = useState<number>(4.9);
   const [reviewsCount, setReviewsCount] = useState<number>(128);
+
+  // поля формы
+  const [name, setName] = useState("");
+  const [text, setText] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
     document.body.style.opacity = "1";
@@ -31,42 +39,37 @@ export default function ReviewsPage() {
       name: "Сергей К.",
       date: "2025-10-18",
       rating: 5,
-      likes: 42,
       text: "Не знал, что у сайта может быть «видимость для ИИ». После проверки понял, почему ChatGPT не находил мой бизнес. Очень полезно — теперь хотя бы ясно, с чего начинать.",
     },
     {
       name: "Елена М.",
       date: "2025-10-16",
       rating: 5,
-      likes: 51,
       text: "Прошла полную проверку и получила готовое техническое задание для разработчика. Чётко, по пунктам, с пояснениями. Это реально сэкономило время и деньги — раньше на это ушли бы недели.",
     },
     {
       name: "Андрей П.",
       date: "2025-10-14",
       rating: 4,
-      likes: 33,
       text: "Интересная идея — измерять, как ИИ видит сайт. Сделал оценку сам, всё просто. Потом отправил отчёт друзьям-владельцам сайтов как подарок. Все были удивлены результатами.",
     },
     {
       name: "Марина С.",
       date: "2025-10-11",
       rating: 5,
-      likes: 60,
       text: "Обратилась в AI Signal Max, потому что потеряла контакт со старым разработчиком. Тут сразу разобрали, что мешает видимости сайта. Приятно, когда работаешь с теми, кто реально понимает, что делает.",
     },
     {
       name: "Алексей Г.",
       date: "2025-10-15",
       rating: 5,
-      likes: 47,
       text: "Занимаюсь интернет-маркетингом и помогаю компаниям выстраивать digital-присутствие. Когда узнал про AI Signal Max, решил проверить, насколько мои сайты видны для ИИ-платформ. После полной проверки получил подробный отчёт и готовое ТЗ для разработчиков — сразу внёс нужные правки. Теперь проекты клиентов лучше индексируются нейросетями.",
     },
   ];
 
   const sortedReviews = [...reviews].sort((a, b) => {
     if (sortMode === "new") return new Date(b.date).getTime() - new Date(a.date).getTime();
-    if (sortMode === "popular") return b.likes - a.likes;
+    if (sortMode === "popular") return b.rating - a.rating;
     return 0;
   });
 
@@ -89,9 +92,34 @@ export default function ReviewsPage() {
 
   const handleBack = () => router.push("/");
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+
+    try {
+      const res = await fetch("/api/reviews/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, text }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setStatus("success");
+        setName("");
+        setText("");
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
-      {/* Звёзды, рейтинг и количество */}
+      {/* Рейтинг и количество */}
       <p className="text-center mb-8 text-lg">
         <span
           className="inline-block"
@@ -110,13 +138,59 @@ export default function ReviewsPage() {
         </span>
       </p>
 
-      {/* Текст приглашения */}
+      {/* Если add=true — форма добавления */}
+      {isAddMode && (
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-center mb-6">Оставить отзыв</h2>
+
+          {status === "success" ? (
+            <p className="text-green-600 text-center text-lg">
+              Спасибо! Ваш отзыв отправлен на модерацию.
+            </p>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col gap-4 w-full max-w-md mx-auto"
+            >
+              <input
+                type="text"
+                placeholder="Ваше имя"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="border border-gray-300 rounded-md p-2"
+                required
+              />
+              <textarea
+                placeholder="Ваш отзыв..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="border border-gray-300 rounded-md p-2 h-32 resize-none"
+                required
+              />
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {status === "loading" ? "Отправка..." : "Отправить"}
+              </button>
+            </form>
+          )}
+
+          {status === "error" && (
+            <p className="text-red-600 mt-4 text-center">
+              Ошибка. Попробуйте позже.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Заголовок перед отзывами */}
       <p
         className="text-center leading-relaxed text-[16px] mb-14"
         style={{ color: "#475569" }}
       >
-        Поделитесь своим мнением, расскажите о себе или своей компании, вашу
-        историю увидят тысячи пользователей по всему миру
+        Поделитесь своим мнением, расскажите о себе или своей компании, вашу историю увидят тысячи пользователей по всему миру
       </p>
 
       {/* Кнопки сортировки */}
@@ -165,39 +239,11 @@ export default function ReviewsPage() {
             <p className="text-gray-700 leading-relaxed text-[15px] text-justify">
               {r.text}
             </p>
-
-            {/* Лайки / дизлайки / ответ */}
-            <div className="grid grid-cols-3 items-center text-center mt-4 text-sm text-neutral-600 w-[140px]">
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center">
-                  <span
-                    style={{
-                      color: "#eab308",
-                      fontWeight: "600",
-                      transform: "scale(1.3)",
-                      display: "inline-block",
-                    }}
-                  >
-                    +
-                  </span>
-                </div>
-              </div>
-              <span className="text-center font-medium">{r.likes}</span>
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border border-gray-400 rounded flex items-center justify-center">
-                  <span style={{ color: "#111111", fontWeight: "600" }}>−</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3 text-sm text-blue-600 hover:underline cursor-pointer w-fit">
-              Ответить
-            </div>
           </div>
         ))}
       </div>
 
-      {/* Фиксированная кнопка (всегда видна) */}
+      {/* Кнопка "На главную" */}
       <button
         onClick={handleBack}
         className="fixed bottom-6 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
