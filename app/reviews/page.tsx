@@ -22,10 +22,8 @@ function ReviewsPage() {
   const [reviewsCount, setReviewsCount] = useState<number>(128);
   const [reviews, setReviews] = useState<any[]>([]);
 
-  type Status = "idle" | "loading" | "success" | "error";
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
-
   const [name, setName] = useState("");
   const [text, setText] = useState("");
 
@@ -129,8 +127,7 @@ function ReviewsPage() {
           ★★★★★
         </span>{" "}
         <span className="text-gray-700 ml-[6px]">
-          {rating.toFixed(1)}{" "}
-          <span className="text-neutral-500">({reviewsCount})</span>
+          {rating.toFixed(1)} <span className="text-neutral-500">({reviewsCount})</span>
         </span>
       </p>
 
@@ -143,10 +140,7 @@ function ReviewsPage() {
           ) : status === "idle" || status === "error" ? (
             <>
               <h2 className="text-xl font-semibold text-center mb-6">Оставить отзыв</h2>
-              <form
-                onSubmit={handleSubmit}
-                className="flex flex-col gap-4 w-full max-w-md mx-auto"
-              >
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md mx-auto">
                 <input
                   type="text"
                   placeholder="Ваше имя"
@@ -164,7 +158,7 @@ function ReviewsPage() {
                 />
                 <button
                   type="submit"
-                  disabled={status === "loading"}
+                  disabled={status === ("loading" as any)}
                   className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {status === "loading" ? (
@@ -208,19 +202,14 @@ function ReviewsPage() {
                 </button>
               </form>
               {status === "error" && (
-                <p className="text-red-600 mt-4 text-center">
-                  Ошибка. Попробуйте позже.
-                </p>
+                <p className="text-red-600 mt-4 text-center">Ошибка. Попробуйте позже.</p>
               )}
             </>
           ) : null}
         </div>
       )}
 
-      <p
-        className="text-center leading-relaxed text-[16px] mb-14"
-        style={{ color: "#475569" }}
-      >
+      <p className="text-center leading-relaxed text-[16px] mb-14" style={{ color: "#475569" }}>
         Поделитесь своим мнением, расскажите о себе или своей компании, вашу историю увидят тысячи пользователей по всему миру
       </p>
 
@@ -228,9 +217,7 @@ function ReviewsPage() {
         <button
           onClick={() => setSortMode("new")}
           className={`px-3 py-1 rounded-full transition-colors ${
-            sortMode === "new"
-              ? "text-blue-600 bg-blue-50"
-              : "text-neutral-600 hover:bg-neutral-100"
+            sortMode === "new" ? "text-blue-600 bg-blue-50" : "text-neutral-600 hover:bg-neutral-100"
           }`}
         >
           Сначала новые
@@ -266,9 +253,7 @@ function ReviewsPage() {
                   })}
                 </span>
               </div>
-              <p className="text-gray-700 leading-relaxed text-[15px] text-justify">
-                {r.text}
-              </p>
+              <p className="text-gray-700 leading-relaxed text-[15px] text-justify">{r.text}</p>
             </div>
           ))
         ) : (
