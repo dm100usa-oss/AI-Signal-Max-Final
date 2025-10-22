@@ -1,3 +1,6 @@
+// 🔸 Добавляем первую строку:
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { validateReviewToken } from "@/lib/reviewTokens";
 
