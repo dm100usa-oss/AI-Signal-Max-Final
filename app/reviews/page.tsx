@@ -1,45 +1,18 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-function Dots() {
+export default function ReviewsPageWrapper() {
   return (
-    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-baseline ml-1">
-      <span className="dot">.</span>
-      <span className="dot dot2">.</span>
-      <span className="dot dot3">.</span>
-      <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-        }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
-        @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
-        }
-      `}</style>
-    </span>
+    <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
+      <ReviewsPage />
+    </Suspense>
   );
 }
 
-function ReviewsContent() {
+function ReviewsPage() {
   const router = useRouter();
   const params = useSearchParams();
   const isAddMode = params.get("add") === "true";
@@ -79,19 +52,16 @@ function ReviewsContent() {
         setReviews((prev) => [{ name, text }, ...prev]);
         setName("");
         setText("");
-
-        setTimeout(() => {
-          setShowForm(false);
-          setShowThanks(true);
-          setTimeout(() => setShowThanks(false), 4000);
-        }, 0);
+        setShowThanks(true);
+        setShowForm(false);
+        setTimeout(() => setShowThanks(false), 4000);
       } else {
         setStatus("error");
       }
     } catch {
       setStatus("error");
     } finally {
-      setTimeout(() => setStatus("idle"), 7000);
+      setTimeout(() => setStatus("idle"), 4000);
     }
   };
 
@@ -141,13 +111,40 @@ function ReviewsContent() {
           >
             {status === "loading" ? (
               <span className="inline-flex items-end">
-                Отправка
-                <Dots />
+                Отправка<span className="dot">.</span>
+                <span className="dot dot2">.</span>
+                <span className="dot dot3">.</span>
               </span>
             ) : (
               "Отправить отзыв"
             )}
           </button>
+          <style jsx>{`
+            .dot {
+              opacity: 0.2;
+              animation: aiv-dots 1200ms infinite;
+            }
+            .dot2 {
+              animation-delay: 200ms;
+            }
+            .dot3 {
+              animation-delay: 400ms;
+            }
+            @keyframes aiv-dots {
+              0% {
+                opacity: 0.2;
+              }
+              30% {
+                opacity: 1;
+              }
+              60% {
+                opacity: 0.2;
+              }
+              100% {
+                opacity: 0.2;
+              }
+            }
+          `}</style>
         </form>
       )}
 
@@ -159,7 +156,10 @@ function ReviewsContent() {
 
       <div className="space-y-4">
         {reviews.map((r, i) => (
-          <div key={i} className="p-4 border border-gray-200 rounded-lg shadow-sm bg-white">
+          <div
+            key={i}
+            className="p-4 border border-gray-200 rounded-lg shadow-sm bg-white"
+          >
             <p className="font-medium mb-1">{r.name}</p>
             <p className="text-gray-700">{r.text}</p>
           </div>
@@ -175,13 +175,5 @@ function ReviewsContent() {
         </button>
       </div>
     </main>
-  );
-}
-
-export default function ReviewsPage() {
-  return (
-    <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
-      <ReviewsContent />
-    </Suspense>
   );
 }
