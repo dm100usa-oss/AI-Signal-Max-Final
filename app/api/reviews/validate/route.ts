@@ -1,8 +1,5 @@
-// app/api/reviews/validate/route.ts
 import { NextResponse } from "next/server";
-import { validateReviewToken, removeReviewToken } from "@/lib/reviews";
-
-export const dynamic = "force-dynamic";
+import { validateReviewToken } from "@/lib/reviewTokens";
 
 export async function GET(req: Request) {
   try {
@@ -14,17 +11,16 @@ export async function GET(req: Request) {
     }
 
     const valid = await validateReviewToken(token);
+
     if (!valid) {
+      console.warn("Token invalid or expired:", token);
       return NextResponse.json({ ok: false, error: "invalid_or_expired" }, { status: 403 });
     }
 
-    // одноразовое использование
-    await removeReviewToken(token);
+    // не удаляем токен на этом этапе — удалим только после отправки отзыва
     return NextResponse.json({ ok: true, message: "token_valid" });
-  } catch (e: any) {
-    return NextResponse.json(
-      { ok: false, error: e?.message || "server_error" },
-      { status: 500 }
-    );
+  } catch (err: any) {
+    console.error("Validate token error:", err);
+    return NextResponse.json({ ok: false, error: err.message || "server_error" }, { status: 500 });
   }
 }
