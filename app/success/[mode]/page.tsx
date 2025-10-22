@@ -35,21 +35,21 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         setScore(data.score);
 
         const allFactors = [
-          { key: "robots_txt", name: "Robots.txt", desc: "Управляет тем, видят ли ваш сайт ИИ-платформы." },
-          { key: "sitemap_xml", name: "Sitemap.xml", desc: "Сообщает ИИ, какие страницы существуют и должны индексироваться." },
-          { key: "x_robots_tag", name: "X-Robots-Tag", desc: "Серверная настройка, разрешающая отображение страниц в результатах." },
-          { key: "meta_robots", name: "Meta Robots", desc: "Мета-тег, контролирующий, могут ли страницы показываться ИИ." },
-          { key: "canonical", name: "Canonical", desc: "Указывает ИИ, какая страница является основной." },
-          { key: "title_tag", name: "Title Tag", desc: "Определяет заголовок, который видят пользователи и ИИ." },
-          { key: "meta_description", name: "Meta Description", desc: "Краткое описание страницы, отображаемое под заголовком." },
-          { key: "open_graph", name: "Open Graph", desc: "Делает ссылки красивыми в превью и результатах ИИ." },
-          { key: "h1_present", name: "H1 Heading", desc: "Главный заголовок, поясняющий ИИ, о чём страница." },
-          { key: "structured_data", name: "Structured Data", desc: "Разметка JSON-LD, помогающая ИИ понимать содержание страницы." },
-          { key: "mobile_friendly", name: "Mobile Friendly", desc: "Обеспечивает удобство просмотра на мобильных устройствах." },
-          { key: "https", name: "HTTPS", desc: "Безопасный протокол, повышающий доверие и рейтинг." },
-          { key: "alt_attributes", name: "Alt Texts", desc: "Подписи к изображениям, помогающие ИИ интерпретировать визуалы." },
-          { key: "favicon", name: "Favicon", desc: "Маленький значок, завершающий визуальную идентичность сайта." },
-          { key: "page_404", name: "404 Page", desc: "Сообщает ИИ, что запрашиваемая страница не существует." },
+          { key: "robots_txt", name: "Robots.txt", desc: "Определяет, могут ли платформы ИИ видеть ваш сайт." },
+          { key: "sitemap_xml", name: "Sitemap.xml", desc: "Сообщает ИИ, какие страницы существуют и подлежат индексации." },
+          { key: "x_robots_tag", name: "X-Robots-Tag", desc: "Указывает ИИ, могут ли страницы появляться в результатах." },
+          { key: "meta_robots", name: "Meta Robots", desc: "Контролирует, может ли ИИ показывать страницу." },
+          { key: "canonical", name: "Canonical", desc: "Указывает ИИ, какая страница является основной версией." },
+          { key: "title_tag", name: "Title Tag", desc: "Определяет заголовок, видимый в результатах поиска или ИИ." },
+          { key: "meta_description", name: "Meta Description", desc: "Краткое описание, отображаемое ИИ под заголовком." },
+          { key: "open_graph", name: "Open Graph", desc: "Делает ссылки красивыми в ИИ и социальных сетях." },
+          { key: "h1_present", name: "H1 Heading", desc: "Главный заголовок, объясняющий ИИ, о чём страница." },
+          { key: "structured_data", name: "Structured Data", desc: "Разметка JSON-LD, помогающая ИИ понять контент страницы." },
+          { key: "mobile_friendly", name: "Mobile Friendly", desc: "Обеспечивает удобство использования на телефонах и планшетах." },
+          { key: "https", name: "HTTPS", desc: "Протокол безопасности, повышающий доверие и рейтинг." },
+          { key: "alt_attributes", name: "Alt Texts", desc: "Подписи к изображениям, помогающие ИИ понимать визуалы." },
+          { key: "favicon", name: "Favicon", desc: "Маленькая иконка, завершающая визуальный стиль сайта." },
+          { key: "page_404", name: "404 Page", desc: "Сообщает ИИ, что запрашиваемого ресурса не существует." },
         ];
 
         const mappedFactors = allFactors.map((f) => ({
@@ -62,9 +62,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (data.score >= 80) {
           setSummary("Ваш сайт хорошо виден для ИИ-платформ. Большинство параметров настроены корректно.");
         } else if (data.score >= 40) {
-          setSummary("Ваш сайт частично виден для ИИ-платформ. Некоторые параметры требуют доработки.");
+          setSummary("Ваш сайт частично виден для ИИ-платформ. Некоторые параметры требуют улучшения.");
         } else {
-          setSummary("Ваш сайт плохо виден для ИИ-платформ. Большинство параметров настроены неверно и ограничивают видимость.");
+          setSummary("Ваш сайт слабо виден для ИИ-платформ. Большинство параметров настроены неправильно.");
         }
       } catch (err) {
         console.error("Failed to load analysis:", err);
@@ -94,7 +94,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
     <main className="max-w-3xl mx-auto px-6 py-12">
       <h1 className="text-2xl font-semibold text-center mb-2">
         {mode === "quick"
-          ? "Результаты быстрой проверки видимости сайта"
+          ? "Результаты быстрой проверки"
           : "Полный аудит видимости сайта"}
       </h1>
 
@@ -122,10 +122,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         ))}
       </div>
 
-      <div className="mt-10 text-center space-y-4">
+      {/* Кнопки */}
+      <div className="mt-10 flex flex-col items-center space-y-3">
         <button
           onClick={() => (window.location.href = "/")}
-          className="px-6 py-2 rounded-2xl text-white"
+          className="w-full max-w-xs px-6 py-3 rounded-2xl text-white font-medium text-base"
           style={{
             background:
               mode === "quick"
@@ -133,29 +134,35 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                 : "linear-gradient(90deg, #059669 0%, #10b981 100%)",
           }}
         >
-          На главную
+          Назад на главную
         </button>
 
-        {/* Новая кнопка оставить отзыв */}
         <button
           onClick={() => (window.location.href = "/reviews")}
-          className="px-6 py-2 rounded-2xl text-black font-medium border border-yellow-400 hover:bg-yellow-50 transition-colors"
-          style={{
-            background: "#fef9c3",
-          }}
+          className="w-full max-w-xs px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-colors flex items-center justify-center space-x-2"
         >
-          ★ Оставить отзыв
+          <span
+            style={{
+              color: "#facc15",
+              WebkitTextStroke: "0.8px #eab308",
+              fontSize: "20px",
+              lineHeight: "20px",
+            }}
+          >
+            ★
+          </span>
+          <span>Оставить отзыв</span>
         </button>
-
-        {mode === "pro" && (
-          <p className="text-sm text-gray-600 mt-3">
-            Полный отчёт и чек-лист для разработчика отправлены на ваш email.
-          </p>
-        )}
       </div>
 
+      {mode === "pro" && (
+        <p className="text-sm text-gray-600 text-center mt-4">
+          Полный отчёт и чек-лист разработчика отправлены вам на email.
+        </p>
+      )}
+
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
-        <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
+        <p>© 2025 AI Signal Max. All rights reserved.</p>
         <p className="opacity-60">
           Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.
         </p>
@@ -171,14 +178,13 @@ function StatusText({ status }: { status: Factor["status"] }) {
     Moderate: "text-yellow-600",
     Poor: "text-red-600",
   };
-  const labels = {
-    Good: "Хорошо",
-    Moderate: "Средне",
-    Poor: "Плохо",
-  };
   return (
     <span className={`text-base font-semibold ${colors[status]}`}>
-      {labels[status]}
+      {status === "Good"
+        ? "Хорошо"
+        : status === "Moderate"
+        ? "Средне"
+        : "Плохо"}
     </span>
   );
 }
