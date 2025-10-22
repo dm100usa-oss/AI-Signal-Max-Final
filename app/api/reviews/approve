@@ -1,0 +1,45 @@
+import { NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+export async function POST(req: Request) {
+  try {
+    const { name, text } = await req.json();
+
+    if (!name || !text) {
+      return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
+    }
+
+    // Загружаем все отзывы, которые ждут проверки
+    const pending = await redis.lrange("reviews:pending", 0, -1);
+
+    let approvedReview = null;
+
+    for (const item of pending) {
+      const parsed = JSON.parse(item);
+      if (parsed.name === name && parsed.text === text) {
+        approvedReview = { ...parsed, approved: true };
+        break;
+      }
+    }
+
+    if (!approvedReview) {
+      return NextResponse.json({ ok: false, error: "Review not found" }, { status: 404 });
+    }
+
+    // Удаляем старую запись из pending
+    await redis.lrem("reviews:pending", 1, JSON.stringify({ ...approvedReview, approved: false }));
+
+    // Добавляем в список одобренных
+    await redis.lpush("reviews:approved", JSON.stringify(approvedReview));
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("Error approving review:", err);
+    return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
+  }
+}
