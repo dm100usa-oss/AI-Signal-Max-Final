@@ -84,14 +84,15 @@ export default function ReviewsPage() {
         setName("");
         setText("");
 
-        // Показываем карточку "Спасибо!"
-        setShowThanks(true);
+        // Оставляем форму видимой во время 3 секунд имитации
+        // Только после этого скрываем форму и показываем "Спасибо!"
+        setTimeout(() => {
+          setShowForm(false);
+          setShowThanks(true);
 
-        // Скрываем форму после успешной отправки
-        setShowForm(false);
-
-        // ⏳ Через 4 секунды убираем карточку
-        setTimeout(() => setShowThanks(false), 4000);
+          // ⏳ Через 4 секунды убираем карточку
+          setTimeout(() => setShowThanks(false), 4000);
+        }, 0);
       } else {
         setStatus("error");
       }
@@ -99,7 +100,7 @@ export default function ReviewsPage() {
       setStatus("error");
     } finally {
       // Возвращаем статус в idle после цикла
-      setTimeout(() => setStatus("idle"), 4000);
+      setTimeout(() => setStatus("idle"), 7000);
     }
   };
 
