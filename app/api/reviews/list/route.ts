@@ -8,14 +8,14 @@ const redis = new Redis({
 
 export async function GET() {
   try {
-    // Загружаем все отзывы из основного списка
+    // Загружаем список одобренных отзывов
     const raw = await redis.lrange("reviews:list", 0, -1);
 
     if (!raw || raw.length === 0) {
       return NextResponse.json({ ok: true, reviews: [] });
     }
 
-    // Преобразуем строки JSON в объекты и фильтруем только одобренные
+    // Преобразуем JSON-строки в объекты
     const reviews = raw
       .map((item) => {
         try {
@@ -24,11 +24,16 @@ export async function GET() {
           return null;
         }
       })
-      .filter((r) => r && r.approved === true);
+      .filter(Boolean);
+
+    // Сортировка по дате (сначала новые)
+    reviews.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 
     return NextResponse.json({ ok: true, reviews });
   } catch (err) {
-    console.error("Error loading reviews:", err);
+    console.error("Error loading approved reviews:", err);
     return NextResponse.json(
       { ok: false, error: "Server error" },
       { status: 500 }
