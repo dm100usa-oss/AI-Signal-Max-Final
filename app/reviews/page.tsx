@@ -121,7 +121,7 @@ function ReviewsPage() {
       name: "Алексей Г.",
       date: "2025-10-15",
       rating: 5,
-      text: "Занимаюсь интернет-маркетингом и помогаю компаниям выстраивать digital-присутствие. Когда узнал про AI Signal Max, решил проверить, насколько мои сайты видны для ИИ-платформ. После полной проверки получил подробный отчёт и готовое ТЗ для разработчиков — сразу внёс нужные правки. Теперь проекты клиентов лучше индексируются нейросетями.",
+      text: "Занимаюсь интернет-маркетингом и помогаю компаниям выстраивать digital-присутствие. После полной проверки получил отчёт и готовое ТЗ — сразу внёс нужные правки. Теперь проекты клиентов лучше индексируются нейросетями.",
     },
   ];
 
@@ -179,7 +179,6 @@ function ReviewsPage() {
       setStatus("error");
     }
   };
-
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
       {/* Рейтинг и количество */}
@@ -258,16 +257,6 @@ function ReviewsPage() {
         </div>
       )}
 
-      {isAddMode && hideForm && showSuccess && (
-        <div
-          className={`bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 mb-12 ${
-            showSuccess ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          Спасибо! Ваш отзыв отправлен на модерацию.
-        </div>
-      )}
-
       <p
         className="text-center leading-relaxed text-[16px] mb-14"
         style={{ color: "#475569" }}
@@ -323,6 +312,14 @@ function ReviewsPage() {
         ))}
       </div>
 
+      {/* Панель модерации, видна только при admin=true */}
+      {params.get("admin") === "true" && (
+        <section className="mt-16 border-t border-gray-200 pt-8">
+          <h2 className="text-xl font-semibold mb-4 text-center">Модерация отзывов</h2>
+          <AdminPanel />
+        </section>
+      )}
+
       <button
         onClick={handleBack}
         className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
@@ -342,5 +339,62 @@ function ReviewsPage() {
         <p className="opacity-60">Не являются юридической консультацией.</p>
       </footer>
     </main>
+  );
+}
+
+/* ----- Админ-панель для одобрения отзывов ----- */
+function AdminPanel() {
+  const [pending, setPending] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function loadPending() {
+      try {
+        const res = await fetch("/api/reviews/pending");
+        const data = await res.json();
+        if (data.ok) setPending(data.reviews);
+      } catch {
+        setPending([]);
+      }
+    }
+    loadPending();
+  }, []);
+
+  async function handleApprove(name: string, text: string) {
+    setLoading(true);
+    await fetch("/api/reviews/approve", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, text }),
+    });
+    setPending((prev) => prev.filter((r) => r.name !== name || r.text !== text));
+    setLoading(false);
+  }
+
+  if (!pending.length) {
+    return <p className="text-center text-gray-500">Нет отзывов на модерации</p>;
+  }
+
+  return (
+    <div className="space-y-4">
+      {pending.map((r, i) => (
+        <div
+          key={i}
+          className="border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-sm flex justify-between items-start"
+        >
+          <div>
+            <p className="font-medium text-gray-800 mb-1">{r.name}</p>
+            <p className="text-gray-600">{r.text}</p>
+          </div>
+          <button
+            onClick={() => handleApprove(r.name, r.text)}
+            disabled={loading}
+            className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 transition disabled:opacity-50"
+          >
+            Одобрить
+          </button>
+        </div>
+      ))}
+    </div>
   );
 }
