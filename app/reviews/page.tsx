@@ -27,6 +27,7 @@ function ReviewsPage() {
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
+  const [hideForm, setHideForm] = useState(false);
 
   useEffect(() => {
     document.body.style.opacity = "1";
@@ -45,12 +46,12 @@ function ReviewsPage() {
     fetchStats();
   }, []);
 
-  // автоскрытие карточки "Спасибо!"
+  // эффект для плавного скрытия карточки "Спасибо!"
   useEffect(() => {
     if (showSuccess) {
       const timer = setTimeout(() => {
         setShowSuccess(false);
-      }, 3000);
+      }, 2500); // начало исчезновения через 2.5 сек
       return () => clearTimeout(timer);
     }
   }, [showSuccess]);
@@ -129,8 +130,12 @@ function ReviewsPage() {
       if (data.ok) {
         setStatus("success");
         setShowSuccess(true);
+        setHideForm(true);
         setName("");
         setText("");
+        setTimeout(() => {
+          setShowSuccess(false);
+        }, 3000);
       } else {
         setStatus("error");
       }
@@ -161,10 +166,14 @@ function ReviewsPage() {
       </p>
 
       {/* Если add=true — форма добавления */}
-      {isAddMode && (
+      {isAddMode && !hideForm && (
         <div className="mb-12">
           {showSuccess ? (
-            <div className="bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-500">
+            <div
+              className={`bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 ${
+                showSuccess ? "opacity-100" : "opacity-0"
+              }`}
+            >
               Спасибо! Ваш отзыв отправлен на модерацию.
             </div>
           ) : (
@@ -204,6 +213,17 @@ function ReviewsPage() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* Карточка "Спасибо!" после исчезновения формы */}
+      {isAddMode && hideForm && showSuccess && (
+        <div
+          className={`bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 mb-12 ${
+            showSuccess ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          Спасибо! Ваш отзыв отправлен на модерацию.
         </div>
       )}
 
