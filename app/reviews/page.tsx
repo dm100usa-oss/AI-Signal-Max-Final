@@ -27,7 +27,6 @@ function ReviewsPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // загрузка отзывов из Redis
   useEffect(() => {
     async function fetchReviews() {
       try {
@@ -47,7 +46,6 @@ function ReviewsPage() {
     fetchReviews();
   }, []);
 
-  // имитация отправки и плавное исчезновение карточки
   useEffect(() => {
     if (status === "success") {
       const timer = setTimeout(() => {
@@ -76,12 +74,11 @@ function ReviewsPage() {
 
   const handleBack = () => router.push("/");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("loading");
 
     try {
-      // имитация задержки 2 секунды
       await new Promise((r) => setTimeout(r, 2000));
 
       const res = await fetch("/api/reviews/submit", {
@@ -98,7 +95,6 @@ function ReviewsPage() {
         setName("");
         setText("");
 
-        // обновить список отзывов
         const updated = await fetch("/api/reviews/store", { cache: "no-store" });
         const updatedData = await updated.json();
         if (updatedData?.ok && Array.isArray(updatedData.reviews)) {
@@ -118,7 +114,6 @@ function ReviewsPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
-      {/* Рейтинг и количество */}
       <p className="text-center mb-8 text-lg">
         <span
           className="inline-block"
@@ -137,7 +132,6 @@ function ReviewsPage() {
         </span>
       </p>
 
-      {/* Форма добавления */}
       {isAddMode && (
         <div className="mb-12">
           {showSuccess ? (
@@ -168,7 +162,7 @@ function ReviewsPage() {
                 />
                 <button
                   type="submit"
-                  disabled={status === "loading"}
+                  disabled={status === "loading" ? true : false}
                   className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {status === "loading" ? (
@@ -221,7 +215,6 @@ function ReviewsPage() {
         </div>
       )}
 
-      {/* Текст и сортировка */}
       <p
         className="text-center leading-relaxed text-[16px] mb-14"
         style={{ color: "#475569" }}
@@ -252,7 +245,6 @@ function ReviewsPage() {
         </button>
       </div>
 
-      {/* Список отзывов */}
       <div className="space-y-6">
         {reviews.length > 0 ? (
           reviews.map((r, i) => (
@@ -282,7 +274,6 @@ function ReviewsPage() {
         )}
       </div>
 
-      {/* Кнопка "На главную" */}
       <button
         onClick={handleBack}
         className="fixed bottom-24 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
@@ -294,7 +285,6 @@ function ReviewsPage() {
         На главную
       </button>
 
-      {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
         <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
         <p className="opacity-60">
