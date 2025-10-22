@@ -126,7 +126,7 @@ function ReviewsPage() {
     setShowForm(false);
 
     try {
-      await new Promise((r) => setTimeout(r, 1500)); // имитация задержки отправки
+      await new Promise((r) => setTimeout(r, 3000)); // имитация 3 секунд отправки
 
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
@@ -140,7 +140,7 @@ function ReviewsPage() {
         setStatus("success");
         setName("");
         setText("");
-        await new Promise((r) => setTimeout(r, 4000)); // показываем карточку 4 секунды
+        await new Promise((r) => setTimeout(r, 4000)); // карточка "Спасибо" держится 4 секунды
         setStatus("idle");
       } else {
         setStatus("error");
@@ -259,7 +259,11 @@ function ReviewsPage() {
                 <p className="text-red-600 mt-4 text-center">Ошибка. Попробуйте позже.</p>
               )}
             </>
-          ) : null}
+          ) : (
+            status === "loading" && (
+              <div className="text-center text-gray-600 mt-6">Отправка отзыва...</div>
+            )
+          )}
         </div>
       )}
 
@@ -313,7 +317,7 @@ function ReviewsPage() {
 
       <button
         onClick={handleBack}
-        className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
+        className="fixed bottom-20 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
         style={{
           background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
           opacity: 0.9,
