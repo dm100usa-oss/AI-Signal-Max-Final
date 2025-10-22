@@ -1,9 +1,19 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ReviewsPage() {
+// 🔸 Обёртка для Suspense (нужна Next.js 14)
+export default function ReviewsPageWrapper() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
+      <ReviewsPage />
+    </Suspense>
+  );
+}
+
+function ReviewsPage() {
   const router = useRouter();
   const params = useSearchParams();
   const isAddMode = params.get("add") === "true";
