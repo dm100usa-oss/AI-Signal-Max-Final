@@ -138,7 +138,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </button>
 
         <button
-          onClick={() => (window.location.href = "/reviews")}
+          onClick={() => (window.location.href = "/reviews?add=true")}
           className="w-full max-w-xs px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-colors flex items-center justify-center space-x-2"
         >
           <span
