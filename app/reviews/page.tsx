@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// 🔸 Обёртка для Suspense (нужна Next.js 14)
+// Обёртка для Suspense (Next.js 14)
 export default function ReviewsPageWrapper() {
   return (
     <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
@@ -22,7 +22,6 @@ function ReviewsPage() {
   const [rating, setRating] = useState<number>(4.9);
   const [reviewsCount, setReviewsCount] = useState<number>(128);
 
-  // поля формы
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -46,12 +45,12 @@ function ReviewsPage() {
     fetchStats();
   }, []);
 
-  // эффект для плавного скрытия карточки "Спасибо!"
+  // Плавное скрытие карточки "Спасибо!"
   useEffect(() => {
     if (showSuccess) {
       const timer = setTimeout(() => {
         setShowSuccess(false);
-      }, 2500); // начало исчезновения через 2.5 сек
+      }, 4000); // карточка держится дольше
       return () => clearTimeout(timer);
     }
   }, [showSuccess]);
@@ -118,6 +117,9 @@ function ReviewsPage() {
     e.preventDefault();
     setStatus("loading");
 
+    // имитация реальной задержки 2 сек
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     try {
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
@@ -133,9 +135,7 @@ function ReviewsPage() {
         setHideForm(true);
         setName("");
         setText("");
-        setTimeout(() => {
-          setShowSuccess(false);
-        }, 3000);
+        setTimeout(() => setShowSuccess(false), 4000);
       } else {
         setStatus("error");
       }
@@ -146,6 +146,36 @@ function ReviewsPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
+      <style jsx>{`
+        .dots {
+          display: inline-flex;
+          margin-left: 4px;
+        }
+        .dot {
+          width: 4px;
+          height: 4px;
+          margin: 0 1px;
+          background-color: white;
+          border-radius: 50%;
+          opacity: 0;
+          animation: blink 1.2s infinite;
+        }
+        .dot:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+        .dot:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+        @keyframes blink {
+          0%, 80%, 100% {
+            opacity: 0;
+          }
+          40% {
+            opacity: 1;
+          }
+        }
+      `}</style>
+
       {/* Рейтинг и количество */}
       <p className="text-center mb-8 text-lg">
         <span
@@ -165,7 +195,7 @@ function ReviewsPage() {
         </span>
       </p>
 
-      {/* Если add=true — форма добавления */}
+      {/* Форма добавления */}
       {isAddMode && !hideForm && (
         <div className="mb-12">
           {showSuccess ? (
@@ -201,9 +231,20 @@ function ReviewsPage() {
                 <button
                   type="submit"
                   disabled={status === "loading"}
-                  className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
                 >
-                  {status === "loading" ? "Отправка..." : "Отправить"}
+                  {status === "loading" ? (
+                    <>
+                      Отправка
+                      <span className="dots">
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                        <span className="dot"></span>
+                      </span>
+                    </>
+                  ) : (
+                    "Отправить"
+                  )}
                 </button>
               </form>
               {status === "error" && (
@@ -287,7 +328,7 @@ function ReviewsPage() {
       {/* Кнопка "На главную" */}
       <button
         onClick={handleBack}
-        className="fixed bottom-6 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
+        className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
         style={{
           background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
           opacity: 0.9,
