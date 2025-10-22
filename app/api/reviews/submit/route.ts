@@ -14,7 +14,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
     }
 
-    // создаём объект отзыва
     const review = {
       name,
       text,
@@ -22,12 +21,12 @@ export async function POST(req: Request) {
       approved: false,
     };
 
-    // сохраняем в Redis — в список ожидающих модерации
+    // Сохраняем в очередь "ожидающих"
     await redis.lpush("reviews:pending", JSON.stringify(review));
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Error in /api/reviews/submit:", err);
+    console.error("Ошибка при добавлении отзыва:", err);
     return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
   }
 }
