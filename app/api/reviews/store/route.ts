@@ -36,7 +36,8 @@ export async function POST(req: Request) {
     };
 
     const existing = (await redis.get(REVIEWS_KEY)) || [];
-    const updated = [newReview, ...existing];
+    const list = Array.isArray(existing) ? existing : [];
+    const updated = [newReview, ...list];
     await redis.set(REVIEWS_KEY, updated);
 
     return NextResponse.json({ ok: true });
