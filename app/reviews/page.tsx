@@ -162,7 +162,7 @@ function ReviewsPage() {
                 />
                 <button
                   type="submit"
-                  disabled={status === "loading" ? true : false}
+                  disabled={status === ("loading" as typeof status)}
                   className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {status === "loading" ? (
