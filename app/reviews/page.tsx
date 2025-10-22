@@ -26,6 +26,7 @@ function ReviewsPage() {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     document.body.style.opacity = "1";
@@ -44,15 +45,15 @@ function ReviewsPage() {
     fetchStats();
   }, []);
 
-  // эффект для автоскрытия карточки "Спасибо!"
+  // автоскрытие карточки "Спасибо!"
   useEffect(() => {
-    if (status === "success") {
+    if (showSuccess) {
       const timer = setTimeout(() => {
-        setStatus("idle");
+        setShowSuccess(false);
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [status]);
+  }, [showSuccess]);
 
   const reviews = [
     {
@@ -127,6 +128,7 @@ function ReviewsPage() {
 
       if (data.ok) {
         setStatus("success");
+        setShowSuccess(true);
         setName("");
         setText("");
       } else {
@@ -159,9 +161,9 @@ function ReviewsPage() {
       </p>
 
       {/* Если add=true — форма добавления */}
-      {isAddMode && status !== "idle" && status !== "loading" ? null : isAddMode && (
+      {isAddMode && (
         <div className="mb-12">
-          {status === "success" ? (
+          {showSuccess ? (
             <div className="bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-500">
               Спасибо! Ваш отзыв отправлен на модерацию.
             </div>
