@@ -27,9 +27,11 @@ function ReviewsPage() {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [showForm, setShowForm] = useState(true);
 
   useEffect(() => {
     document.body.style.opacity = "1";
+
     async function fetchStats() {
       try {
         const resp = await fetch("/api/reviews/stats");
@@ -58,15 +60,6 @@ function ReviewsPage() {
     fetchStats();
     fetchReviews();
   }, []);
-
-  useEffect(() => {
-    if (status === "success") {
-      const timer = setTimeout(() => {
-        setStatus("idle");
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [status]);
 
   const staticReviews = [
     {
@@ -130,6 +123,7 @@ function ReviewsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
+    setShowForm(false);
 
     try {
       await new Promise((r) => setTimeout(r, 1500)); // имитация задержки отправки
@@ -146,11 +140,15 @@ function ReviewsPage() {
         setStatus("success");
         setName("");
         setText("");
+        await new Promise((r) => setTimeout(r, 4000)); // показываем карточку 4 секунды
+        setStatus("idle");
       } else {
         setStatus("error");
+        setShowForm(true);
       }
     } catch {
       setStatus("error");
+      setShowForm(true);
     }
   };
 
@@ -173,24 +171,27 @@ function ReviewsPage() {
         </span>
       </p>
 
-      {isAddMode && status !== "idle" && status !== "loading" ? null : isAddMode && (
+      {isAddMode && (
         <div className="mb-12">
           {status === "success" ? (
-            <div
-              className="bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm opacity-100 transition-opacity duration-700"
-              style={{ animation: "fadeOut 1s ease-in-out 3s forwards" }}
-            >
+            <div className="bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm opacity-100 animate-fadeOut">
               Спасибо! Ваш отзыв отправлен на модерацию.
               <style jsx>{`
                 @keyframes fadeOut {
-                  to {
+                  0% {
+                    opacity: 1;
+                  }
+                  100% {
                     opacity: 0;
                     transform: translateY(-10px);
                   }
                 }
+                .animate-fadeOut {
+                  animation: fadeOut 1s ease-in-out 3s forwards;
+                }
               `}</style>
             </div>
-          ) : (
+          ) : showForm ? (
             <>
               <h2 className="text-xl font-semibold text-center mb-6">Оставить отзыв</h2>
               <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md mx-auto">
@@ -258,7 +259,7 @@ function ReviewsPage() {
                 <p className="text-red-600 mt-4 text-center">Ошибка. Попробуйте позже.</p>
               )}
             </>
-          )}
+          ) : null}
         </div>
       )}
 
