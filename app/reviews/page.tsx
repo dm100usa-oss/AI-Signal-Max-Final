@@ -4,50 +4,11 @@ import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Обёртка для Suspense (Next.js 14)
 export default function ReviewsPageWrapper() {
   return (
     <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
       <ReviewsPage />
     </Suspense>
-  );
-}
-
-function Dots() {
-  return (
-    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-baseline">
-      <span className="dot">.</span>
-      <span className="dot dot2">.</span>
-      <span className="dot dot3">.</span>
-      <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-          position: relative;
-          top: 2px;
-        }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
-        @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
-        }
-      `}</style>
-    </span>
   );
 }
 
@@ -59,77 +20,42 @@ function ReviewsPage() {
   const [sortMode, setSortMode] = useState<"new" | "popular">("new");
   const [rating, setRating] = useState<number>(4.9);
   const [reviewsCount, setReviewsCount] = useState<number>(128);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [hideForm, setHideForm] = useState(false);
 
+  // загрузка отзывов из Redis
   useEffect(() => {
-    document.body.style.opacity = "1";
-    async function fetchStats() {
+    async function fetchReviews() {
       try {
-        const resp = await fetch("/api/reviews/stats");
-        if (resp.ok) {
-          const data = await resp.json();
-          if (data?.rating && data?.reviews) {
-            setRating(data.rating);
-            setReviewsCount(data.reviews);
-          }
+        const res = await fetch("/api/reviews/store", { cache: "no-store" });
+        const data = await res.json();
+        if (data?.ok && Array.isArray(data.reviews)) {
+          const sorted = data.reviews.sort(
+            (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+          setReviews(sorted);
+          setReviewsCount(sorted.length);
         }
-      } catch {}
+      } catch (err) {
+        console.error(err);
+      }
     }
-    fetchStats();
+    fetchReviews();
   }, []);
 
+  // имитация отправки и плавное исчезновение карточки
   useEffect(() => {
-    if (showSuccess) {
+    if (status === "success") {
       const timer = setTimeout(() => {
         setShowSuccess(false);
       }, 4000);
       return () => clearTimeout(timer);
     }
-  }, [showSuccess]);
-
-  const reviews = [
-    {
-      name: "Сергей К.",
-      date: "2025-10-18",
-      rating: 5,
-      text: "Не знал, что у сайта может быть «видимость для ИИ». После проверки понял, почему ChatGPT не находил мой бизнес. Очень полезно — теперь хотя бы ясно, с чего начинать.",
-    },
-    {
-      name: "Елена М.",
-      date: "2025-10-16",
-      rating: 5,
-      text: "Прошла полную проверку и получила готовое техническое задание для разработчика. Чётко, по пунктам, с пояснениями. Это реально сэкономило время и деньги — раньше на это ушли бы недели.",
-    },
-    {
-      name: "Андрей П.",
-      date: "2025-10-14",
-      rating: 4,
-      text: "Интересная идея — измерять, как ИИ видит сайт. Сделал оценку сам, всё просто. Потом отправил отчёт друзьям-владельцам сайтов как подарок. Все были удивлены результатами.",
-    },
-    {
-      name: "Марина С.",
-      date: "2025-10-11",
-      rating: 5,
-      text: "Обратилась в AI Signal Max, потому что потеряла контакт со старым разработчиком. Тут сразу разобрали, что мешает видимости сайта. Приятно, когда работаешь с теми, кто реально понимает, что делает.",
-    },
-    {
-      name: "Алексей Г.",
-      date: "2025-10-15",
-      rating: 5,
-      text: "Занимаюсь интернет-маркетингом и помогаю компаниям выстраивать digital-присутствие. Когда узнал про AI Signal Max, решил проверить, насколько мои сайты видны для ИИ-платформ. После полной проверки получил подробный отчёт и готовое ТЗ для разработчиков — сразу внёс нужные правки. Теперь проекты клиентов лучше индексируются нейросетями.",
-    },
-  ];
-
-  const sortedReviews = [...reviews].sort((a, b) => {
-    if (sortMode === "new") return new Date(b.date).getTime() - new Date(a.date).getTime();
-    if (sortMode === "popular") return b.rating - a.rating;
-    return 0;
-  });
+  }, [status]);
 
   const renderStars = (rating: number) => {
     const full = Math.floor(rating);
@@ -154,9 +80,10 @@ function ReviewsPage() {
     e.preventDefault();
     setStatus("loading");
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
     try {
+      // имитация задержки 2 секунды
+      await new Promise((r) => setTimeout(r, 2000));
+
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -168,10 +95,19 @@ function ReviewsPage() {
       if (data.ok) {
         setStatus("success");
         setShowSuccess(true);
-        setHideForm(true);
         setName("");
         setText("");
-        setTimeout(() => setShowSuccess(false), 4000);
+
+        // обновить список отзывов
+        const updated = await fetch("/api/reviews/store", { cache: "no-store" });
+        const updatedData = await updated.json();
+        if (updatedData?.ok && Array.isArray(updatedData.reviews)) {
+          const sorted = updatedData.reviews.sort(
+            (a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+          setReviews(sorted);
+          setReviewsCount(sorted.length);
+        }
       } else {
         setStatus("error");
       }
@@ -201,17 +137,14 @@ function ReviewsPage() {
         </span>
       </p>
 
-      {isAddMode && !hideForm && (
+      {/* Форма добавления */}
+      {isAddMode && (
         <div className="mb-12">
           {showSuccess ? (
-            <div
-              className={`bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 ${
-                showSuccess ? "opacity-100" : "opacity-0"
-              }`}
-            >
+            <div className="bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm opacity-100 transition-opacity duration-700">
               Спасибо! Ваш отзыв отправлен на модерацию.
             </div>
-          ) : (
+          ) : status === "idle" || status === "error" ? (
             <>
               <h2 className="text-xl font-semibold text-center mb-6">Оставить отзыв</h2>
               <form
@@ -236,12 +169,42 @@ function ReviewsPage() {
                 <button
                   type="submit"
                   disabled={status === "loading"}
-                  className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
+                  className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {status === "loading" ? (
-                    <span className="inline-flex items-center">
+                    <span className="inline-flex items-end">
                       Отправка
-                      <Dots />
+                      <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-baseline ml-1">
+                        <span className="dot">.</span>
+                        <span className="dot dot2">.</span>
+                        <span className="dot dot3">.</span>
+                        <style jsx>{`
+                          .dot {
+                            opacity: 0.2;
+                            animation: aiv-dots 1200ms infinite;
+                          }
+                          .dot2 {
+                            animation-delay: 200ms;
+                          }
+                          .dot3 {
+                            animation-delay: 400ms;
+                          }
+                          @keyframes aiv-dots {
+                            0% {
+                              opacity: 0.2;
+                            }
+                            30% {
+                              opacity: 1;
+                            }
+                            60% {
+                              opacity: 0.2;
+                            }
+                            100% {
+                              opacity: 0.2;
+                            }
+                          }
+                        `}</style>
+                      </span>
                     </span>
                   ) : (
                     "Отправить"
@@ -254,20 +217,11 @@ function ReviewsPage() {
                 </p>
               )}
             </>
-          )}
+          ) : null}
         </div>
       )}
 
-      {isAddMode && hideForm && showSuccess && (
-        <div
-          className={`bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 mb-12 ${
-            showSuccess ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          Спасибо! Ваш отзыв отправлен на модерацию.
-        </div>
-      )}
-
+      {/* Текст и сортировка */}
       <p
         className="text-center leading-relaxed text-[16px] mb-14"
         style={{ color: "#475569" }}
@@ -298,34 +252,40 @@ function ReviewsPage() {
         </button>
       </div>
 
+      {/* Список отзывов */}
       <div className="space-y-6">
-        {sortedReviews.map((r, i) => (
-          <div
-            key={i}
-            className="bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-start space-x-2 mb-3">
-              <div className="flex">{renderStars(r.rating)}</div>
-              <span className="font-semibold text-gray-800">{r.name}</span>
-              <span className="text-neutral-400 text-sm">
-                ·{" "}
-                {new Date(r.date).toLocaleDateString("ru-RU", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </span>
+        {reviews.length > 0 ? (
+          reviews.map((r, i) => (
+            <div
+              key={i}
+              className="bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-start space-x-2 mb-3">
+                <div className="flex">{renderStars(5)}</div>
+                <span className="font-semibold text-gray-800">{r.name}</span>
+                <span className="text-neutral-400 text-sm">
+                  ·{" "}
+                  {new Date(r.date).toLocaleDateString("ru-RU", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+              <p className="text-gray-700 leading-relaxed text-[15px] text-justify">
+                {r.text}
+              </p>
             </div>
-            <p className="text-gray-700 leading-relaxed text-[15px] text-justify">
-              {r.text}
-            </p>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className="text-center text-gray-500">Отзывов пока нет</p>
+        )}
       </div>
 
+      {/* Кнопка "На главную" */}
       <button
         onClick={handleBack}
-        className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
+        className="fixed bottom-24 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
         style={{
           background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)",
           opacity: 0.9,
@@ -334,6 +294,7 @@ function ReviewsPage() {
         На главную
       </button>
 
+      {/* Футер */}
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
         <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
         <p className="opacity-60">
