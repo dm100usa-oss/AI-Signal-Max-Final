@@ -1,93 +1,76 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function ReviewsPage() {
-  const [mode, setMode] = useState<"view" | "write" | "loading">("loading");
+  const [name, setName] = useState("");
+  const [text, setText] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
 
-    if (!token) {
-      setMode("view");
-      return;
-    }
+    try {
+      const res = await fetch("/api/reviews/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, text }),
+      });
 
-    async function validate() {
-      try {
-        const res = await fetch(`/api/reviews/validate?token=${token}`);
-        const data = await res.json();
+      const data = await res.json();
 
-        if (data.ok) {
-          setMode("write");
-        } else {
-          setMode("view");
-        }
-      } catch {
-        setMode("view");
+      if (data.ok) {
+        setStatus("success");
+        setName("");
+        setText("");
+      } else {
+        setStatus("error");
       }
+    } catch {
+      setStatus("error");
     }
+  };
 
-    validate();
-  }, []);
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen px-4">
+      <h1 className="text-2xl font-semibold mb-6">Оставить отзыв</h1>
 
-  if (mode === "loading") {
-    return (
-      <div className="flex h-[60vh] items-center justify-center text-neutral-500">
-        Проверка доступа...
-      </div>
-    );
-  }
-
-  if (mode === "write") {
-    return (
-      <div className="max-w-2xl mx-auto px-6 py-16">
-        <h1 className="text-2xl font-semibold mb-6 text-center">Оставить отзыв</h1>
-        <form className="space-y-4">
+      {status === "success" ? (
+        <p className="text-green-600 text-lg">Спасибо! Ваш отзыв успешно отправлен.</p>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4 w-full max-w-md"
+        >
           <input
             type="text"
             placeholder="Ваше имя"
-            className="w-full border rounded-lg px-4 py-2"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border border-gray-300 rounded-md p-2"
+            required
           />
           <textarea
             placeholder="Ваш отзыв..."
-            className="w-full border rounded-lg px-4 py-2 h-32"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="border border-gray-300 rounded-md p-2 h-32 resize-none"
+            required
           />
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={status === "loading"}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            Отправить
+            {status === "loading" ? "Отправка..." : "Отправить"}
           </button>
         </form>
-      </div>
-    );
-  }
+      )}
 
-  return (
-    <div className="max-w-3xl mx-auto px-6 py-16">
-      <h1 className="text-2xl font-semibold mb-6 text-center">Отзывы пользователей</h1>
-      <p className="text-neutral-500 text-center mb-8">
-        Чтобы оставить отзыв, пройдите оплату проверки или перейдите по ссылке из письма.
-      </p>
-
-      {/* Здесь будет список отзывов */}
-      <div className="space-y-6">
-        <div className="border p-4 rounded-lg shadow-sm">
-          <p className="font-medium mb-2">Анна, владелец сайта</p>
-          <p className="text-neutral-600">
-            Очень интересный сервис — отчёт оказался полезным для разработчика.
-          </p>
-        </div>
-
-        <div className="border p-4 rounded-lg shadow-sm">
-          <p className="font-medium mb-2">Михаил, SEO-специалист</p>
-          <p className="text-neutral-600">
-            Проверка помогла найти технические ошибки и повысить видимость в ChatGPT.
-          </p>
-        </div>
-      </div>
+      {status === "error" && (
+        <p className="text-red-600 mt-4">Ошибка. Попробуйте позже.</p>
+      )}
     </div>
   );
 }
