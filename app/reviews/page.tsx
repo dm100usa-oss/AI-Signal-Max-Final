@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// 🔹 Анимация трёх точек
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-baseline ml-1">
@@ -40,7 +39,7 @@ function Dots() {
   );
 }
 
-export default function ReviewsPage() {
+function ReviewsContent() {
   const router = useRouter();
   const params = useSearchParams();
   const isAddMode = params.get("add") === "true";
@@ -65,7 +64,6 @@ export default function ReviewsPage() {
 
     setStatus("loading");
 
-    // ⏳ Имитируем реальную отправку (3 секунды)
     await new Promise((r) => setTimeout(r, 3000));
 
     try {
@@ -78,19 +76,13 @@ export default function ReviewsPage() {
 
       if (data.ok) {
         setStatus("success");
-
-        // Добавляем новый отзыв локально
         setReviews((prev) => [{ name, text }, ...prev]);
         setName("");
         setText("");
 
-        // Оставляем форму видимой во время 3 секунд имитации
-        // Только после этого скрываем форму и показываем "Спасибо!"
         setTimeout(() => {
           setShowForm(false);
           setShowThanks(true);
-
-          // ⏳ Через 4 секунды убираем карточку
           setTimeout(() => setShowThanks(false), 4000);
         }, 0);
       } else {
@@ -99,7 +91,6 @@ export default function ReviewsPage() {
     } catch {
       setStatus("error");
     } finally {
-      // Возвращаем статус в idle после цикла
       setTimeout(() => setStatus("idle"), 7000);
     }
   };
@@ -123,7 +114,6 @@ export default function ReviewsPage() {
         </button>
       </div>
 
-      {/* 💬 Форма для добавления отзыва */}
       {showForm && (
         <form
           onSubmit={handleSubmit}
@@ -161,27 +151,21 @@ export default function ReviewsPage() {
         </form>
       )}
 
-      {/* ✅ Карточка "Спасибо!" */}
       {showThanks && (
         <div className="mb-10 p-6 text-center border border-green-200 rounded-lg bg-green-50 text-green-700 opacity-100 transition-opacity duration-1000">
           Спасибо! Ваш отзыв отправлен на модерацию
         </div>
       )}
 
-      {/* 🧩 Список отзывов */}
       <div className="space-y-4">
         {reviews.map((r, i) => (
-          <div
-            key={i}
-            className="p-4 border border-gray-200 rounded-lg shadow-sm bg-white"
-          >
+          <div key={i} className="p-4 border border-gray-200 rounded-lg shadow-sm bg-white">
             <p className="font-medium mb-1">{r.name}</p>
             <p className="text-gray-700">{r.text}</p>
           </div>
         ))}
       </div>
 
-      {/* ⬅ Кнопка "На главную" */}
       <div className="mt-16 text-center">
         <button
           onClick={() => router.push("/")}
@@ -191,5 +175,13 @@ export default function ReviewsPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function ReviewsPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
+      <ReviewsContent />
+    </Suspense>
   );
 }
