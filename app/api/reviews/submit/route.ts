@@ -14,20 +14,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
     }
 
-    // Отзыв получает статус "ожидает проверки"
+    // создаём объект отзыва
     const review = {
       name,
       text,
       date: new Date().toISOString(),
-      approved: false, // флаг модерации
+      approved: false,
     };
 
-    // Сохраняем в список ожидающих модерации
+    // сохраняем в Redis — в список ожидающих модерации
     await redis.lpush("reviews:pending", JSON.stringify(review));
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error(err);
+    console.error("Error in /api/reviews/submit:", err);
     return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
   }
 }
