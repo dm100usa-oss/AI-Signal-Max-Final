@@ -19,6 +19,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const [factors, setFactors] = useState<Factor[]>([]);
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
+  const [showSummary, setShowSummary] = useState(false); // задержка перед появлением текста
 
   useEffect(() => {
     const fetchData = async () => {
@@ -161,6 +162,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             "Ваш сайт слабо виден для ИИ-платформ. ИИ затрудняется определить тематику, содержание и структуру сайта. Большинство параметров требуют настройки, чтобы сайт стал понятен и доступен для ИИ-систем. При таком уровне видимости сайт почти не показывается в запросах и ответах ИИ-ассистентов."
           );
         }
+
+        // 🔹 Задержка перед показом блока под кругом (2 секунды)
+        setTimeout(() => setShowSummary(true), 2000);
       } catch (err) {
         console.error("Failed to load analysis:", err);
       } finally {
@@ -203,17 +207,19 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <Donut score={score} />
       </div>
 
-      {/* Улучшенный блок под кругом */}
-      <div className="animate-fadeIn max-w-xl mx-auto rounded-2xl p-6 mb-10 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 text-justify">
-        <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
-          {score >= 80
-            ? "Высокая видимость сайта"
-            : score >= 40
-            ? "Средняя видимость сайта"
-            : "Низкая видимость сайта"}
-        </p>
-        <p className="text-base text-gray-700 leading-relaxed">{summary}</p>
-      </div>
+      {/* Улучшенный блок под кругом с задержкой 2 секунды */}
+      {showSummary && (
+        <div className="animate-fadeIn max-w-xl mx-auto rounded-2xl p-6 mb-10 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 text-justify">
+          <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
+            {score >= 80
+              ? "Высокая видимость сайта"
+              : score >= 40
+              ? "Средняя видимость сайта"
+              : "Низкая видимость сайта"}
+          </p>
+          <p className="text-base text-gray-700 leading-relaxed">{summary}</p>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes fadeIn {
