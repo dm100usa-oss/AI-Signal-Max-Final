@@ -1,4 +1,4 @@
-<!-- === OWNER.HTML (ФИНАЛЬНАЯ ВЕРСИЯ — ЕДИНАЯ КАРТОЧКА ОЦЕНКИ С ЦВЕТОМ) === -->
+<!-- === OWNER.HTML (ФИНАЛЬНАЯ ВЕРСИЯ — ОДНА КАРТОЧКА, ВСЕ ТЕКСТЫ СОХРАНЕНЫ) === -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -14,9 +14,9 @@
         color: rgb(107,114,128);
       }
     }
-    @page:first { @bottom-center { content: ""; } }
+    @page:first { @bottom-center { content:""; } }
 
-    html, body { margin: 0; padding: 0; background: #fff; }
+    html, body { margin:0; padding:0; background:#fff; }
     body {
       font-family: Helvetica, Arial, sans-serif;
       color: rgb(15,23,42);
@@ -24,115 +24,96 @@
       font-size: 12pt;
     }
 
-    p, .factor-desc, .summary-box p {
-      text-align: justify;
-      text-align-last: left;
-    }
+    p, .factor-desc, .summary-box p { text-align: justify; text-align-last: left; }
+    .center { text-align:center; }
+    .logo { display:block; margin:0 auto; width:160px; }
+    h1 { font-size:22pt; text-align:center; margin:10px 0 0; font-weight:700; }
+    .meta { text-align:center; font-size:11pt; color:rgb(55,65,81); margin-top:8px; }
 
-    .center { text-align: center; }
-    .logo { display: block; margin: 0 auto; width: 160px; }
-    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
-    .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
-
-    h2 { font-size: 14pt; margin-top: 26px; font-weight: 700; color: rgb(15,23,42); }
-    p { margin: 8px 0; color: rgb(15,23,42); }
-
-    .donut-wrap { display: flex; justify-content: center; margin: 20px 0 18px; }
+    h2 { font-size:14pt; margin-top:26px; font-weight:700; color:rgb(15,23,42); }
+    p { margin:8px 0; color:rgb(15,23,42); }
+    .donut-wrap { display:flex; justify-content:center; margin:20px 0 18px; }
 
     .summary-box {
-      margin: 20px auto;
-      padding: 16px 20px;
-      border-radius: 10px;
-      background: rgb(249,250,251);
-      border: 1px solid rgb(229,231,235);
-      color: rgb(55,65,81);
-      width: 90%;
-      text-align: center;
+      margin:20px auto;
+      padding:16px 20px;
+      border-radius:10px;
+      width:90%;
+      text-align:center;
+      border:1px solid rgb(229,231,235);
+      background:rgb(249,250,251);
+      color:rgb(55,65,81);
     }
     .summary-box h3 {
-      font-size: 15pt;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: rgb(15,23,42);
-    }
-    .summary-box p {
-      text-align: justify;
-      text-align-last: left;
+      font-size:15pt;
+      font-weight:700;
+      margin-bottom:10px;
+      color:rgb(15,23,42);
     }
 
-    /* Цветовые варианты оценки */
-    .summary-box.good {
-      border: 1px solid rgb(16,185,129);
-      background: rgba(16,185,129,0.05);
-    }
-    .summary-box.moderate {
-      border: 1px solid rgb(245,158,11);
-      background: rgba(245,158,11,0.05);
-    }
-    .summary-box.poor {
-      border: 1px solid rgb(239,68,68);
-      background: rgba(239,68,68,0.05);
-    }
-    .summary-box.good h3 { color: rgb(16,185,129); }
-    .summary-box.moderate h3 { color: rgb(245,158,11); }
-    .summary-box.poor h3 { color: rgb(239,68,68); }
+    /* цветовые варианты */
+    .summary-box.good { border-color:rgb(16,185,129); background:rgba(16,185,129,0.05); }
+    .summary-box.moderate { border-color:rgb(245,158,11); background:rgba(245,158,11,0.05); }
+    .summary-box.poor { border-color:rgb(239,68,68); background:rgba(239,68,68,0.05); }
+    .summary-box.good h3 { color:rgb(16,185,129); }
+    .summary-box.moderate h3 { color:rgb(245,158,11); }
+    .summary-box.poor h3 { color:rgb(239,68,68); }
 
     .factor {
-      margin-top: 14px;
-      padding: 12px 16px;
-      border: 1px solid rgb(229,231,235);
-      border-radius: 10px;
-      background: #fff;
+      margin-top:14px;
+      padding:12px 16px;
+      border:1px solid rgb(229,231,235);
+      border-radius:10px;
+      background:#fff;
     }
     .factor-head {
-      display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-      margin-bottom: 6px;
+      display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+      margin-bottom:6px;
     }
-    .factor-lead { display: flex; align-items: center; gap: 8px; color: rgb(15,23,42); }
-    .factor-lead.good .dot { border-color: rgb(16,185,129); }
-    .factor-lead.moderate .dot { border-color: rgb(245,158,11); }
-    .factor-lead.poor .dot { border-color: rgb(239,68,68); }
-
-    .dot {
-      width: 14px; height: 14px; border-radius: 50%;
-      border: 2px solid currentColor;
-      background: #fff;
-      display: inline-block;
-      box-sizing: border-box;
-    }
-
-    .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
-    .status { font-weight: 700; font-size: 11pt; }
-    .status.good { color: rgb(16,185,129); }
-    .status.moderate { color: rgb(245,158,11); }
-    .status.poor { color: rgb(239,68,68); }
-
-    .footer { margin-top: 40px; text-align: center; font-size: 10pt; }
-    .footer .disclaimer { opacity: 0.6; color: rgb(55,65,81); font-size: 10pt; }
+    .factor-lead { display:flex; align-items:center; gap:8px; color:rgb(15,23,42); }
+    .factor-lead.good .dot { border-color:rgb(16,185,129); }
+    .factor-lead.moderate .dot { border-color:rgb(245,158,11); }
+    .factor-lead.poor .dot { border-color:rgb(239,68,68); }
+    .dot { width:14px; height:14px; border-radius:50%; border:2px solid currentColor; background:#fff; display:inline-block; }
+    .factor-name { font-weight:700; font-size:12.5pt; color:rgb(15,23,42); }
+    .status { font-weight:700; font-size:11pt; }
+    .status.good { color:rgb(16,185,129); }
+    .status.moderate { color:rgb(245,158,11); }
+    .status.poor { color:rgb(239,68,68); }
+    .footer { margin-top:40px; text-align:center; font-size:10pt; }
+    .footer .disclaimer { opacity:.6; color:rgb(55,65,81); font-size:10pt; }
   </style>
 </head>
 <body>
   <div class="center">
     <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
     <h1>Отчёт о видимости сайта в ИИ-платформах</h1>
-    <div class="meta">Сайт: {{website}} &nbsp; | &nbsp; Дата: {{date}}</div>
+    <div class="meta">Сайт: {{website}} &nbsp;|&nbsp; Дата: {{date}}</div>
   </div>
 
   <div class="donut-wrap">
     <svg width="260" height="260" viewBox="0 0 260 260">
       <circle cx="130" cy="130" r="90" stroke="#e5e7eb" stroke-width="14" fill="none" />
-      <circle cx="130" cy="130" r="90" stroke="{{donut_color}}" stroke-width="14"
-              fill="none" stroke-linecap="round" stroke-dasharray="565.49"
+      <circle cx="130" cy="130" r="90" stroke="{{donut_color}}" stroke-width="14" fill="none"
+              stroke-linecap="round" stroke-dasharray="565.49"
               stroke-dashoffset="{{donut_offset}}" transform="rotate(-90 130 130)" />
       <text x="130" y="130" text-anchor="middle" dominant-baseline="central"
             font-size="48" font-weight="700" fill="#111827">{{score}}%</text>
     </svg>
   </div>
 
-  <!-- ЕДИНАЯ КАРТОЧКА ОЦЕНКИ ВИДИМОСТИ -->
+  <!-- единая карточка, текст выбирается по score -->
   <div class="summary-box {{visibility_class}}">
-    <h3>{{visibility_title}}</h3>
-    <p>{{visibility_text}}</p>
+    {% if score >= 75 %}
+      <h3>🔹 Высокая видимость</h3>
+      <p>Ваш сайт хорошо виден для ИИ-ассистентов. Большинство параметров настроены корректно, и системы искусственного интеллекта воспринимают ваш сайт как надёжный источник информации. Это помогает клиентам и ИИ-сервисам быстрее находить вас среди конкурентов. Продолжайте периодически проверять настройки — алгоритмы ИИ меняются, и важно сохранять актуальность, чтобы не потерять позиции. Так вы удержите достигнутый результат и сохраните стабильный поток посетителей из ИИ-платформ.</p>
+    {% elif score >= 40 %}
+      <h3>🔹 Средняя видимость</h3>
+      <p>Ваш сайт частично виден для ИИ-ассистентов. Некоторые параметры требуют улучшения, и из-за этого ваш ресурс не всегда отображается в ответах. После корректировки ключевых настроек его видимость может заметно вырасти. Вы близки к хорошему результату — достаточно доработать детали, чтобы сайт стал понятнее для ИИ-систем. Тогда ваш сайт начнёт появляться в ответах чаще, и вы получите больше переходов и обращений.</p>
+    {% else %}
+      <h3>🔹 Низкая видимость</h3>
+      <p>Ваш сайт почти не показывается ИИ-ассистентам. Несколько критически важных параметров отсутствуют или настроены неправильно. Исправление ошибок значительно повысит шанс, что вас начнут находить по релевантным запросам. Сейчас сайт почти не участвует в показах внутри ИИ-платформ и не попадает в их ответы. После базовых исправлений он сможет снова появляться в рекомендациях и привлекать новых клиентов.</p>
+    {% endif %}
   </div>
 
   <h2>Введение</h2>
@@ -320,4 +301,16 @@
 
   <h2>Заключение</h2>
   <p>Данный отчёт предназначен для того, чтобы предоставить владельцам и разработчикам чёткие и практические ориентиры по повышению видимости сайта в современных ИИ-платформах. Следуя этим рекомендациям, можно добиться корректного индексирования и интерпретации контента системами искусственного интеллекта, улучшения доверия и цитируемости сайта в ответах ИИ-сервисов, повышения устойчивости ресурса к техническим ошибкам и сбоям, а также улучшения общего пользовательского опыта.</p>
-  <p>Рекомендации AI Signal Max основаны на наблюдениях и анализе реального поведения ИИ-платформ при взаимодействии с веб-страницами и отражают лучшие технические практики 2025 года.</
+  <p>Рекомендации AI Signal Max основаны на наблюдениях и анализе реального поведения ИИ-платформ при взаимодействии с веб-страницами и отражают лучшие технические практики 2025 года.</p>
+
+  <div class="footer">
+    <p>© 2025 AI Signal Max. All rights reserved.</p>
+    <p class="disclaimer">
+      Visibility scores are approximate and based on publicly available data.<br>
+      This report is for informational purposes only and does not constitute legal or technical advice.<br>
+      All actions must comply with U.S. law.
+    </p>
+  </div>
+</body>
+</html>
+<!-- === OWNER.HTML (ФИНАЛЬНАЯ ВЕРСИЯ — ОДНА КАРТОЧКА, ВСЕ ТЕКСТЫ СОХРАНЕНЫ) === -->
