@@ -206,7 +206,7 @@ export default function FullPreview() {
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Отчёты подготовлены
+                Отчёты созданы
               </p>
             </div>
           )}
