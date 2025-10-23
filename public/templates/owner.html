@@ -1,4 +1,4 @@
-<!-- === OWNER.HTML (ИТОГОВАЯ ВЕРСИЯ С ОДНОЙ КАРТОЧКОЙ ОЦЕНКИ ВИДИМОСТИ) === -->
+<!-- === OWNER.HTML (ФИНАЛЬНАЯ ВЕРСИЯ — ЕДИНАЯ КАРТОЧКА ОЦЕНКИ С ЦВЕТОМ) === -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -60,6 +60,23 @@
       text-align-last: left;
     }
 
+    /* Цветовые варианты оценки */
+    .summary-box.good {
+      border: 1px solid rgb(16,185,129);
+      background: rgba(16,185,129,0.05);
+    }
+    .summary-box.moderate {
+      border: 1px solid rgb(245,158,11);
+      background: rgba(245,158,11,0.05);
+    }
+    .summary-box.poor {
+      border: 1px solid rgb(239,68,68);
+      background: rgba(239,68,68,0.05);
+    }
+    .summary-box.good h3 { color: rgb(16,185,129); }
+    .summary-box.moderate h3 { color: rgb(245,158,11); }
+    .summary-box.poor h3 { color: rgb(239,68,68); }
+
     .factor {
       margin-top: 14px;
       padding: 12px 16px;
@@ -113,7 +130,7 @@
   </div>
 
   <!-- ЕДИНАЯ КАРТОЧКА ОЦЕНКИ ВИДИМОСТИ -->
-  <div class="summary-box">
+  <div class="summary-box {{visibility_class}}">
     <h3>{{visibility_title}}</h3>
     <p>{{visibility_text}}</p>
   </div>
@@ -303,16 +320,4 @@
 
   <h2>Заключение</h2>
   <p>Данный отчёт предназначен для того, чтобы предоставить владельцам и разработчикам чёткие и практические ориентиры по повышению видимости сайта в современных ИИ-платформах. Следуя этим рекомендациям, можно добиться корректного индексирования и интерпретации контента системами искусственного интеллекта, улучшения доверия и цитируемости сайта в ответах ИИ-сервисов, повышения устойчивости ресурса к техническим ошибкам и сбоям, а также улучшения общего пользовательского опыта.</p>
-  <p>Рекомендации AI Signal Max основаны на наблюдениях и анализе реального поведения ИИ-платформ при взаимодействии с веб-страницами и отражают лучшие технические практики 2025 года.</p>
-
-  <div class="footer">
-    <p>© 2025 AI Signal Max. All rights reserved.</p>
-    <p class="disclaimer">
-      Visibility scores are approximate and based on publicly available data.<br>
-      This report is for informational purposes only and does not constitute legal or technical advice.<br>
-      All actions must comply with U.S. law.
-    </p>
-  </div>
-</body>
-</html>
-<!-- === OWNER.HTML — ИТОГОВАЯ ВЕРСИЯ С ОДНОЙ КАРТОЧКОЙ ОЦЕНКИ === -->
+  <p>Рекомендации AI Signal Max основаны на наблюдениях и анализе реального поведения ИИ-платформ при взаимодействии с веб-страницами и отражают лучшие технические практики 2025 года.</
