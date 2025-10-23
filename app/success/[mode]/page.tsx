@@ -34,32 +34,118 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
         setScore(data.score);
 
-        // 🔹 Единый список 15 человеческих факторов
+        // 🔹 Полный унифицированный список из 15 человеческих факторов
         const allFactors: Factor[] = [
-          { key: "robots_txt", name: "Открыт ли сайт для ИИ", desc: "Определяет, могут ли ИИ-платформы видеть ваш сайт.", status: data.results["robots_txt"] || "Moderate" },
-          { key: "h1_present", name: "Понимает ли ИИ, о чём ваш сайт", desc: "Показывает, есть ли на сайте понятный заголовок H1.", status: data.results["h1_present"] || "Moderate" },
-          { key: "sitemap_xml", name: "Понятна ли ИИ структура сайта", desc: "Проверяет наличие карты сайта sitemap.xml.", status: data.results["sitemap_xml"] || "Moderate" },
-          { key: "title_tag", name: "Видит ли ИИ заголовки и описания", desc: "Определяет корректность тегов Title и Description.", status: data.results["title_tag"] || "Moderate" },
-          { key: "structured_data", name: "Видит ли ИИ содержание страниц", desc: "Проверяет наличие структурированных данных (JSON-LD).", status: data.results["structured_data"] || "Moderate" },
-          { key: "alt_attributes", name: "Видит ли ИИ изображения на сайте", desc: "Проверяет наличие alt-тегов у изображений.", status: data.results["alt_attributes"] || "Moderate" },
-          { key: "internal_links", name: "Может ли ИИ переходить по ссылкам сайта", desc: "Анализирует внутренние связи и навигацию.", status: data.results["internal_links"] || "Moderate" },
-          { key: "structured_data_org", name: "Воспринимает ли ИИ сайт как источник информации", desc: "Определяет наличие схемы Organization / Author / Publisher.", status: data.results["structured_data_org"] || "Moderate" },
-          { key: "canonical", name: "Считает ли ИИ ваш сайт логичным", desc: "Проверяет корректность канонических ссылок.", status: data.results["canonical"] || "Moderate" },
-          { key: "https", name: "Считает ли ИИ ваш сайт безопасным", desc: "Определяет наличие защищённого соединения HTTPS.", status: data.results["https"] || "Moderate" },
-          { key: "meta_description", name: "Понимает ли ИИ категорию вашего сайта", desc: "Проверяет, соответствует ли метаописание теме страницы.", status: data.results["meta_description"] || "Moderate" },
-          { key: "x_robots_tag", name: "Учитывает ли ИИ ваш сайт при поиске", desc: "Проверяет разрешение на индексацию страниц ИИ-сервисами.", status: data.results["x_robots_tag"] || "Moderate" },
-          { key: "open_graph", name: "Выделяет ли ИИ ваш сайт среди других", desc: "Проверяет наличие Open Graph-разметки для отображения ссылок.", status: data.results["open_graph"] || "Moderate" },
-          { key: "content_quality", name: "Считает ли ИИ ваш сайт полезным", desc: "Оценивает полноту и качество контента на страницах.", status: data.results["content_quality"] || "Moderate" },
+          {
+            key: "robots_txt",
+            name: "Открыт ли сайт для ИИ",
+            desc: "Проверяет, разрешён ли доступ ИИ-платформам к вашему сайту.",
+            status: data.results["robots_txt"] || "Moderate",
+          },
+          {
+            key: "h1_present",
+            name: "Понимает ли ИИ, о чём ваш сайт",
+            desc: "Проверяет, есть ли на сайте основной заголовок H1, который помогает ИИ определить тему страницы.",
+            status: data.results["h1_present"] || "Moderate",
+          },
+          {
+            key: "sitemap_xml",
+            name: "Понятна ли ИИ структура сайта",
+            desc: "Проверяет, есть ли карта сайта sitemap.xml и помогает ли она ИИ понять структуру страниц.",
+            status: data.results["sitemap_xml"] || "Moderate",
+          },
+          {
+            key: "title_tag",
+            name: "Видит ли ИИ заголовки и описания",
+            desc: "Определяет корректность тегов Title и Description, по которым ИИ формирует предварительное описание сайта.",
+            status: data.results["title_tag"] || "Moderate",
+          },
+          {
+            key: "structured_data",
+            name: "Видит ли ИИ содержание страниц",
+            desc: "Проверяет наличие структурированных данных (JSON-LD), помогающих ИИ понять контент сайта.",
+            status: data.results["structured_data"] || "Moderate",
+          },
+          {
+            key: "alt_attributes",
+            name: "Видит ли ИИ изображения на сайте",
+            desc: "Проверяет наличие alt-тегов у изображений, которые позволяют ИИ понимать визуальные элементы.",
+            status: data.results["alt_attributes"] || "Moderate",
+          },
+          {
+            key: "https",
+            name: "Считает ли ИИ ваш сайт безопасным",
+            desc: "Определяет наличие защищённого соединения HTTPS, влияющего на доверие ИИ к сайту.",
+            status: data.results["https"] || "Moderate",
+          },
+          {
+            key: "x_robots_tag",
+            name: "Учитывает ли ИИ ваш сайт при поиске",
+            desc: "Проверяет разрешение на индексацию страниц ИИ-сервисами (X-Robots-Tag).",
+            status: data.results["x_robots_tag"] || "Moderate",
+          },
+          {
+            key: "open_graph",
+            name: "Выделяет ли ИИ ваш сайт среди других",
+            desc: "Проверяет наличие Open Graph-разметки, формирующей привлекательное отображение ссылок.",
+            status: data.results["open_graph"] || "Moderate",
+          },
           {
             key: "score",
             name: "Как оценивает ИИ ваш сайт",
-            desc: "Итоговая оценка на основе всех параметров.",
+            desc: "Итоговая оценка на основе всех параметров анализа.",
             status: data.score >= 80 ? "Good" : data.score >= 40 ? "Moderate" : "Poor",
+          },
+          // 🔸 Дополнительные 5 факторов для полной проверки
+          {
+            key: "canonical",
+            name: "Считает ли ИИ ваш сайт логичным",
+            desc: "Проверяет корректность канонических ссылок, влияющих на понимание структуры сайта.",
+            status: data.results["canonical"] || "Moderate",
+          },
+          {
+            key: "structured_data_org",
+            name: "Воспринимает ли ИИ сайт как источник информации",
+            desc: "Определяет наличие схемы Organization / Author / Publisher, повышающей авторитет сайта.",
+            status: data.results["structured_data_org"] || "Moderate",
+          },
+          {
+            key: "meta_description",
+            name: "Понимает ли ИИ категорию вашего сайта",
+            desc: "Проверяет, соответствует ли метаописание теме страницы и помогает ли определить категорию.",
+            status: data.results["meta_description"] || "Moderate",
+          },
+          {
+            key: "internal_links",
+            name: "Может ли ИИ переходить по ссылкам сайта",
+            desc: "Анализирует внутренние связи и навигацию для правильного восприятия логики сайта ИИ.",
+            status: data.results["internal_links"] || "Moderate",
+          },
+          {
+            key: "content_quality",
+            name: "Считает ли ИИ ваш сайт полезным",
+            desc: "Оценивает полноту, актуальность и релевантность контента на страницах.",
+            status: data.results["content_quality"] || "Moderate",
           },
         ];
 
-        // 🔹 Быстрая проверка — первые 10 факторов (включая итоговый)
-        setFactors(mode === "quick" ? allFactors.slice(0, 10) : allFactors);
+        // 🔹 Для быстрой проверки берём ровно утверждённые 10 пунктов
+        const quickKeys = [
+          "robots_txt",
+          "h1_present",
+          "structured_data",
+          "title_tag",
+          "sitemap_xml",
+          "alt_attributes",
+          "https",
+          "x_robots_tag",
+          "open_graph",
+          "score",
+        ];
+
+        const quickFactors = allFactors.filter((f) => quickKeys.includes(f.key));
+
+        setFactors(mode === "quick" ? quickFactors : allFactors);
 
         // 🔹 Текст под кругом
         if (data.score >= 80) {
