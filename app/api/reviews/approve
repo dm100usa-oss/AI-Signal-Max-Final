@@ -10,37 +10,34 @@ export async function POST(req: Request) {
   try {
     const { name, text } = await req.json();
     if (!name || !text) {
-      return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Invalid data" }, { status: 400 });
     }
 
-    const review = {
-      name,
-      text,
-      date: new Date().toISOString(),
-      approved: true,
-    };
-
-    // Добавляем в основной список
-    await redis.lpush("reviews:list", JSON.stringify(review));
-
-    // Удаляем из очереди ожидания (не обязательно, но аккуратно)
+    // Удаляем из pending
     const pending = await redis.lrange("reviews:pending", 0, -1);
-    const updated = pending.filter((r) => {
+    const filtered = pending.filter((item) => {
       try {
-        const parsed = JSON.parse(r);
-        return !(parsed.name === name && parsed.text === text);
+        const r = JSON.parse(item);
+        return !(r.name === name && r.text === text);
       } catch {
         return true;
       }
     });
     await redis.del("reviews:pending");
-    for (const r of updated) {
-      await redis.lpush("reviews:pending", r);
-    }
+    if (filtered.length) await redis.rpush("reviews:pending", ...filtered);
+
+    // Добавляем в list
+    const approvedReview = {
+      name,
+      text,
+      date: new Date().toISOString(),
+      approved: true,
+    };
+    await redis.lpush("reviews:list", JSON.stringify(approvedReview));
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Ошибка при одобрении:", err);
+    console.error("Error approving review:", err);
     return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
   }
 }
