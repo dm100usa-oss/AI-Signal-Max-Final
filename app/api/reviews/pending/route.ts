@@ -8,14 +8,13 @@ const redis = new Redis({
 
 export async function GET() {
   try {
-    // Загружаем все ожидающие отзывы
     const raw = await redis.lrange("reviews:pending", 0, -1);
 
     if (!raw || raw.length === 0) {
       return NextResponse.json({ ok: true, reviews: [] });
     }
 
-    const parsed = raw
+    const reviews = raw
       .map((item) => {
         try {
           return JSON.parse(item);
@@ -25,9 +24,9 @@ export async function GET() {
       })
       .filter(Boolean);
 
-    return NextResponse.json({ ok: true, reviews: parsed });
+    return NextResponse.json({ ok: true, reviews });
   } catch (err) {
-    console.error("Ошибка при загрузке ожидающих отзывов:", err);
+    console.error("Error loading pending reviews:", err);
     return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
   }
 }
