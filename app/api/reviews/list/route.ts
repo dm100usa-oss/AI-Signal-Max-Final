@@ -1,3 +1,5 @@
+export const runtime = "nodejs";  // обязательно первая строка
+
 import { NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 
