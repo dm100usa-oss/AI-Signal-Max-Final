@@ -19,7 +19,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const [factors, setFactors] = useState<Factor[]>([]);
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
-  const [showSummary, setShowSummary] = useState(false); // задержка перед появлением текста
+  const [showSummary, setShowSummary] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,143 +32,55 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const data = await res.json();
 
         if (!data || !data.score) throw new Error("No valid data");
-
         setScore(data.score);
 
-        // 🔹 Полный унифицированный список из 15 человеческих факторов
-        const allFactors: Factor[] = [
-          {
-            key: "robots_txt",
-            name: "Открыт ли сайт для ИИ",
-            desc: "Проверяет, разрешён ли доступ ИИ-платформам к вашему сайту.",
-            status: data.results["robots_txt"] || "Moderate",
-          },
-          {
-            key: "h1_present",
-            name: "Понимает ли ИИ, о чём ваш сайт",
-            desc: "Проверяет, есть ли на сайте основной заголовок H1, который помогает ИИ определить тему страницы.",
-            status: data.results["h1_present"] || "Moderate",
-          },
-          {
-            key: "sitemap_xml",
-            name: "Понятна ли ИИ структура сайта",
-            desc: "Проверяет, есть ли карта сайта sitemap.xml и помогает ли она ИИ понять структуру страниц.",
-            status: data.results["sitemap_xml"] || "Moderate",
-          },
-          {
-            key: "title_tag",
-            name: "Видит ли ИИ заголовки и описания",
-            desc: "Определяет корректность тегов Title и Description, по которым ИИ формирует предварительное описание сайта.",
-            status: data.results["title_tag"] || "Moderate",
-          },
-          {
-            key: "structured_data",
-            name: "Видит ли ИИ содержание страниц",
-            desc: "Проверяет наличие структурированных данных (JSON-LD), помогающих ИИ понять контент сайта.",
-            status: data.results["structured_data"] || "Moderate",
-          },
-          {
-            key: "alt_attributes",
-            name: "Видит ли ИИ изображения на сайте",
-            desc: "Проверяет наличие alt-тегов у изображений, которые позволяют ИИ понимать визуальные элементы.",
-            status: data.results["alt_attributes"] || "Moderate",
-          },
-          {
-            key: "https",
-            name: "Считает ли ИИ ваш сайт безопасным",
-            desc: "Определяет наличие защищённого соединения HTTPS, влияющего на доверие ИИ к сайту.",
-            status: data.results["https"] || "Moderate",
-          },
-          {
-            key: "x_robots_tag",
-            name: "Учитывает ли ИИ ваш сайт при поиске",
-            desc: "Проверяет разрешение на индексацию страниц ИИ-сервисами (X-Robots-Tag).",
-            status: data.results["x_robots_tag"] || "Moderate",
-          },
-          {
-            key: "open_graph",
-            name: "Выделяет ли ИИ ваш сайт среди других",
-            desc: "Проверяет наличие Open Graph-разметки, формирующей привлекательное отображение ссылок.",
-            status: data.results["open_graph"] || "Moderate",
-          },
-          {
-            key: "score",
-            name: "Как оценивает ИИ ваш сайт",
-            desc: "Итоговая оценка на основе всех параметров анализа.",
-            status: data.score >= 80 ? "Good" : data.score >= 40 ? "Moderate" : "Poor",
-          },
-          // 🔸 Дополнительные 5 факторов для полной проверки
-          {
-            key: "canonical",
-            name: "Считает ли ИИ ваш сайт логичным",
-            desc: "Проверяет корректность канонических ссылок, влияющих на понимание структуры сайта.",
-            status: data.results["canonical"] || "Moderate",
-          },
-          {
-            key: "structured_data_org",
-            name: "Воспринимает ли ИИ сайт как источник информации",
-            desc: "Определяет наличие схемы Organization / Author / Publisher, повышающей авторитет сайта.",
-            status: data.results["structured_data_org"] || "Moderate",
-          },
-          {
-            key: "meta_description",
-            name: "Понимает ли ИИ категорию вашего сайта",
-            desc: "Проверяет, соответствует ли метаописание теме страницы и помогает ли определить категорию.",
-            status: data.results["meta_description"] || "Moderate",
-          },
-          {
-            key: "internal_links",
-            name: "Может ли ИИ переходить по ссылкам сайта",
-            desc: "Анализирует внутренние связи и навигацию для правильного восприятия логики сайта ИИ.",
-            status: data.results["internal_links"] || "Moderate",
-          },
-          {
-            key: "content_quality",
-            name: "Считает ли ИИ ваш сайт полезным",
-            desc: "Оценивает полноту, актуальность и релевантность контента на страницах.",
-            status: data.results["content_quality"] || "Moderate",
-          },
+        // Все 15 человеческих факторов
+        const allFactors = [
+          { key: "robots_txt", name: "Открыт ли сайт для ИИ", desc: "Проверяет, разрешён ли доступ ИИ-платформам к вашему сайту." },
+          { key: "h1_present", name: "Понимает ли ИИ, о чём ваш сайт", desc: "Проверяет наличие главного заголовка (H1), объясняющего содержание страницы." },
+          { key: "structured_data", name: "Видит ли ИИ содержание страниц", desc: "Проверяет наличие структурированных данных (JSON-LD), которые помогают ИИ понимать контент." },
+          { key: "title_tag", name: "Видит ли ИИ заголовки и описания", desc: "Проверяет корректность тегов Title и Description для правильного отображения в результатах." },
+          { key: "sitemap_xml", name: "Понятна ли ИИ структура сайта", desc: "Проверяет наличие карты сайта (sitemap.xml), чтобы ИИ знал все страницы." },
+          { key: "alt_attributes", name: "Видит ли ИИ изображения на сайте", desc: "Проверяет наличие alt-текстов у изображений, помогающих ИИ распознавать визуалы." },
+          { key: "https", name: "Считает ли ИИ ваш сайт безопасным", desc: "Проверяет, используется ли защищённое соединение HTTPS." },
+          { key: "x_robots_tag", name: "Учитывает ли ИИ ваш сайт при поиске", desc: "Проверяет наличие X-Robots-Tag и отсутствие запретов на индексацию." },
+          { key: "open_graph", name: "Выделяет ли ИИ ваш сайт среди других", desc: "Проверяет настройки Open Graph, влияющие на то, как сайт выглядит в ИИ и соцсетях." },
+          { key: "overall", name: "Как оценивает ИИ ваш сайт", desc: "Определяет общий уровень видимости сайта на основе всех параметров." },
+          { key: "canonical", name: "Понимает ли ИИ, какая страница главная", desc: "Проверяет корректность канонических ссылок, чтобы избежать дубликатов." },
+          { key: "meta_description", name: "Понимает ли ИИ категорию вашего сайта", desc: "Проверяет описание сайта для правильной тематической классификации." },
+          { key: "internal_links", name: "Считает ли ИИ ваш сайт логичным", desc: "Проверяет внутреннюю структуру ссылок и навигации." },
+          { key: "content_quality", name: "Считает ли ИИ ваш сайт полезным", desc: "Оценивает качество и полноту контента." },
+          { key: "score", name: "Формирует итоговую оценку", desc: "Подсчитывает совокупный результат всех проверок." },
         ];
 
-        // 🔹 Для быстрой проверки берём ровно утверждённые 10 пунктов
-        const quickKeys = [
-          "robots_txt",
-          "h1_present",
-          "structured_data",
-          "title_tag",
-          "sitemap_xml",
-          "alt_attributes",
-          "https",
-          "x_robots_tag",
-          "open_graph",
-          "score",
-        ];
+        const mappedFactors = allFactors.map((f) => ({
+          ...f,
+          status: data.results[f.key] || "Moderate",
+        }));
 
-        const quickFactors = allFactors.filter((f) => quickKeys.includes(f.key));
+        // Быстрая проверка — 10 факторов
+        const quickFactors = mappedFactors.slice(0, 10);
 
-        setFactors(mode === "quick" ? quickFactors : allFactors);
+        setFactors(mode === "quick" ? quickFactors : mappedFactors);
 
-        // 🔹 Текст под кругом
         if (data.score >= 80) {
           setSummary(
-            "Ваш сайт хорошо виден для ИИ-платформ. ИИ понимает, о чём ваш сайт, видит структуру, содержание и изображения. Большинство параметров настроены корректно и формируют положительное восприятие ресурса. Это помогает клиентам и ИИ-сервисам быстрее находить вас среди конкурентов."
+            "Ваш сайт хорошо виден для ИИ-ассистентов. Большинство параметров настроены корректно, и системы искусственного интеллекта воспринимают ваш сайт как надёжный источник информации. Это помогает клиентам и ИИ-сервисам быстрее находить вас среди конкурентов."
           );
         } else if (data.score >= 40) {
           setSummary(
-            "Ваш сайт частично виден для ИИ-платформ. ИИ распознаёт основные разделы и заголовки, но не всегда правильно понимает содержание или связи между страницами. Рекомендуется уточнить структуру и описания, чтобы улучшить восприятие сайта. Сейчас ваш сайт показывается по ограниченному числу запросов и не всегда попадает в ответы ИИ-ассистентов."
+            "Ваш сайт частично виден для ИИ-ассистентов. Некоторые параметры требуют улучшения, и из-за этого ваш ресурс не всегда отображается в ответах. После корректировки ключевых настроек его видимость может заметно вырасти."
           );
         } else {
           setSummary(
-            "Ваш сайт слабо виден для ИИ-платформ. ИИ затрудняется определить тематику, содержание и структуру сайта. Большинство параметров требуют настройки, чтобы сайт стал понятен и доступен для ИИ-систем. При таком уровне видимости сайт почти не показывается в запросах и ответах ИИ-ассистентов."
+            "Ваш сайт почти не показывается ИИ-ассистентам. Несколько критически важных параметров отсутствуют или настроены неправильно. Исправление ошибок значительно повысит шанс, что вас начнут находить по релевантным запросам."
           );
         }
-
-        // 🔹 Задержка перед показом блока под кругом (2 секунды)
-        setTimeout(() => setShowSummary(true), 2000);
       } catch (err) {
         console.error("Failed to load analysis:", err);
       } finally {
         setLoading(false);
+        setTimeout(() => setShowSummary(true), 2000); // задержка 2 секунды
       }
     };
 
@@ -207,35 +119,27 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <Donut score={score} />
       </div>
 
-      {/* Улучшенный блок под кругом с задержкой 2 секунды */}
-      {showSummary && (
-        <div className="animate-fadeIn max-w-xl mx-auto rounded-2xl p-6 mb-10 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 text-justify">
-          <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
-            {score >= 80
-              ? "Высокая видимость сайта"
-              : score >= 40
-              ? "Средняя видимость сайта"
-              : "Низкая видимость сайта"}
-          </p>
-          <p className="text-base text-gray-700 leading-relaxed">{summary}</p>
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.6s ease-out;
-        }
-      `}</style>
+      {/* Блок под кругом с плавным появлением и фиксированной высотой */}
+      <div
+        className="max-w-xl mx-auto rounded-2xl p-6 mb-10 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 text-justify transition-all duration-1000 ease-in-out"
+        style={{
+          minHeight: "180px",
+          opacity: showSummary ? 1 : 0,
+        }}
+      >
+        {showSummary && (
+          <>
+            <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
+              {score >= 80
+                ? "Высокая видимость сайта"
+                : score >= 40
+                ? "Средняя видимость сайта"
+                : "Низкая видимость сайта"}
+            </p>
+            <p className="text-base text-gray-700 leading-relaxed">{summary}</p>
+          </>
+        )}
+      </div>
 
       <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-6">
         Проверенные параметры
@@ -289,7 +193,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
         <p>© 2025 AI Signal Max. All rights reserved.</p>
         <p className="opacity-60">
-          Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.
+          Показатели видимости рассчитаны приблизительно и основаны на
+          общедоступных данных.
         </p>
         <p className="opacity-60">Не являются юридической консультацией.</p>
       </footer>
