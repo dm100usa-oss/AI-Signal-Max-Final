@@ -1,4 +1,4 @@
-<!-- === OWNER.HTML (ОБНОВЛЁННАЯ ВЕРСИЯ) — ЧАСТЬ 1 ИЗ 2 === -->
+<!-- === OWNER.HTML (ВОССТАНОВЛЕННЫЙ ШАБЛОН) — ЧАСТЬ 1 ИЗ 2 === -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -15,6 +15,7 @@
       }
     }
     @page:first { @bottom-center { content: ""; } }
+
     html, body { margin: 0; padding: 0; background: #fff; }
     body {
       font-family: Helvetica, Arial, sans-serif;
@@ -22,16 +23,11 @@
       line-height: 1.6;
       font-size: 12pt;
     }
-    p, .factor-desc, .summary-box p {
-      text-align: justify;
-      text-align-last: left;
-    }
+
     .center { text-align: center; }
-    .logo { display: block; margin: 0 auto; width: 140px; }
+    .logo { display: block; margin: 0 auto; width: 160px; }
     h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
     .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
-    h2 { font-size: 14pt; margin-top: 26px; font-weight: 700; color: rgb(15,23,42); }
-    p { margin: 8px 0; color: rgb(15,23,42); }
 
     .donut-wrap { display: flex; justify-content: center; margin: 20px 0 18px; }
     .donut-label {
@@ -43,13 +39,14 @@
     }
 
     .summary-box {
-      margin-top: 12px;
+      margin-top: 14px;
       padding: 12px 16px;
       border-radius: 10px;
       background: rgb(249,250,251);
       border: 1px solid rgb(229,231,235);
       color: rgb(55,65,81);
     }
+
     .factor {
       margin-top: 14px;
       padding: 12px 16px;
@@ -86,11 +83,7 @@
 </head>
 <body>
   <div class="center">
-    <svg width="64" height="64" viewBox="0 0 64 64" class="logo">
-      <path d="M32 6C28 14 20 22 16 34c4 2 8 4 16 4s12-2 16-4c-4-12-12-20-16-28z" fill="#10b981"/>
-      <path d="M32 10c-2 6-6 12-8 20 2 1 4 2 8 2s6-1 8-2c-2-8-6-14-8-20z" fill="#059669"/>
-      <path d="M32 2C30 10 22 18 18 28c4 2 8 4 14 4s10-2 14-4C42 18 34 10 32 2z" fill="#047857"/>
-    </svg>
+    <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
     <h1>Отчёт о видимости сайта в ИИ-платформах</h1>
     <div class="meta">Сайт: {{website}} &nbsp; | &nbsp; Дата: {{date}}</div>
   </div>
@@ -107,30 +100,204 @@
   </div>
   <div class="donut-label">{{visibility_level}}</div>
 
-  <!-- Автоматический текст видимости -->
-  <div id="visibilityText" style="margin:18px 12px 0; line-height:1.6;"></div>
-
-  <script>
-    const s = {{score}};
-    let html = "";
-    if (s >= 75) {
-      html = `<p style='font-weight:700;margin-bottom:6px;'>🔹 Высокая видимость</p>
-      <p>Ваш сайт хорошо виден для ИИ-ассистентов. Большинство параметров настроены корректно, и системы искусственного интеллекта воспринимают ваш сайт как надёжный источник информации. Это помогает клиентам и ИИ-сервисам быстрее находить вас среди конкурентов. Продолжайте периодически проверять настройки — алгоритмы ИИ меняются, и важно сохранять актуальность, чтобы не потерять позиции. Так вы удержите достигнутый результат и сохраните стабильный поток посетителей из ИИ-платформ.</p>`;
-    } else if (s >= 40) {
-      html = `<p style='font-weight:700;margin-bottom:6px;'>🔹 Средняя видимость</p>
-      <p>Ваш сайт частично виден для ИИ-ассистентов. Некоторые параметры требуют улучшения, и из-за этого ваш ресурс не всегда отображается в ответах. После корректировки ключевых настроек его видимость может заметно вырасти. Вы близки к хорошему результату — достаточно доработать детали, чтобы сайт стал понятнее для ИИ-систем. Тогда ваш сайт начнёт появляться в ответах чаще, и вы получите больше переходов и обращений.</p>`;
-    } else {
-      html = `<p style='font-weight:700;margin-bottom:6px;'>🔹 Низкая видимость</p>
-      <p>Ваш сайт почти не показывается ИИ-ассистентам. Несколько критически важных параметров отсутствуют или настроены неправильно. Исправление ошибок значительно повысит шанс, что вас начнут находить по релевантным запросам. Сейчас сайт почти не участвует в показах внутри ИИ-платформ и не попадает в их ответы. После базовых исправлений он сможет снова появляться в рекомендациях и привлекать новых клиентов.</p>`;
-    }
-    document.currentScript.previousElementSibling.innerHTML = html;
-  </script>
+  <!-- === ДИНАМИЧЕСКИЙ ТЕКСТ ПОД КРУГОМ === -->
+  {% if score >= 75 %}
+    <div class="summary-box">
+      <p>Ваш сайт хорошо виден для ИИ-ассистентов. Большинство параметров настроены корректно, и системы искусственного интеллекта воспринимают ваш сайт как надёжный источник информации. Это помогает клиентам и ИИ-сервисам быстрее находить вас среди конкурентов. Продолжайте периодически проверять настройки — алгоритмы ИИ меняются, и важно сохранять актуальность, чтобы не потерять позиции. Так вы удержите достигнутый результат и сохраните стабильный поток посетителей из ИИ-платформ.</p>
+    </div>
+  {% elif score >= 40 %}
+    <div class="summary-box">
+      <p>Ваш сайт частично виден для ИИ-ассистентов. Некоторые параметры требуют улучшения, и из-за этого ваш ресурс не всегда отображается в ответах. После корректировки ключевых настроек его видимость может заметно вырасти. Вы близки к хорошему результату — достаточно доработать детали, чтобы сайт стал понятнее для ИИ-систем. Тогда ваш сайт начнёт появляться в ответах чаще, и вы получите больше переходов и обращений.</p>
+    </div>
+  {% else %}
+    <div class="summary-box">
+      <p>Ваш сайт почти не показывается ИИ-ассистентам. Несколько критически важных параметров отсутствуют или настроены неправильно. Исправление ошибок значительно повысит шанс, что вас начнут находить по релевантным запросам. Сейчас сайт почти не участвует в показах внутри ИИ-платформ и не попадает в их ответы. После базовых исправлений он сможет снова появляться в рекомендациях и привлекать новых клиентов.</p>
+    </div>
+  {% endif %}
   <h2>Введение</h2>
   <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения видимости в ИИ-платформах и объясняет, какие параметры на это влияют. Результаты собраны в сводке, а далее даны подробные объяснения и рекомендации. Итоговый раздел отчёта содержит техническое задание для разработчика, которое можно сразу передать для внедрения улучшений.</p>
 
   <h2>Проверенные параметры</h2>
 
-  {{factors_html}}
+  <!-- 1. robots.txt -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_robots_txt_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">robots.txt</div>
+      </div>
+      <div class="status {{status_robots_txt_class}}">{{status_robots_txt}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Этот файл сообщает поисковым и ИИ-системам, какие разделы сайта можно сканировать. Ошибки в нём могут полностью скрыть ваш сайт из результатов ИИ-поиска и ChatGPT.</p>
+  </div>
+
+  <!-- 2. sitemap.xml -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_sitemap_xml_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">sitemap.xml</div>
+      </div>
+      <div class="status {{status_sitemap_xml_class}}">{{status_sitemap_xml}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Карта сайта показывает ИИ-платформам, какие страницы существуют и как они связаны. Без неё часть контента остаётся «невидимой» для анализа моделей.</p>
+  </div>
+
+  <!-- 3. X-Robots-Tag -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_x_robots_tag_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">X-Robots-Tag</div>
+      </div>
+      <div class="status {{status_x_robots_tag_class}}">{{status_x_robots_tag}}</div>
+    </div>
+    <p><strong>Назначение:</strong> HTTP-заголовок, который управляет индексированием файлов (PDF, изображения, страницы). Если он настроен неправильно, ИИ не сможет использовать эти данные.</p>
+  </div>
+
+  <!-- 4. Meta Robots -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_robots_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Meta Robots</div>
+      </div>
+      <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Мета-тег robots в HTML управляет доступом ИИ к конкретной странице. Он должен использоваться корректно и не конфликтовать с другими настройками индексации.</p>
+  </div>
+
+  <!-- 5. Canonical -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_canonical_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Canonical</div>
+      </div>
+      <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Атрибут rel="canonical" помогает ИИ-платформам определить основную версию страницы и избежать путаницы при анализе дубликатов контента.</p>
+  </div>
+
+  <!-- 6. Title Tag -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_title_tag_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Title Tag</div>
+      </div>
+      <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Заголовок страницы отображается в результатах поиска и помогает ИИ определить тему контента. Он должен быть уникальным и информативным.</p>
+  </div>
+
+  <!-- 7. Meta Description -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_description_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Meta Description</div>
+      </div>
+      <div class="status {{status_meta_description_class}}">{{status_meta_description}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Краткое описание страницы помогает ИИ понять контент и повысить вероятность включения в ответы моделей. Дублирующиеся или отсутствующие описания снижают видимость.</p>
+  </div>
+
+  <!-- 8. Open Graph -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_open_graph_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Open Graph</div>
+      </div>
+      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Open Graph-теги обеспечивают корректное отображение ссылок на сайт в соцсетях и в ИИ-интерфейсах. Их отсутствие ухудшает восприятие контента.</p>
+  </div>
+
+  <!-- 9. H1 Headings -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_h1_present_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">H1 Headings</div>
+      </div>
+      <div class="status {{status_h1_present_class}}">{{status_h1_present}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Главный заголовок H1 определяет основную тему страницы. Его отсутствие или повторение на других страницах снижает понятность сайта для ИИ.</p>
+  </div>
+
+  <!-- 10. Structured Data -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_structured_data_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Structured Data (Schema)</div>
+      </div>
+      <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Структурированные данные помогают ИИ-платформам понимать контекст контента — например, где описание компании, товара, услуги или статьи.</p>
+  </div>
+
+  <!-- 11. Mobile Friendly -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_mobile_friendly_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Mobile Friendly</div>
+      </div>
+      <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Адаптивность влияет на восприятие качества сайта. ИИ-модели учитывают мобильную оптимизацию при формировании ответов и рекомендаций.</p>
+  </div>
+
+  <!-- 12. HTTPS -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_https_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">HTTPS</div>
+      </div>
+      <div class="status {{status_https_class}}">{{status_https}}</div>
+    </div>
+    <p><strong>Назначение:</strong> HTTPS защищает соединение и показывает ИИ-системам, что сайт безопасен. Отсутствие SSL-сертификата снижает доверие и рейтинг.</p>
+  </div>
+
+  <!-- 13. Alt Attributes -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_alt_attributes_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Alt Attributes</div>
+      </div>
+      <div class="status {{status_alt_attributes_class}}">{{status_alt_attributes}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Атрибуты alt описывают изображения. Без них ИИ теряет смысловую часть контента и не может учитывать изображения при анализе.</p>
+  </div>
+
+  <!-- 14. Favicon -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_favicon_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Favicon</div>
+      </div>
+      <div class="status {{status_favicon_class}}">{{status_favicon}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Маленький значок сайта (favicon) помогает системам распознавания бренда. Его отсутствие снижает узнаваемость ресурса.</p>
+  </div>
+
+  <!-- 15. Custom 404 Page -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_page_404_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Custom 404 Page</div>
+      </div>
+      <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
+    </div>
+    <p><strong>Назначение:</strong> Кастомная страница ошибки 404 удерживает посетителя и помогает ИИ корректно оценить стабильность сайта и работу ссылок.</p>
+  </div>
 
   <h2>Заключение</h2>
   <p>Данный отчёт предназначен для того, чтобы предоставить владельцам и разработчикам чёткие и практические ориентиры по повышению видимости сайта в современных ИИ-платформах. Следуя этим рекомендациям, можно добиться корректного индексирования и интерпретации контента системами искусственного интеллекта, улучшения доверия и цитируемости сайта в ответах ИИ-сервисов, повышения устойчивости ресурса к техническим ошибкам и сбоям, а также улучшения общего пользовательского опыта.</p>
@@ -139,11 +306,11 @@
   <div class="footer">
     <p>© 2025 AI Signal Max. All rights reserved.</p>
     <p class="disclaimer">
-      Visibility scores are approximate and based on publicly available data.<br>
-      This report is for informational purposes only and does not constitute legal or technical advice.<br>
-      All actions must comply with U.S. law.
+      Показатели видимости являются приблизительными и основаны на публично доступных данных.<br>
+      Отчёт предоставляется исключительно в информационных целях и не является юридической или технической консультацией.<br>
+      Все действия по внедрению должны соответствовать законодательству США.
     </p>
   </div>
 </body>
 </html>
-<!-- === OWNER.HTML (ОБНОВЛЁННАЯ ВЕРСИЯ) — ЧАСТЬ 2 ИЗ 2 === -->
+<!-- === OWNER.HTML (ВОССТАНОВЛЕННЫЙ ШАБЛОН) — ЧАСТЬ 2 ИЗ 2 === -->
