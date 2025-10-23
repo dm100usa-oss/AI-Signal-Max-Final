@@ -8,14 +8,13 @@ const redis = new Redis({
 
 export async function GET() {
   try {
-    // Загружаем список отзывов из reviews:list
+    // Читаем реальные отзывы из reviews:list
     const raw = await redis.lrange("reviews:list", 0, -1);
 
     if (!raw || raw.length === 0) {
       return NextResponse.json({ ok: true, reviews: [] });
     }
 
-    // Преобразуем строки JSON в объекты
     const reviews = raw
       .map((item) => {
         try {
