@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getData } from "@/lib/storage";
 import { generatePDF } from "@/lib/generatePDF";
 import { sendReportEmail } from "@/lib/email";
-import { createReviewToken } from "@/lib/reviews"; // 🔹 добавлено
+import { createReviewToken } from "@/lib/reviews";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
@@ -66,32 +66,37 @@ export async function POST(req: Request) {
         results,
       };
 
-      const ownerBuffer = await generatePDF({
-        type: "owner",
-        data: baseData,
-      });
-
-      const developerBuffer = await generatePDF({
-        type: "developer",
-        data: baseData,
-      });
-
-      if (email) {
-        await sendReportEmail({
-          to: email,
-          url,
-          mode,
-          ownerBuffer,
-          developerBuffer,
-          score,
-          results,
-        });
-        console.log(`Email sent to ${email}`);
+      if (mode === "quick") {
+        console.log(
+          `Quick mode completed for ${url}. Skipping PDF generation and email.`
+        );
       } else {
-        console.warn(`No email found for ${url}`);
+        const ownerBuffer = await generatePDF({
+          type: "owner",
+          data: baseData,
+        });
+
+        const developerBuffer = await generatePDF({
+          type: "developer",
+          data: baseData,
+        });
+
+        if (email) {
+          await sendReportEmail({
+            to: email,
+            url,
+            mode,
+            ownerBuffer,
+            developerBuffer,
+            score,
+            results,
+          });
+          console.log(`Email sent to ${email}`);
+        } else {
+          console.warn(`No email found for ${url}`);
+        }
       }
 
-      // 🔹 создаём токен для раздела отзывов
       const tokenKey = await createReviewToken(session.id);
       console.log("Review token created:", tokenKey);
 
