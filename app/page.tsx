@@ -75,8 +75,10 @@ export default function Home() {
 
       const u = normalizeUrl(url);
 
+      // ВОЗВРАЩЕНА ПРАВИЛЬНАЯ ЛОГИКА
       if (!isValidUrl(u)) {
-        return; 
+        setError("Введите корректный URL, включая https://");
+        return;
       }
 
       setError(null);
@@ -155,7 +157,7 @@ export default function Home() {
             }
           }}
           onKeyDown={(e) => {
-            if (e.key === "Enter" && isValidUrl(url)) go("quick");
+            if (e.key === "Enter") go("quick");
           }}
           className={[
             "w-full rounded-md border px-4 py-3 pr-12 text-base outline-none",
@@ -180,8 +182,7 @@ export default function Home() {
 
       <button
         onClick={() => go("quick")}
-        disabled={!!loading || !isValidUrl(url)}
-        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors cursor-pointer"
+        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 transition-colors cursor-pointer"
       >
         {loading === "quick" ? (
           <span className="inline-flex items-center">Проверяем<Dots /></span>
@@ -189,14 +190,14 @@ export default function Home() {
           "Быстрая проверка $5.99"
         )}
       </button>
+
       <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
         Мгновенный результат, 10 ключевых факторов, краткие рекомендации
       </p>
 
       <button
         onClick={() => go("pro")}
-        disabled={!!loading || !isValidUrl(url)}
-        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 disabled:opacity-60 transition-colors cursor-pointer"
+        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-colors cursor-pointer"
       >
         {loading === "pro" ? (
           <span className="inline-flex items-center">Проверяем<Dots /></span>
@@ -204,6 +205,7 @@ export default function Home() {
           "Полная проверка $19.99"
         )}
       </button>
+
       <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
