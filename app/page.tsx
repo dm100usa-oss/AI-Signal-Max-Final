@@ -31,17 +31,13 @@ const isValidUrl = (u: string): boolean => {
   try {
     const url = new URL(u.trim());
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
-
     const hostname = url.hostname;
     const parts = hostname.split(".");
     if (parts.length < 2) return false;
-
     const tld = parts[parts.length - 1];
     if (!/^[a-zA-Z]{2,6}$/.test(tld)) return false;
-
     const lastBeforeTld = parts[parts.length - 2];
     if (lastBeforeTld.length < 2) return false;
-
     return true;
   } catch {
     return false;
@@ -78,24 +74,19 @@ export default function Home() {
   const go = useCallback(
     async (mode: "quick" | "pro") => {
       if (loading) return;
-
       let u = normalizeUrl(url);
-
       if (!u.startsWith("http://") && !u.startsWith("https://")) {
         u = "https://" + u;
       }
-
       if (!isValidUrl(u)) {
         setError("Введите корректный URL, включая https://");
         return;
       }
-
       setError(null);
       setLoading(mode);
 
       const minDuration = 2200;
       const started = Date.now();
-
       let status: "ok" | "error" = "ok";
 
       try {
@@ -223,29 +214,49 @@ export default function Home() {
         <div className="flex justify-center mb-2">
           <style jsx>{`
             .stars {
+              position: relative;
               display: flex;
-              gap: 8px;
-              animation: shimmer 3s linear infinite;
+              gap: 10px;
+              padding: 4px 8px;
+              overflow: hidden;
+            }
+            .stars::before {
+              content: "";
+              position: absolute;
+              top: 0;
+              left: -140%;
+              width: 80%;
+              height: 100%;
+              background: linear-gradient(
+                90deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.5) 50%,
+                rgba(255,255,255,0) 100%
+              );
+              filter: blur(6px);
+              animation: shine 3.2s linear infinite;
+            }
+            @keyframes shine {
+              0% { left: -140%; }
+              55% { left: 160%; }
+              100% { left: 160%; }
             }
             .star {
-              font-size: 26px;
+              font-size: 30px;
               cursor: pointer;
               user-select: none;
-              background: linear-gradient(90deg, #eab308 0%, #facc15 50%, #eab308 100%);
-              background-size: 300% auto;
+              background: linear-gradient(180deg, #facc15 0%, #eab308 100%);
+              background-size: 100% 100%;
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
+              transition: transform 0.2s ease, filter 0.2s ease;
             }
-            @keyframes shimmer {
-              0% { background-position: 200% center; }
-              100% { background-position: -200% center; }
+            .flash .star {
+              animation: clickFlash 0.4s ease;
             }
-            .flash {
-              animation: flashAnim 0.35s ease;
-            }
-            @keyframes flashAnim {
-              0% { filter: brightness(2); }
-              100% { filter: brightness(1); }
+            @keyframes clickFlash {
+              0% { filter: brightness(2.5); transform: scale(1.13); }
+              100% { filter: brightness(1); transform: scale(1); }
             }
           `}</style>
 
