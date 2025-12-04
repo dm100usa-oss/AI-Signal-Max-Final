@@ -35,18 +35,14 @@ const isValidUrl = (u: string): boolean => {
   try {
     const url = new URL(u.trim());
 
-    // Разрешаем только http / https
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
 
-    // Обязателен домен с точкой
     if (!url.hostname.includes(".")) return false;
 
-    // Обязательна буквенная доменная зона (com, net, ai...)
     const parts = url.hostname.split(".");
     const tld = parts[parts.length - 1];
     if (!/^[a-zA-Z]{2,}$/.test(tld)) return false;
 
-    // Минимальная длина домена
     if (url.hostname.length < 4) return false;
 
     return true;
