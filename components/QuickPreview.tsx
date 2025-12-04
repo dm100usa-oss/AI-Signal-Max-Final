@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// 🔹 Анимация трёх точек
 function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
   return (
     <span className={`inline-flex justify-start tabular-nums align-middle ${colorClass}`}>
@@ -45,6 +44,12 @@ export default function QuickPreview() {
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
 
+  const today = new Date().toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
@@ -78,18 +83,14 @@ export default function QuickPreview() {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (totalTime / factors.length) * 1000);
 
-    // Заголовок: тускнеет и поднимается
     setTimeout(() => setFadeHeader(true), 1500);
-    // Точки появляются чуть позже, как на странице полной проверки
     setTimeout(() => setShowDots(true), 1900);
 
-    // Основной процесс
     setTimeout(() => {
       setFinished(true);
       setTimeout(() => setShowFinal(true), 1400);
       setTimeout(() => setShowResultText(true), 2200);
 
-      // 🔹 Автоматический переход на оплату через Stripe
       setTimeout(async () => {
         try {
           const resp = await fetch("/api/pay", {
@@ -119,10 +120,9 @@ export default function QuickPreview() {
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
-        https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Date: October 16, 2025
+        https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Дата: {today}
       </p>
 
-      {/* 🔹 Заголовок с плавным движением и точками (точно как на pro) */}
       <div className="my-6 flex items-center justify-center">
         <div
           className={`flex items-center justify-center text-[22px] sm:text-[24px] font-bold transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform ${
@@ -144,7 +144,6 @@ export default function QuickPreview() {
       </div>
 
       <div className="rounded-md p-0">
-        {/* 🔹 Факторы с плавным появлением */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
             {factors[current]}
@@ -166,7 +165,6 @@ export default function QuickPreview() {
           `}</style>
         </div>
 
-        {/* Верхняя синяя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
@@ -197,7 +195,6 @@ export default function QuickPreview() {
 
         <p className="text-center text-sm text-neutral-600 mb-4">Анализ 10 ключевых факторов</p>
 
-        {/* Нижняя полоса (тайминг) */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <div
