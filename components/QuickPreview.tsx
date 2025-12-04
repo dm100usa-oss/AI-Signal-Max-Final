@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// Анимация точек
-function Dots({ className = "text-neutral-400" }: { className?: string }) {
+function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
   return (
-    <span className={`inline-flex justify-start tabular-nums align-middle ${className}`}>
+    <span className={`inline-flex justify-start tabular-nums align-middle ${colorClass}`}>
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
@@ -22,7 +21,6 @@ function Dots({ className = "text-neutral-400" }: { className?: string }) {
         .dot3 {
           animation-delay: 400ms;
         }
-
         @keyframes aiv-dots {
           0% {
             opacity: 0.2;
@@ -44,151 +42,189 @@ function Dots({ className = "text-neutral-400" }: { className?: string }) {
 
 export default function QuickPreview() {
   const router = useRouter();
-  const params = useSearchParams();
+  const searchParams = useSearchParams();
+  const url = searchParams.get("url") || "";
 
-  const siteUrl = params.get("url") || "";
-
-  // Основные шаги
-  const steps = [
+  const factors = [
     "Открыт ли сайт для ИИ",
     "Понимает ли ИИ, о чём ваш сайт",
-    "Может ли ИИ читать содержание страниц",
+    "Видит ли ИИ содержание страниц",
     "Видит ли ИИ заголовки и описания",
-    "Понимает ли ИИ структуру сайта",
+    "Понятна ли ИИ структура сайта",
     "Видит ли ИИ изображения на сайте",
-    "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия",
+    "Считает ли ИИ ваш сайт безопасным",
     "Учитывает ли ИИ ваш сайт при поиске",
-    "Видит ли ИИ ваш сайт среди конкурентов",
+    "Выделяет ли ИИ ваш сайт среди других",
     "Как оценивает ИИ ваш сайт"
   ];
 
-  // Длительности шагов (как в v3)
-  const durations = [1000, 1400, 1000, 800, 1000, 800, 1400, 1300, 1600, 1500];
-  const totalTime = durations.reduce((a, b) => a + b, 0) / 1000 + 3;
-
-  const [index, setIndex] = useState(0);
+  const totalTime = 20;
+  const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [visible, setVisible] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(totalTime);
+  const [finished, setFinished] = useState(false);
+  const [fadeHeader, setFadeHeader] = useState(false);
+  const [showDots, setShowDots] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(Math.ceil(totalTime));
+  const [showResultText, setShowResultText] = useState(false);
 
-  // Обратный отсчёт
+  // исправленная логика: плавный показ + переход как в рабочей версии
   useEffect(() => {
-    if (timeLeft > 0) {
-      const t = setTimeout(() => setTimeLeft((v) => v - 1), 1000);
-      return () => clearTimeout(t);
-    }
-  }, [timeLeft]);
+    const progressTimer = setInterval(() => {
+      setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
+    }, 1000);
 
-  // Анимация прогресса по шагам
-  useEffect(() => {
-    if (index >= steps.length) {
-      setTimeout(() => setShowFinal(true), 350);
-      return;
-    }
+    const factorTimer = setInterval(() => {
+      setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
+    }, (totalTime / factors.length) * 1000);
 
-    setVisible(true);
-    setProgress(0);
-    const duration = durations[index];
-    const start = performance.now();
+    setTimeout(() => setFadeHeader(true), 1500);
+    setTimeout(() => setShowDots(true), 1900);
 
-    const animate = (now: number) => {
-      const elapsed = now - start;
-      const pct = Math.min(elapsed / duration, 1);
-      setProgress(pct * 100);
+    setTimeout(() => {
+      setFinished(true);
+      setTimeout(() => setShowFinal(true), 1400);
+      setTimeout(() => setShowResultText(true), 2200);
 
-      if (pct < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setTimeout(() => {
-          setVisible(false);
-          setTimeout(() => setIndex((i) => i + 1), 250);
-        }, 180);
-      }
+      // исправлено: больше нет fetch("/api/pay") — возвращено рабочее поведение V3
+      setTimeout(() => {
+        router.push(`/pay?url=${encodeURIComponent(url)}&mode=quick`);
+      }, 4000);
+
+    }, totalTime * 1000);
+
+    return () => {
+      clearInterval(progressTimer);
+      clearInterval(factorTimer);
     };
-
-    requestAnimationFrame(animate);
-  }, [index]);
-
-  // Переход после завершения
-  useEffect(() => {
-    if (showFinal && siteUrl) {
-      const t = setTimeout(() => {
-        router.push(`/pay?url=${encodeURIComponent(siteUrl)}&mode=quick`);
-      }, 1800);
-      return () => clearTimeout(t);
-    }
-  }, [showFinal, router, siteUrl]);
-
-  // Текущая дата
-  const date = new Date().toLocaleDateString("ru-RU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
+  }, [router, url]);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-white min-h-screen flex flex-col items-center text-center">
-      <h1 className="text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
 
-      {siteUrl && (
-        <p className="text-sm text-neutral-500 mb-6">
-          {siteUrl} • {date}
-        </p>
-      )}
+      <p className="text-base text-neutral-400 mt-1 mb-2">
+        {url} &nbsp; | &nbsp; Дата:{" "}
+        {new Date().toLocaleDateString("ru-RRU", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        })}
+      </p>
 
-      {!showFinal ? (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-2xl px-8 py-12">
-          <p className="text-xl font-semibold text-neutral-700 mb-10">
-            Мы начали проверку сайта
-            <Dots className="text-neutral-400 ml-1" />
+      <div className="my-6 flex items-center justify-center">
+        <div
+          className={`flex items-center justify-center text-[22px] sm:text-[24px] font-bold transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform ${
+            fadeHeader
+              ? "opacity-60 text-neutral-400 translate-y-[-6px]"
+              : "opacity-100 text-neutral-800 translate-y-0"
+          }`}
+        >
+          Мы начали проверку
+          <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
+            {showDots && (
+              <>
+                <Dots colorClass="text-neutral-400" />
+                <Dots colorClass="text-blue-400/70 absolute" />
+              </>
+            )}
+          </span>
+        </div>
+      </div>
+
+      <div className="rounded-md p-0">
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
+            {factors[current]}
           </p>
 
+          <style jsx>{`
+            @keyframes fadeInUp {
+              from {
+                opacity: 0;
+                transform: translateY(10px);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            .animate-fadeInUp {
+              animation: fadeInUp 0.8s ease forwards;
+            }
+          `}</style>
+        </div>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className={`h-8 flex items-center justify-center text-lg font-semibold text-neutral-800 mb-5 transition-opacity duration-700 ${
-              visible ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            {steps[index]}
-          </div>
+            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
+            style={{ width: `${progress}%` }}
+          />
 
-          <div className="w-full h-[12px] bg-[#E5E7EB] overflow-hidden rounded-md">
-            <div
-              className="h-full transition-all duration-100 ease-linear"
-              style={{
-                width: `${progress}%`,
-                background:
-                  "linear-gradient(to right, #D1D5DB 0%, #60A5FA 50%, #3B82F6 100%)"
-              }}
-            ></div>
-          </div>
+          {showResultText && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center">
+                Получить результат
+                <Dots colorClass="text-white ml-1" />
+              </p>
 
-          <p className="mt-6 text-sm text-neutral-500">
-            Проверка завершится через <span className="font-semibold">{timeLeft}s</span>
-          </p>
+              <style jsx>{`
+                @keyframes fadeIn {
+                  from {
+                    opacity: 0;
+                  }
+                  to {
+                    opacity: 1;
+                  }
+                }
+                .animate-fadeIn {
+                  animation: fadeIn 1s ease forwards;
+                }
+              `}</style>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="w-full bg-white border border-neutral-200 shadow-sm rounded-2xl px-8 py-14">
-          <p className="text-2xl font-semibold text-neutral-800 mb-6">
-            Проверка завершена
-          </p>
 
-          <div className="w-full h-[12px] bg-[#E5E7EB] overflow-hidden rounded-md">
+        <p className="text-center text-sm text-neutral-600 mb-4">Анализ 10 ключевых факторов</p>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+          {!finished && (
             <div
-              className="h-full w-full"
-              style={{
-                background:
-                  "linear-gradient(to right, #D1D5DB 0%, #60A5FA 50%, #3B82F6 100%)",
-                transition: "width 1.4s linear"
-              }}
-            ></div>
-          </div>
-        </div>
-      )}
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
+              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+            />
+          )}
 
-      <footer className="mt-12 text-center text-xs text-neutral-500">
+          {finished && (
+            <div
+              className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
+                showFinal
+                  ? "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-100"
+                  : "bg-gray-200 opacity-0"
+              }`}
+            />
+          )}
+
+          {!finished && (
+            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+              {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
+            </div>
+          )}
+
+          {finished && showFinal && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
+                Проверка завершена
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
