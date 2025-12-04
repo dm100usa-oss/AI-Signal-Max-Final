@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-/** Only dots animate; text stays stable */
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle">
@@ -28,6 +27,25 @@ function Dots() {
 const normalizeUrl = (v: string) =>
   v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
+// ЭТАЛОННАЯ ПРОФЕССИОНАЛЬНАЯ ПРОВЕРКА URL
+const isValidUrl = (u: string): boolean => {
+  try {
+    const url = new URL(u.trim());
+
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+
+    if (!url.hostname.includes(".")) return false;
+
+    if (!/[a-zA-Z]/.test(url.hostname)) return false;
+
+    if (url.hostname.length < 4) return false;
+
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export default function Home() {
   const router = useRouter();
   const [url, setUrl] = useState("");
@@ -36,7 +54,6 @@ export default function Home() {
   const [animating, setAnimating] = useState(false);
   const [wave, setWave] = useState(false);
 
-  // 🔹 Рейтинг и количество отзывов (динамическая загрузка)
   const [rating, setRating] = useState<number>(4.9);
   const [reviews, setReviews] = useState<number>(128);
 
@@ -51,24 +68,21 @@ export default function Home() {
             setReviews(data.reviews);
           }
         }
-      } catch {
-        // если API ещё не подключено, просто остаются значения по умолчанию
-      }
+      } catch {}
     }
     fetchStats();
   }, []);
-
-  const isValid = (u: string) =>
-    /^https?:\/\/[\w.-]+\.[a-z]{2,}.*$/i.test(u.trim());
 
   const go = useCallback(
     async (mode: "quick" | "pro") => {
       if (loading) return;
       const u = normalizeUrl(url);
-      if (!isValid(u)) {
-        setError("Введите корректный адрес сайта (включая http или https).");
+
+      if (!isValidUrl(u)) {
+        setError("Введите корректный URL сайта.");
         return;
       }
+
       setError(null);
       setLoading(mode);
 
@@ -76,6 +90,7 @@ export default function Home() {
       const started = Date.now();
 
       let status: "ok" | "error" = "ok";
+
       try {
         const resp = await fetch("/api/precheck", {
           method: "POST",
@@ -127,7 +142,6 @@ export default function Home() {
         Проверьте как ИИ ассистенты видят и оценивают ваш сайт: ChatGPT · Copilot · Gemini · Perplexity · Grok и другие
       </p>
 
-      {/* URL input */}
       <div className="mb-2 relative">
         <input
           type="url"
@@ -165,9 +179,9 @@ export default function Home() {
           </button>
         )}
       </div>
+
       {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
 
-      {/* Quick */}
       <button
         onClick={() => go("quick")}
         disabled={!!loading}
@@ -183,7 +197,6 @@ export default function Home() {
         Мгновенный результат, 10 ключевых факторов, краткие рекомендации
       </p>
 
-      {/* Pro */}
       <button
         onClick={() => go("pro")}
         disabled={!!loading}
@@ -199,7 +212,6 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* Gold stars + rating */}
       <div className="flex flex-col items-center mb-10">
         <div className="flex justify-center space-x-2 mb-2">
           <style jsx>{`
