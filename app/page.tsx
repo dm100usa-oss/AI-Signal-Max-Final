@@ -31,11 +31,17 @@ const isValidUrl = (u: string): boolean => {
   try {
     const url = new URL(u.trim());
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
-    if (!url.hostname.includes(".")) return false;
-    const parts = url.hostname.split(".");
+
+    const hostname = url.hostname;
+    const parts = hostname.split(".");
+    if (parts.length < 2) return false;
+
     const tld = parts[parts.length - 1];
-    if (!/^[a-zA-Z]{2,}$/.test(tld)) return false;
-    if (url.hostname.length < 4) return false;
+    if (!/^[a-zA-Z]{2,6}$/.test(tld)) return false;
+
+    const lastBeforeTld = parts[parts.length - 2];
+    if (lastBeforeTld.length < 2) return false;
+
     return true;
   } catch {
     return false;
@@ -73,9 +79,12 @@ export default function Home() {
     async (mode: "quick" | "pro") => {
       if (loading) return;
 
-      const u = normalizeUrl(url);
+      let u = normalizeUrl(url);
 
-      // ВОЗВРАЩЕНА ПРАВИЛЬНАЯ ЛОГИКА
+      if (!u.startsWith("http://") && !u.startsWith("https://")) {
+        u = "https://" + u;
+      }
+
       if (!isValidUrl(u)) {
         setError("Введите корректный URL, включая https://");
         return;
@@ -211,7 +220,7 @@ export default function Home() {
       </p>
 
       <div className="flex flex-col items-center mb-10">
-        <div className="flex justify-center space-x-2 mb-2">
+      <div className="flex justify-center space-x-2 mb-2">
           <style jsx>{`
             .star {
               font-size: 26px;
