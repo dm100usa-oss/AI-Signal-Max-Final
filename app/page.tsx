@@ -220,41 +220,42 @@ export default function Home() {
       </p>
 
       <div className="flex flex-col items-center mb-10">
-      <div className="flex justify-center space-x-2 mb-2">
+        <div className="flex justify-center mb-2">
           <style jsx>{`
+            .stars {
+              display: flex;
+              gap: 8px;
+              animation: shimmer 3s linear infinite;
+            }
             .star {
               font-size: 26px;
-              color: #facc15;
-              -webkit-text-stroke: 0.8px #eab308;
-              transition: transform 0.2s ease, filter 0.2s ease;
-              background: linear-gradient(90deg, #facc15 0%, #eab308 100%);
-              background-size: 200% auto;
+              cursor: pointer;
+              user-select: none;
+              background: linear-gradient(90deg, #eab308 0%, #facc15 50%, #eab308 100%);
+              background-size: 300% auto;
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
             }
-            .star:hover {
-              transform: scale(1.05);
-              filter: brightness(1.15);
+            @keyframes shimmer {
+              0% { background-position: 200% center; }
+              100% { background-position: -200% center; }
             }
-            .wave {
-              animation: waveShift 1.6s linear infinite;
+            .flash {
+              animation: flashAnim 0.35s ease;
             }
-            @keyframes waveShift {
-              from { background-position: 200% center; }
-              to { background-position: -200% center; }
+            @keyframes flashAnim {
+              0% { filter: brightness(2); }
+              100% { filter: brightness(1); }
             }
           `}</style>
 
-          {[1, 2, 3, 4, 5].map((i) => (
-            <span
-              key={i}
-              onClick={handleStarsClick}
-              className={`star cursor-pointer select-none ${wave ? "wave" : ""}`}
-            >
-              ★
-            </span>
-          ))}
+          <div className={`stars ${wave ? "flash" : ""}`}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <span key={i} onClick={handleStarsClick} className="star">★</span>
+            ))}
+          </div>
         </div>
+
         <p className="text-sm text-neutral-700 font-medium tracking-tight">
           {rating.toFixed(1)} <span className="opacity-70">({reviews})</span>
         </p>
