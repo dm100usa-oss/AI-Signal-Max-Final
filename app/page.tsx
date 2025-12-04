@@ -72,11 +72,11 @@ export default function Home() {
   const go = useCallback(
     async (mode: "quick" | "pro") => {
       if (loading) return;
+
       const u = normalizeUrl(url);
 
       if (!isValidUrl(u)) {
-        setError("Введите корректный URL сайта.");
-        return;
+        return; 
       }
 
       setError(null);
