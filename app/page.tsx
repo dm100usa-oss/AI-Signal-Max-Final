@@ -49,7 +49,6 @@ export default function Home() {
   const [url, setUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
-  const [animating, setAnimating] = useState(false);
   const [wave, setWave] = useState(false);
 
   const [rating, setRating] = useState<number>(4.9);
@@ -113,16 +112,8 @@ export default function Home() {
   const clear = () => setUrl("");
 
   const handleStarsClick = async () => {
-    if (animating) return;
-    setAnimating(true);
-
-    for (let i = 0; i < 2; i++) {
-      setWave(true);
-      await new Promise((r) => setTimeout(r, 1600));
-      setWave(false);
-      await new Promise((r) => setTimeout(r, 300));
-    }
-
+    setWave(true);
+    await new Promise((r) => setTimeout(r, 450));
     document.body.style.transition = "opacity 0.6s ease";
     document.body.style.opacity = "0";
     setTimeout(() => router.push("/reviews"), 600);
@@ -250,12 +241,13 @@ export default function Home() {
               -webkit-background-clip: text;
               -webkit-text-fill-color: transparent;
               transition: transform 0.2s ease, filter 0.2s ease;
+              text-shadow: 0 0 1px rgba(234, 179, 8, 0.6);
             }
             .flash .star {
-              animation: clickFlash 0.4s ease;
+              animation: clickFlash 0.45s ease;
             }
             @keyframes clickFlash {
-              0% { filter: brightness(2.5); transform: scale(1.13); }
+              0% { filter: brightness(2.7); transform: scale(1.11); }
               100% { filter: brightness(1); transform: scale(1); }
             }
           `}</style>
