@@ -1,4 +1,3 @@
-// app/api/pay/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { analyze } from "../../../lib/analyze";
@@ -15,21 +14,34 @@ function getBaseUrl(req: NextRequest) {
   return `${proto}://${host}`;
 }
 
+// строгая проверка URL на сервере
+function isValidUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { mode, url } = await req.json();
 
+    // проверка режима
     if (mode !== "quick" && mode !== "pro") {
       return NextResponse.json({ error: "Invalid mode" }, { status: 400 });
     }
 
-    if (!url || typeof url !== "string") {
+    // проверка URL
+    if (!url || typeof url !== "string" || !isValidUrl(url)) {
       return NextResponse.json(
-        { error: "Missing or invalid URL" },
+        { error: "Invalid URL format" },
         { status: 400 }
       );
     }
 
+    // цены Stripe
     const priceId =
       mode === "quick"
         ? "price_1SaTZaFEP1IRb3Hwea5vrLgL"
@@ -44,12 +56,15 @@ export async function POST(req: NextRequest) {
 
     const base = getBaseUrl(req);
 
+    // анализ сайта
     const analysis = await analyze(url, mode);
     const { score, results, factors } = analysis;
 
+    // временное сохранение результата (до оплаты)
     const tempKey = `pending:${url}`;
     await saveData(tempKey, { score, results, factors });
 
+    // создание Stripe сессии
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
@@ -60,6 +75,7 @@ export async function POST(req: NextRequest) {
       metadata: { url, mode },
     });
 
+    // сохранение данных
     await saveData(`session:${session.id}`, {
       url,
       score,
