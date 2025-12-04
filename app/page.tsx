@@ -27,24 +27,15 @@ function Dots() {
 const normalizeUrl = (v: string) =>
   v.replace(/^\s*checked\s+website:\s*/i, "").trim();
 
-/* -------------------------------------------------------------------
-   ПРОФЕССИОНАЛЬНАЯ, ЭТАЛОННАЯ, СТРОГАЯ ПРОВЕРКА URL
-   Использует встроенный URL + жёсткую валидацию домена
-------------------------------------------------------------------- */
 const isValidUrl = (u: string): boolean => {
   try {
     const url = new URL(u.trim());
-
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
-
     if (!url.hostname.includes(".")) return false;
-
     const parts = url.hostname.split(".");
     const tld = parts[parts.length - 1];
     if (!/^[a-zA-Z]{2,}$/.test(tld)) return false;
-
     if (url.hostname.length < 4) return false;
-
     return true;
   } catch {
     return false;
@@ -164,7 +155,7 @@ export default function Home() {
             }
           }}
           onKeyDown={(e) => {
-            if (e.key === "Enter") go("quick");
+            if (e.key === "Enter" && isValidUrl(url)) go("quick");
           }}
           className={[
             "w-full rounded-md border px-4 py-3 pr-12 text-base outline-none",
@@ -189,7 +180,7 @@ export default function Home() {
 
       <button
         onClick={() => go("quick")}
-        disabled={!!loading}
+        disabled={!!loading || !isValidUrl(url)}
         className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 disabled:opacity-60 transition-colors cursor-pointer"
       >
         {loading === "quick" ? (
@@ -204,7 +195,7 @@ export default function Home() {
 
       <button
         onClick={() => go("pro")}
-        disabled={!!loading}
+        disabled={!!loading || !isValidUrl(url)}
         className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 disabled:opacity-60 transition-colors cursor-pointer"
       >
         {loading === "pro" ? (
