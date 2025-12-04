@@ -24,12 +24,15 @@ export async function POST(req: NextRequest) {
     }
 
     if (!url || typeof url !== "string") {
-      return NextResponse.json({ error: "Missing or invalid URL" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing or invalid URL" },
+        { status: 400 }
+      );
     }
 
     const priceId =
       mode === "quick"
-        ? process.env.STRIPE_PRICE_QUICK
+        ? "price_1SaTZaFEP1IRb3Hwea5vrLgL"
         : process.env.STRIPE_PRICE_FULL;
 
     if (!priceId) {
@@ -41,15 +44,12 @@ export async function POST(req: NextRequest) {
 
     const base = getBaseUrl(req);
 
-    // Run pre-analysis before payment
     const analysis = await analyze(url, mode);
     const { score, results, factors } = analysis;
 
-    // Save analysis results before creating the session
     const tempKey = `pending:${url}`;
     await saveData(tempKey, { score, results, factors });
 
-    // ✅ Create Stripe Checkout Session (email не передаём — Stripe сам добавит)
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
@@ -60,8 +60,13 @@ export async function POST(req: NextRequest) {
       metadata: { url, mode },
     });
 
-    // Save results tied to this session
-    await saveData(`session:${session.id}`, { url, score, results, factors });
+    await saveData(`session:${session.id}`, {
+      url,
+      score,
+      results,
+      factors,
+    });
+
     await saveData(url, { score, results, factors });
 
     return NextResponse.json({ url: session.url });
