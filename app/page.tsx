@@ -240,10 +240,7 @@ export default function Home() {
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             transition: transform 0.2s ease, filter 0.2s ease;
-            text-shadow:
-              0 0 1px #c49a06,
-              0 0 1px #c49a06,
-              0 0 1px #c49a06;
+            text-shadow: 0 0 1px rgba(234,179,8,0.6);
           }
           .flash .star {
             animation: clickFlash 0.45s ease;
@@ -260,8 +257,9 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="ml-3 text-lg text-neutral-700 font-medium tracking-tight">
-          {rating.toFixed(1)} <span className="opacity-70">({reviews})</span>
+        <div className="ml-3 flex gap-3 text-base text-neutral-700 tracking-tight">
+          <span>{rating.toFixed(1)}</span>
+          <span>{reviews}</span>
         </div>
       </div>
 
