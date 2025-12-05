@@ -171,42 +171,6 @@ export default function FullPreview() {
           )}
         </div>
 
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6 flex items-center justify-center">
-          <div className="flex gap-2">
-            {Array.from({ length: 15 }).map((_, i) => {
-              const active = i <= current;
-              return (
-                <svg
-                  key={i}
-                  width="26"
-                  height="26"
-                  viewBox="0 0 24 24"
-                  className={`transition-opacity duration-700 ${
-                    active ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    stroke="#22C55E"
-                    strokeWidth="3"
-                    fill="none"
-                  />
-                  <path
-                    d="M8 12.5L10.5 15L16 9"
-                    stroke="#22C55E"
-                    strokeWidth="3"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              );
-            })}
-          </div>
-        </div>
-
         <div className="h-[32px] flex items-center justify-center mb-2">
           <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
             {reportStage === "final"
@@ -220,6 +184,12 @@ export default function FullPreview() {
         </div>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
+          {!auditDone && (
+            <div
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+              style={{ width: `${progressAudit}%` }}
+            />
+          )}
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
               auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
@@ -234,6 +204,8 @@ export default function FullPreview() {
             </div>
           )}
         </div>
+
+        <div className="h-4"></div>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
@@ -328,6 +300,7 @@ export default function FullPreview() {
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
+        <br />
         <span className="opacity-60">
           Visibility scores are estimated and based on publicly available data. Not legal advice.
         </span>
