@@ -154,6 +154,7 @@ export default function FullPreview() {
           </p>
         </div>
 
+        {/* ВЕРХНЯЯ ПОЛОСА — БЕЗ КРУЖКОВ */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
@@ -162,12 +163,51 @@ export default function FullPreview() {
             style={{ backgroundSize: "200% 100%", width: `${progressAudit}%` }}
           />
 
+          {auditDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Аудит завершён
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="h-[32px] flex items-center justify-center mb-2">
+          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
+            {reportStage === "final"
+              ? "Отчёт для владельца • ТЗ для разработчика"
+              : reportStage === "audit"
+              ? "Аудит 15 ключевых факторов"
+              : reportStage === "owner"
+              ? "Формируем отчёт для владельца сайта"
+              : "Создаём ТЗ для разработчика"}
+          </p>
+        </div>
+
+        {/* СРЕДНЯЯ ПОЛОСА — ИМЕННО СЮДА ПЕРЕНЕСЕНЫ КРУЖКИ */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
+          {!auditDone && (
+            <div
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+              style={{ width: `${progressAudit}%` }}
+            />
+          )}
+
+          {/* Зеленая полоса отчётов */}
+          <div
+            className={`h-full transition-[width] duration-1000 ease-linear ${
+              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
+            }`}
+            style={{ width: `${progressReport}%` }}
+          />
+
+          {/* КРУЖКИ ПОЯВЛЯЮТСЯ ТУТ — НА СРЕДНЕЙ ПОЛОСЕ */}
           {!auditDone && (
             <div className="absolute inset-0 flex items-center justify-center px-4 pointer-events-none">
               <div className="flex w-full justify-between items-center">
                 {Array.from({ length: circlesCount }).map((_, i) => {
                   const appearPoint = (i / circlesCount) * 100;
-                  const active = progressAudit >= appearPoint;
+                  const active = progressReport >= appearPoint;
                   return (
                     <div
                       key={i}
@@ -196,40 +236,6 @@ export default function FullPreview() {
             </div>
           )}
 
-          {auditDone && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Аудит завершён
-              </p>
-            </div>
-          )}
-        </div>
-
-        <div className="h-[32px] flex items-center justify-center mb-2">
-          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
-            {reportStage === "final"
-              ? "Отчёт для владельца • ТЗ для разработчика"
-              : reportStage === "audit"
-              ? "Аудит 15 ключевых факторов"
-              : reportStage === "owner"
-              ? "Формируем отчёт для владельца сайта"
-              : "Создаём ТЗ для разработчика"}
-          </p>
-        </div>
-
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
-          {!auditDone && (
-            <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
-              style={{ width: `${progressAudit}%` }}
-            />
-          )}
-          <div
-            className={`h-full transition-[width] duration-1000 ease-linear ${
-              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
-            }`}
-            style={{ width: `${progressReport}%` }}
-          />
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
@@ -239,6 +245,7 @@ export default function FullPreview() {
           )}
         </div>
 
+        {/* НИЖНЯЯ ПОЛОСА */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <>
