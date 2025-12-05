@@ -48,7 +48,8 @@ export default function FullPreview() {
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
+  const [reportStage, setReportStage] =
+    useState<"audit" | "owner" | "dev" | "final">("audit");
 
   const circlesCount = 15;
 
@@ -70,6 +71,7 @@ export default function FullPreview() {
     }, 1000);
 
     const reportStartDelay = auditTime * 1000;
+
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
         setProgressReport((p) => {
@@ -84,6 +86,7 @@ export default function FullPreview() {
           return Math.min(next, 100);
         });
       }, 1000);
+
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
@@ -98,7 +101,7 @@ export default function FullPreview() {
           const resp = await fetch("/api/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "pro", url })
+            body: JSON.stringify({ mode: "pro", url }),
           });
           const json = await resp.json();
           if (json?.url) router.push(json.url);
@@ -128,15 +131,15 @@ export default function FullPreview() {
         {new Date().toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
-          day: "numeric"
+          day: "numeric",
         })}
       </p>
 
       <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ${
           fadeHeader
             ? "opacity-60 text-neutral-400 translate-y-[-6px]"
-            : "opacity-100 text-neutral-800 translate-y-0"
+            : "opacity-100 text-neutral-800"
         }`}
       >
         <span className="flex items-center justify-center">
@@ -148,21 +151,23 @@ export default function FullPreview() {
       </div>
 
       <div className="rounded-md p-0">
-        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
+        <div className="h-[64px] flex items-center justify-center">
+          <p
+            key={current}
+            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+          >
             {factors[current]}
           </p>
         </div>
 
-        {/* ВЕРХНЯЯ ПОЛОСА — РОВНО КАК В ИСХОДНИКЕ */}
+        {/* ПОЛОСА №1 — НЕ ТРОГАЕМ */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
+            className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ${
               progressAudit < 100 ? "animate-softGreenWave" : ""
             }`}
-            style={{ backgroundSize: "200% 100%", width: `${progressAudit}%` }}
+            style={{ width: `${progressAudit}%` }}
           />
-
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
@@ -173,7 +178,10 @@ export default function FullPreview() {
         </div>
 
         <div className="h-[32px] flex items-center justify-center mb-2">
-          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
+          <p
+            key={reportStage}
+            className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
+          >
             {reportStage === "final"
               ? "Отчёт для владельца • ТЗ для разработчика"
               : reportStage === "audit"
@@ -184,24 +192,24 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* СРЕДНЯЯ ПОЛОСА — ЗДЕСЬ 15 КРУЖКОВ */}
+        {/* ПОЛОСА №2 — СЮДА ВСТАВЛЕНЫ КРУЖКИ */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
           {!auditDone && (
             <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000"
               style={{ width: `${progressAudit}%` }}
             />
           )}
 
           <div
-            className={`h-full transition-[width] duration-1000 ease-linear ${
+            className={`h-full transition-[width] duration-1000 ${
               auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
             }`}
             style={{ width: `${progressReport}%` }}
           />
 
-          {/* ПРАВИЛЬНАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ ПОЯВЛЕНИЯ КРУЖКОВ */}
-          {!auditDone && (
+          {/* 15 кружков — ПО ОДНОМУ, РАВНОМЕРНО, НЕ СРАЗУ */}
+          {!reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center px-4 pointer-events-none">
               <div className="flex w-full justify-between items-center">
                 {Array.from({ length: circlesCount }).map((_, i) => {
@@ -218,8 +226,7 @@ export default function FullPreview() {
                         opacity: active ? 1 : 0,
                         transform: active ? "scale(1)" : "scale(0.5)",
                         border: `3px solid ${active ? "#22c55e" : "#22c55e40"}`,
-                        borderRadius: "50%",
-                        backgroundColor: "#e5e7eb"
+                        backgroundColor: "#e5e7eb",
                       }}
                     >
                       <span
@@ -245,15 +252,15 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* НИЖНЯЯ ПОЛОСА — БЕЗ ИЗМЕНЕНИЙ */}
+        {/* ПОЛОСА №3 — НЕ ТРОГАЕМ */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <>
               <div
-                className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+                className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000"
                 style={{ width: `${(timeLeft / totalTime) * 100}%` }}
               />
-              <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+              <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium">
                 {`Полный аудит завершится через ${timeLeft} сек`}
               </div>
             </>
