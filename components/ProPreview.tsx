@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// 🔹 Анимация трёх точек
 function Dots({ colorClass = "text-white" }: { colorClass?: string }) {
   return (
     <span className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}>
@@ -34,7 +33,7 @@ export default function FullPreview() {
     "Учитывает ли ИИ ваш сайт при поиске",
     "Выделяет ли ИИ ваш сайт среди других",
     "Считает ли ИИ ваш сайт полезным",
-    "Как оценивает ИИ ваш сайт",
+    "Как оценивает ИИ ваш сайт"
   ];
 
   const totalTime = 47;
@@ -97,7 +96,7 @@ export default function FullPreview() {
           const resp = await fetch("/api/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "pro", url }),
+            body: JSON.stringify({ mode: "pro", url })
           });
           const json = await resp.json();
           if (json?.url) router.push(json.url);
@@ -122,17 +121,15 @@ export default function FullPreview() {
         AI Signal Max
       </h1>
 
-      {/* URL + дата */}
       <p className="text-base text-neutral-400 mt-1 mb-2">
         {url} &nbsp; | &nbsp; Date:{" "}
         {new Date().toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
-          day: "numeric",
+          day: "numeric"
         })}
       </p>
 
-      {/* Заголовок */}
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
@@ -149,14 +146,12 @@ export default function FullPreview() {
       </div>
 
       <div className="rounded-md p-0">
-        {/* Факторы */}
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
             {factors[current]}
           </p>
         </div>
 
-        {/* Верхняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
@@ -164,7 +159,7 @@ export default function FullPreview() {
             }`}
             style={{
               backgroundSize: "200% 100%",
-              width: `${progressAudit}%`,
+              width: `${progressAudit}%`
             }}
           />
           {auditDone && (
@@ -176,7 +171,6 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* Надпись между полосами */}
         <div className="h-[32px] flex items-center justify-center mb-2">
           <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
             {reportStage === "final"
@@ -189,7 +183,6 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* Средняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
           {!auditDone && (
             <div
@@ -214,7 +207,6 @@ export default function FullPreview() {
 
         <div className="h-4"></div>
 
-        {/* Нижняя полоса */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <>
@@ -310,8 +302,7 @@ export default function FullPreview() {
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data.
-          Not legal advice.
+          Visibility scores are estimated and based on publicly available data. Not legal advice.
         </span>
       </footer>
     </main>
