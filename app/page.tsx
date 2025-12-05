@@ -205,9 +205,9 @@ export default function Home() {
       <div className="flex flex-col items-center mb-10">
         <style jsx>{`
           .ratingText {
-            font-size: 22px;
+            font-size: 20px;         /* уменьшено на 10% */
             line-height: 1;
-            color: #444;
+            color: #6b6b6b;         /* на 15% светлее прежнего */
             font-weight: 400;
             user-select: none;
           }
@@ -244,11 +244,13 @@ export default function Home() {
             cursor: pointer;
             user-select: none;
             background: linear-gradient(180deg, #facc15 0%, #eab308 100%);
-            background-size: 100% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow:
+              0 0 1px rgba(234,179,8,0.6),
+              0 0 1px rgba(180,140,0,0.85),
+              0 0 1px rgba(180,140,0,0.85); /* аккуратная обводка на 20% темнее */
             transition: transform 0.2s ease, filter 0.2s ease;
-            text-shadow: 0 0 1px rgba(234, 179, 8, 0.6);
           }
           .flash .star {
             animation: clickFlash 0.45s ease;
