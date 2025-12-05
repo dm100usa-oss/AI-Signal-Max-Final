@@ -24,16 +24,16 @@ export default function FullPreview() {
     "Понятна ли ИИ структура сайта",
     "Видит ли ИИ заголовки и описания",
     "Видит ли ИИ содержание страниц",
-    "Видит ли ИИ изображения",
-    "Может ли ИИ переходить по ссылкам",
-    "Воспринимает ли ИИ сайт как источник",
-    "Считает ли ИИ сайт логичным",
-    "Считает ли ИИ сайт безопасным",
-    "Понимает ли ИИ категорию",
-    "Учитывает ли ИИ сайт при поиске",
-    "Выделяет ли ИИ сайт среди других",
-    "Считает ли ИИ сайт полезным",
-    "Как оценивает ИИ сайт"
+    "Видит ли ИИ изображения на сайте",
+    "Может ли ИИ переходить по ссылкам сайта",
+    "Воспринимает ли ИИ сайт как источник информации",
+    "Считает ли ИИ ваш сайт логичным",
+    "Считает ли ИИ ваш сайт безопасным",
+    "Понимает ли ИИ категорию вашего сайта",
+    "Учитывает ли ИИ ваш сайт при поиске",
+    "Выделяет ли ИИ ваш сайт среди других",
+    "Считает ли ИИ ваш сайт полезным",
+    "Как оценивает ИИ ваш сайт",
   ];
 
   const totalTime = 47;
@@ -54,13 +54,9 @@ export default function FullPreview() {
   const [reportStage, setReportStage] =
     useState<"audit" | "owner" | "dev" | "final">("audit");
 
-  const [dotsCount, setDotsCount] = useState(0);
-  const [hideDots, setHideDots] = useState(false);
-
   useEffect(() => {
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
-      setDotsCount((d) => (d < factors.length ? d + 1 : d));
     }, (auditTime / factors.length) * 1000);
 
     const auditProgressTimer = setInterval(() => {
@@ -69,8 +65,7 @@ export default function FullPreview() {
         if (next >= 100) {
           clearInterval(auditProgressTimer);
           setAuditDone(true);
-          setTimeout(() => setHideDots(true), 600);
-          setTimeout(() => setReportStage("owner"), 600);
+          setTimeout(() => setReportStage("owner"), 300);
         }
         return Math.min(next, 100);
       });
@@ -106,7 +101,7 @@ export default function FullPreview() {
           const resp = await fetch("/api/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "pro", url })
+            body: JSON.stringify({ mode: "pro", url }),
           });
           const json = await resp.json();
           if (json?.url) router.push(json.url);
@@ -125,9 +120,6 @@ export default function FullPreview() {
     };
   }, [router, url, factors.length]);
 
-  const maxDots = factors.length;
-  const activeDots = Array.from({ length: dotsCount }, (_, i) => i < dotsCount);
-
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
@@ -139,7 +131,7 @@ export default function FullPreview() {
         {new Date().toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
-          day: "numeric"
+          day: "numeric",
         })}
       </p>
 
@@ -165,9 +157,7 @@ export default function FullPreview() {
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ${
-              progressAudit < 100 ? "animate-softGreenWave" : ""
-            }`}
+            className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000`}
             style={{ width: `${progressAudit}%` }}
           />
         </div>
@@ -184,25 +174,24 @@ export default function FullPreview() {
           </p>
         </div>
 
-        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6 flex items-center justify-center">
-          {!hideDots && (
+        {/* Средняя полоса — обновлённая */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6 flex items-center">
+          {!auditDone && (
             <div className="absolute inset-0 flex items-center justify-between px-4">
-              {Array.from({ length: maxDots }).map((_, i) => (
+              {Array.from({ length: factors.length }).map((_, i) => (
                 <div
                   key={i}
-                  className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-700 ${
-                    i < dotsCount ? "bg-green-500 scale-100 opacity-100" : "opacity-0 scale-0"
+                  className={`w-7 h-7 rounded-full border-2 border-green-500 flex items-center justify-center transition-all duration-500 ${
+                    i < current ? "opacity-100 scale-100" : "opacity-0 scale-0"
                   }`}
-                  style={{
-                    transitionDelay: `${i * 80}ms`
-                  }}
+                  style={{ transitionDelay: `${i * 90}ms` }}
                 >
-                  {i < dotsCount && (
+                  {i < current && (
                     <svg
                       viewBox="0 0 24 24"
-                      className="w-4 h-4 text-white"
+                      className="w-5 h-5 text-green-500"
                       fill="none"
-                      stroke="white"
+                      stroke="currentColor"
                       strokeWidth="3"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -215,11 +204,19 @@ export default function FullPreview() {
             </div>
           )}
 
-          {hideDots && (
+          {auditDone && (
             <div
               className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000"
               style={{ width: `${progressReport}%` }}
             />
+          )}
+
+          {reportsDone && auditDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white animate-fadeIn">
+                Отчёты созданы
+              </p>
+            </div>
           )}
         </div>
 
@@ -260,29 +257,18 @@ export default function FullPreview() {
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease forwards;
         }
-
-        @keyframes softGreenWave {
+        @keyframes aiv-dots {
           0% {
-            background-position: 0% 50%;
+            opacity: 0.2;
           }
-          50% {
-            background-position: 100% 50%;
+          30% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 0.2;
           }
           100% {
-            background-position: 0% 50%;
-          }
-        }
-        .animate-softGreenWave {
-          animation: softGreenWave 5s ease-in-out infinite;
-          background-size: 200% 100%;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
+            opacity: 0.2;
           }
         }
         .dot {
@@ -301,7 +287,8 @@ export default function FullPreview() {
         © 2025 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
+          Visibility scores are estimated and based on publicly available data.
+          Not legal advice.
         </span>
       </footer>
     </main>
