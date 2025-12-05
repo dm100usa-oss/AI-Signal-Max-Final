@@ -201,70 +201,67 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      <div className="flex justify-center items-center mb-10">
-        <style jsx>{`
-          .stars {
-            position: relative;
-            display: flex;
-            gap: 10px;
-            padding: 4px 8px;
-            overflow: hidden;
-          }
-          .stars::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -140%;
-            width: 80%;
-            height: 100%;
-            background: linear-gradient(
-              90deg,
-              rgba(255,255,255,0) 0%,
-              rgba(255,255,255,0.5) 50%,
-              rgba(255,255,255,0) 100%
-            );
-            filter: blur(6px);
-            animation: shine 3.2s linear infinite;
-          }
-          @keyframes shine {
-            0% { left: -140%; }
-            55% { left: 160%; }
-            100% { left: 160%; }
-          }
-          .star {
-            font-size: 30px;
-            cursor: pointer;
-            user-select: none;
-            background: linear-gradient(180deg, #facc15 0%, #eab308 100%);
-            background-size: 100% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: transform 0.2s ease, filter 0.2s ease;
-            text-shadow:
-              -1px 0 #c49a06,
-               1px 0 #c49a06,
-               0 -1px #c49a06,
-               0  1px #c49a06;
-          }
-          .flash .star {
-            animation: clickFlash 0.45s ease;
-          }
-          @keyframes clickFlash {
-            0% { filter: brightness(2.7); transform: scale(1.11); }
-            100% { filter: brightness(1); transform: scale(1); }
-          }
-        `}</style>
+      <div className="flex flex-col items-center mb-10">
+        <div className="flex justify-center mb-2">
+          <style jsx>{`
+            .stars {
+              position: relative;
+              display: flex;
+              gap: 10px;
+              padding: 4px 8px;
+              overflow: hidden;
+            }
+            .stars::before {
+              content: "";
+              position: absolute;
+              top: 0;
+              left: -140%;
+              width: 80%;
+              height: 100%;
+              background: linear-gradient(
+                90deg,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.5) 50%,
+                rgba(255,255,255,0) 100%
+              );
+              filter: blur(6px);
+              animation: shine 3.2s linear infinite;
+            }
+            @keyframes shine {
+              0% { left: -140%; }
+              55% { left: 160%; }
+              100% { left: 160%; }
+            }
+            .star {
+              font-size: 30px;
+              cursor: pointer;
+              user-select: none;
+              background: linear-gradient(180deg, #facc15 0%, #eab308 100%);
+              background-size: 100% 100%;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              transition: transform 0.2s ease, filter 0.2s ease;
+              text-shadow: 0 0 1px rgba(234, 179, 8, 0.6);
+            }
+            .flash .star {
+              animation: clickFlash 0.45s ease;
+            }
+            @keyframes clickFlash {
+              0% { filter: brightness(2.7); transform: scale(1.11); }
+              100% { filter: brightness(1); transform: scale(1); }
+            }
+          `}</style>
 
-        <div className={`stars ${wave ? "flash" : ""}`}>
-          {[1, 2, 3, 4, 5].map((i) => (
-            <span key={i} onClick={handleStarsClick} className="star">★</span>
-          ))}
+          <div className={`stars ${wave ? "flash" : ""}`}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <span key={i} onClick={handleStarsClick} className="star">★</span>
+            ))}
+          </div>
         </div>
 
-        <div className="ml-3 flex gap-3 text-base text-neutral-700 tracking-tight">
-          <span>{rating.toFixed(1)}</span>
-          <span>{reviews}</span>
-        </div>
+        <p className="text-sm text-neutral-700 font-medium tracking-tight">
+          {rating.toFixed(1)} <span className="opacity-70">({reviews})</span>
+        </p>
       </div>
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
