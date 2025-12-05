@@ -240,7 +240,11 @@ export default function Home() {
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             transition: transform 0.2s ease, filter 0.2s ease;
-            text-shadow: 0 0 1px rgba(234,179,8,0.6);
+            text-shadow:
+              -1px 0 #c49a06,
+               1px 0 #c49a06,
+               0 -1px #c49a06,
+               0  1px #c49a06;
           }
           .flash .star {
             animation: clickFlash 0.45s ease;
