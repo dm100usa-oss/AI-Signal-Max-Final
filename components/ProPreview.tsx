@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// Animation dots
+// dots
 function Dots({ colorClass = "text-white" }: { colorClass?: string }) {
   return (
-    <span
-      className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}
-    >
+    <span className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}>
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
@@ -51,15 +49,19 @@ export default function FullPreview() {
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [reportStage, setReportStage] = useState<
-    "audit" | "owner" | "dev" | "final"
-  >("audit");
+  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
+
+  // svg ref
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const pathRef = useRef<SVGPathElement | null>(null);
 
   useEffect(() => {
+    // движение пунктов
     const factorTimer = setInterval(() => {
       setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
     }, (auditTime / factors.length) * 1000);
 
+    // движение progressAudit
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -72,6 +74,7 @@ export default function FullPreview() {
       });
     }, 1000);
 
+    // reportStage
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -90,11 +93,12 @@ export default function FullPreview() {
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
-    const overallTimer = setInterval(
-      () => setTimeLeft((t) => (t > 0 ? t - 1 : 0)),
-      1000
-    );
+    // общий таймер
+    const overallTimer = setInterval(() => {
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
+    }, 1000);
 
+    // переход на оплату
     setTimeout(() => {
       setFinished(true);
       setTimeout(async () => {
@@ -121,9 +125,9 @@ export default function FullPreview() {
     };
   }, [router, url]);
 
-  // 15 circles positions
-  const circleCount = 15;
-  const circleSpacing = 100 / (circleCount - 1);
+  // вычисление заполнения для пути svg
+  const totalCircles = 15;
+  const positions = Array.from({ length: totalCircles }, (_, i) => (i / (totalCircles - 1)) * 100);
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
@@ -140,155 +144,155 @@ export default function FullPreview() {
         })}
       </p>
 
-      {/* HEADER */}
+      {/* header */}
       <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ${
+        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader
             ? "opacity-60 text-neutral-400 translate-y-[-6px]"
             : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
-        <span className="flex items-center">
+        <span className="flex items-center justify-center">
           Мы начали полный аудит
-          <span className="inline-flex w-[1.7ch] ml-1">
+          <span className="inline-flex w-[1.7ch] justify-start ml-1">
             {fadeHeader && <Dots colorClass="text-green-400/70" />}
           </span>
         </span>
       </div>
 
-      {/* FACTORS */}
-      <div className="h-[64px] flex items-center justify-center">
-        <p
-          key={current}
-          className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-        >
-          {factors[current]}
-        </p>
-      </div>
+      <div className="rounded-md p-0">
+        {/* Факторы */}
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
+            {factors[current]}
+          </p>
+        </div>
 
-      {/* TOP BAR */}
-      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
-        <div
-          className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
-            progressAudit < 100 ? "animate-softGreenWave" : ""
-          }`}
-          style={{ width: `${progressAudit}%`, backgroundSize: "200% 100%" }}
-        />
-        {auditDone && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-              Аудит завершён
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* TEXT BETWEEN BARS */}
-      <div className="h-[32px] flex items-center justify-center mb-2">
-        <p
-          key={reportStage}
-          className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
-        >
-          {reportStage === "final"
-            ? "Отчёт для владельца • ТЗ для разработчика"
-            : reportStage === "audit"
-            ? "Аудит 15 ключевых факторов"
-            : reportStage === "owner"
-            ? "Формируем отчёт для владельца сайта"
-            : "Создаём ТЗ для разработчика"}
-        </p>
-      </div>
-
-      {/* === MIDDLE BAR WITH SVG CIRCLES === */}
-      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6 flex items-center justify-center">
-        <svg width="95%" height="40" viewBox="0 0 1000 40">
-          {/* Line */}
-          <line
-            x1="0"
-            y1="20"
-            x2="1000"
-            y2="20"
-            stroke="#d1d5db"
-            strokeWidth="3"
-            strokeLinecap="round"
+        {/* Верхняя полоса */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+          <div
+            className={`h-full bg-green-600 transition-[width] duration-1000 ease-linear`}
+            style={{
+              width: `${progressAudit}%`,
+            }}
           />
-
-          {/* Green progress overlay line */}
-          <line
-            x1="0"
-            y1="20"
-            x2={(1000 * progressAudit) / 100}
-            y2="20"
-            stroke="url(#grad)"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-
-          <defs>
-            <linearGradient id="grad" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0%" stopColor="#22c55e" />
-              <stop offset="50%" stopColor="#16a34a" />
-              <stop offset="100%" stopColor="#15803d" />
-            </linearGradient>
-          </defs>
-
-          {/* CIRCLES */}
-          {Array.from({ length: circleCount }).map((_, i) => {
-            const cx = (i * 1000) / (circleCount - 1);
-            const active = progressAudit >= (i / (circleCount - 1)) * 100;
-
-            return (
-              <g key={i}>
-                {/* Circle outline */}
-                <circle
-                  cx={cx}
-                  cy={20}
-                  r={9}
-                  fill="white"
-                  stroke={active ? "#22c55e" : "#d1d5db"}
-                  strokeWidth="2.4"
-                />
-
-                {/* Thin checkmark */}
-                {active && (
-                  <path
-                    d={`M${cx - 4} 20 L${cx - 1} 23 L${cx + 5} 16`}
-                    stroke="#22c55e"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                )}
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-
-      {/* BOTTOM BAR */}
-      <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
-        {!finished && (
-          <>
-            <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
-              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
-            />
-            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium">
-              {`Полный аудит завершится через ${timeLeft} сек`}
+          {auditDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Аудит завершён
+              </p>
             </div>
-          </>
-        )}
-        {finished && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
-            <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm flex items-center">
-              Получить результат <Dots colorClass="text-white" />
-            </p>
-          </div>
-        )}
+          )}
+        </div>
+
+        {/* подпись */}
+        <div className="h-[32px] flex items-center justify-center mb-2">
+          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
+            {reportStage === "final"
+              ? "Отчёт для владельца • ТЗ для разработчика"
+              : reportStage === "audit"
+              ? "Аудит 15 ключевых факторов"
+              : reportStage === "owner"
+              ? "Формируем отчёт для владельца сайта"
+              : "Создаём ТЗ для разработчика"}
+          </p>
+        </div>
+
+        {/* НОВАЯ СРЕДНЯЯ ПОЛОСА */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6 flex items-center justify-center">
+          <svg
+            ref={svgRef}
+            width="100%"
+            height="100%"
+            viewBox="0 0 1000 100"
+            preserveAspectRatio="none"
+          >
+            {/* Серая линия-основа */}
+            <line
+              x1="50"
+              y1="50"
+              x2="950"
+              y2="50"
+              stroke="#d1d5db"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+
+            {/* Зелёная линия-прогресс */}
+            <line
+              x1="50"
+              y1="50"
+              x2={50 + (900 * progressAudit) / 100}
+              y2="50"
+              stroke="#22c55e"
+              strokeWidth="4"
+              strokeLinecap="round"
+              style={{ transition: "x2 1s linear" }}
+            />
+
+            {/* Кружки + галочки */}
+            {positions.map((pos, i) => {
+              const cx = 50 + (900 * pos) / 100;
+              const cy = 50;
+
+              const threshold = pos;
+              const active = progressAudit >= threshold;
+
+              return (
+                <g key={i}>
+                  {/* круг */}
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r="12"
+                    stroke="#d1d5db"
+                    fill="none"
+                    strokeWidth="3"
+                  />
+
+                  {/* галочка */}
+                  {active && (
+                    <polyline
+                      points={`${cx - 6},${cy} ${cx - 2},${cy + 5} ${cx + 7},${cy - 8}`}
+                      stroke="#22c55e"
+                      strokeWidth="3"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ opacity: active ? 1 : 0, transition: "opacity 0.5s linear" }}
+                    />
+                  )}
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+
+        <div className="h-4"></div>
+
+        {/* Нижняя */}
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+          {!finished && (
+            <>
+              <div
+                className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+                style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+              />
+              <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+                {`Полный аудит завершится через ${timeLeft} сек`}
+              </div>
+            </>
+          )}
+          {finished && (
+            <div className="absolute inset-0 flex items-center justify-center bg-green-600 animate-fadeIn">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
+                Получить результат <Dots colorClass="text-white" />
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* GLOBAL STYLES */}
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -330,7 +334,6 @@ export default function FullPreview() {
             opacity: 0.2;
           }
         }
-
         .dot {
           opacity: 0.2;
           animation: aiv-dots 1200ms infinite;
@@ -340,22 +343,6 @@ export default function FullPreview() {
         }
         .dot3 {
           animation-delay: 400ms;
-        }
-
-        @keyframes softGreenWave {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-        .animate-softGreenWave {
-          animation: softGreenWave 5s ease-in-out infinite;
-          background-size: 200% 100%;
         }
       `}</style>
 
