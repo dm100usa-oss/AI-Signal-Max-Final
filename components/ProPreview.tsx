@@ -154,7 +154,7 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* ВЕРХНЯЯ ПОЛОСА — БЕЗ КРУЖКОВ */}
+        {/* ВЕРХНЯЯ ПОЛОСА — РОВНО КАК В ИСХОДНИКЕ */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
             className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
@@ -184,7 +184,7 @@ export default function FullPreview() {
           </p>
         </div>
 
-        {/* СРЕДНЯЯ ПОЛОСА — ИМЕННО СЮДА ПЕРЕНЕСЕНЫ КРУЖКИ */}
+        {/* СРЕДНЯЯ ПОЛОСА — ЗДЕСЬ 15 КРУЖКОВ */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
           {!auditDone && (
             <div
@@ -193,7 +193,6 @@ export default function FullPreview() {
             />
           )}
 
-          {/* Зеленая полоса отчётов */}
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
               auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
@@ -201,13 +200,14 @@ export default function FullPreview() {
             style={{ width: `${progressReport}%` }}
           />
 
-          {/* КРУЖКИ ПОЯВЛЯЮТСЯ ТУТ — НА СРЕДНЕЙ ПОЛОСЕ */}
+          {/* ПРАВИЛЬНАЯ ПОСЛЕДОВАТЕЛЬНОСТЬ ПОЯВЛЕНИЯ КРУЖКОВ */}
           {!auditDone && (
             <div className="absolute inset-0 flex items-center justify-center px-4 pointer-events-none">
               <div className="flex w-full justify-between items-center">
                 {Array.from({ length: circlesCount }).map((_, i) => {
-                  const appearPoint = (i / circlesCount) * 100;
+                  const appearPoint = ((i + 1) / (circlesCount + 1)) * 100;
                   const active = progressReport >= appearPoint;
+
                   return (
                     <div
                       key={i}
@@ -245,7 +245,7 @@ export default function FullPreview() {
           )}
         </div>
 
-        {/* НИЖНЯЯ ПОЛОСА */}
+        {/* НИЖНЯЯ ПОЛОСА — БЕЗ ИЗМЕНЕНИЙ */}
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
             <>
