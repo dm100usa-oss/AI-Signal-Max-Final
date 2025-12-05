@@ -162,37 +162,39 @@ export default function FullPreview() {
             style={{ backgroundSize: "200% 100%", width: `${progressAudit}%` }}
           />
 
-          <div className="absolute inset-0 flex items-center justify-center px-4 pointer-events-none">
-            <div className="flex w-full justify-between items-center">
-              {Array.from({ length: circlesCount }).map((_, i) => {
-                const appearPoint = (i / circlesCount) * 100;
-                const active = progressAudit >= appearPoint;
-                return (
-                  <div
-                    key={i}
-                    className="rounded-full flex items-center justify-center transition-all duration-700"
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      opacity: active ? 1 : 0,
-                      transform: active ? "scale(1)" : "scale(0.5)",
-                      border: `3px solid ${active ? "#22c55e" : "#22c55e40"}`,
-                      borderRadius: "50%",
-                      backgroundColor: "white"
-                    }}
-                  >
-                    <span
-                      className={`text-[18px] transition-opacity duration-700 ${
-                        active ? "opacity-100 text-green-500" : "opacity-0"
-                      }`}
+          {!auditDone && (
+            <div className="absolute inset-0 flex items-center justify-center px-4 pointer-events-none">
+              <div className="flex w-full justify-between items-center">
+                {Array.from({ length: circlesCount }).map((_, i) => {
+                  const appearPoint = (i / circlesCount) * 100;
+                  const active = progressAudit >= appearPoint;
+                  return (
+                    <div
+                      key={i}
+                      className="rounded-full flex items-center justify-center transition-all duration-700"
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        opacity: active ? 1 : 0,
+                        transform: active ? "scale(1)" : "scale(0.5)",
+                        border: `3px solid ${active ? "#22c55e" : "#22c55e40"}`,
+                        borderRadius: "50%",
+                        backgroundColor: "#e5e7eb"
+                      }}
                     >
-                      ✓
-                    </span>
-                  </div>
-                );
-              })}
+                      <span
+                        className={`text-[16px] transition-opacity duration-700 ${
+                          active ? "opacity-100 text-green-500" : "opacity-0"
+                        }`}
+                      >
+                        ✓
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
