@@ -201,11 +201,11 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
       </p>
 
-      {/* ЗВЕЗДЫ + РЕЙТИНГ + ОТЗЫВЫ */}
+      {/* ЗВЁЗДЫ + РЕЙТИНГ + ОТЗЫВЫ */}
       <div className="flex flex-col items-center mb-10">
         <style jsx>{`
           .ratingText {
-            font-size: 20px;
+            font-size: 17px; /* уменьшено дополнительно на 15% */
             line-height: 1;
             color: #6b6b6b;
             font-weight: 400;
@@ -240,18 +240,18 @@ export default function Home() {
             100% { left: 160%; }
           }
           .star {
-            font-size: 30px;
+            font-size: 26px; /* уменьшено с 30px на 15% */
             cursor: pointer;
             user-select: none;
 
-            /* НОВЫЙ ЧИСТЫЙ ЦВЕТ */
             background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
 
+            /* обводка на 15% темнее */
             text-shadow:
-              0 0 1px rgba(255,180,0,0.55),
-              0 0 1px rgba(255,160,0,0.55);
+              0 0 1px rgba(215,150,0,0.65),
+              0 0 1px rgba(200,130,0,0.65);
 
             transition: transform 0.2s ease, filter 0.2s ease;
           }
