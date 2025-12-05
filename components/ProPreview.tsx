@@ -13,6 +13,23 @@ function Dots({ colorClass = "text-white" }: { colorClass?: string }) {
   );
 }
 
+function Circle() {
+  return (
+    <div className="w-[20px] h-[20px] rounded-full border-[2px] border-green-600 flex items-center justify-center opacity-0 animate-circleFade">
+      <svg width="12" height="12" viewBox="0 0 12 12">
+        <path
+          d="M3 6l2 2 4-4"
+          stroke="#16a34a"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export default function FullPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -49,6 +66,7 @@ export default function FullPreview() {
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
+  const [showCircles, setShowCircles] = useState(true);
 
   useEffect(() => {
     const factorTimer = setInterval(() => {
@@ -62,6 +80,7 @@ export default function FullPreview() {
           clearInterval(auditProgressTimer);
           setAuditDone(true);
           setTimeout(() => setReportStage("owner"), 300);
+          setTimeout(() => setShowCircles(false), 500);
         }
         return Math.min(next, 100);
       });
@@ -162,6 +181,15 @@ export default function FullPreview() {
               width: `${progressAudit}%`
             }}
           />
+
+          {showCircles && (
+            <div className="absolute inset-0 flex items-center justify-between px-3">
+              {Array.from({ length: current + 1 }).map((_, i) => (
+                <Circle key={i} />
+              ))}
+            </div>
+          )}
+
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
@@ -190,12 +218,14 @@ export default function FullPreview() {
               style={{ width: `${progressAudit}%` }}
             />
           )}
+
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
               auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
             }`}
             style={{ width: `${progressReport}%` }}
           />
+
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
@@ -243,7 +273,6 @@ export default function FullPreview() {
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease forwards;
         }
-
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -255,7 +284,6 @@ export default function FullPreview() {
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
         }
-
         @keyframes aiv-dots {
           0% {
             opacity: 0.2;
@@ -280,7 +308,6 @@ export default function FullPreview() {
         .dot3 {
           animation-delay: 400ms;
         }
-
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
@@ -295,6 +322,19 @@ export default function FullPreview() {
         .animate-softGreenWave {
           animation: softGreenWave 5s ease-in-out infinite;
           background-size: 200% 100%;
+        }
+        @keyframes circleFade {
+          0% {
+            opacity: 0;
+            transform: scale(0.7);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .animate-circleFade {
+          animation: circleFade 0.4s ease-out forwards;
         }
       `}</style>
 
