@@ -161,23 +161,28 @@ export default function FullPreview() {
             }`}
             style={{ backgroundSize: "200% 100%", width: `${progressAudit}%` }}
           />
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="flex items-center justify-center gap-[8px] w-full px-4">
+
+          <div className="absolute inset-0 flex items-center justify-center px-4 pointer-events-none">
+            <div className="flex w-full justify-between items-center">
               {Array.from({ length: circlesCount }).map((_, i) => {
                 const appearPoint = (i / circlesCount) * 100;
                 const active = progressAudit >= appearPoint;
                 return (
                   <div
                     key={i}
-                    className={`w-[18px] h-[18px] rounded-full flex items-center justify-center transition-all duration-700`}
+                    className="rounded-full flex items-center justify-center transition-all duration-700"
                     style={{
+                      width: "36px",
+                      height: "36px",
                       opacity: active ? 1 : 0,
-                      transform: active ? "scale(1)" : "scale(0.6)",
-                      border: `2px solid ${active ? "#22c55e" : "#22c55e40"}`
+                      transform: active ? "scale(1)" : "scale(0.5)",
+                      border: `3px solid ${active ? "#22c55e" : "#22c55e40"}`,
+                      borderRadius: "50%",
+                      backgroundColor: "white"
                     }}
                   >
                     <span
-                      className={`text-[12px] transition-opacity duration-700 ${
+                      className={`text-[18px] transition-opacity duration-700 ${
                         active ? "opacity-100 text-green-500" : "opacity-0"
                       }`}
                     >
@@ -231,8 +236,6 @@ export default function FullPreview() {
             </div>
           )}
         </div>
-
-        <div className="h-4"></div>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
