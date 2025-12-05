@@ -47,7 +47,7 @@ const isValidUrl = (u: string): boolean => {
 export default function Home() {
   const router = useRouter();
   const [url, setUrl] = useState("");
-  the (error, setError) = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
   const [wave, setWave] = useState(false);
 
