@@ -53,17 +53,11 @@ export default function FullPreview() {
   const [checks, setChecks] = useState<number[]>([]);
 
   useEffect(() => {
-    // единственная добавленная строка
-    setChecks([0]);
+    setChecks([0]); // первый кружок зелёный — как было в предыдущей версии
 
-    const factorTimer = setInterval(() => {
-      setCurrent((p) => {
-        const next = p < factors.length - 1 ? p + 1 : p;
-        if (next !== p) setChecks((c) => [...c, next]);
-        return next;
-      });
-    }, (auditTime / factors.length) * 1000);
+    const cleanup: any[] = [];
 
+    // Аудит (зелёная полоса) запускается сразу — КАК СЕЙЧАС
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -75,7 +69,21 @@ export default function FullPreview() {
         return Math.min(next, 100);
       });
     }, 1000);
+    cleanup.push(auditProgressTimer);
 
+    // Факторы и кружки — запускаем через 1 секунду
+    setTimeout(() => {
+      const factorInterval = setInterval(() => {
+        setCurrent((p) => {
+          const next = p < factors.length - 1 ? p + 1 : p;
+          if (next !== p) setChecks((c) => [...c, next]);
+          return next;
+        });
+      }, (auditTime / factors.length) * 1000);
+      cleanup.push(factorInterval);
+    }, 1000);
+
+    // Отчёты
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -91,13 +99,18 @@ export default function FullPreview() {
           return Math.min(next, 100);
         });
       }, 1000);
+
+      cleanup.push(reportProgressTimer);
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
+    // Основной таймер
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
+    cleanup.push(overallTimer);
 
+    // Завершение
     setTimeout(() => {
       setFinished(true);
       setTimeout(async () => {
@@ -118,10 +131,7 @@ export default function FullPreview() {
 
     setTimeout(() => setFadeHeader(true), 1500);
 
-    return () => {
-      clearInterval(factorTimer);
-      clearInterval(overallTimer);
-    };
+    return () => cleanup.forEach(clearInterval);
   }, [router, url]);
 
   return (
