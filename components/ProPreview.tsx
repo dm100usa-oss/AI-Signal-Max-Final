@@ -3,44 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// ТРИ ТОЧКИ: зелёная → золотистая → синяя
-function Dots() {
+function Dots({ colorClass = "text-white" }: { colorClass?: string }) {
   return (
-    <span className="inline-flex items-center justify-start gap-[2px] align-middle">
-      <span className="dot dot1">.</span>
+    <span className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}>
+      <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
-
-      <style jsx>{`
-        .dot {
-          font-size: 1em;
-          line-height: 1;
-          opacity: 0.35;
-          animation: dotsBlink 1200ms infinite;
-        }
-
-        .dot1 {
-          color: #22c55e; /* ярко-зелёная, как твоя полоса */
-          animation-delay: 0ms;
-        }
-
-        .dot2 {
-          color: #d4a142; /* золотистая, мягкая, гармонирует с зелёной */
-          animation-delay: 200ms;
-        }
-
-        .dot3 {
-          color: #3b82f6; /* насыщенная синяя, сочетается с зелёной */
-          animation-delay: 400ms;
-        }
-
-        @keyframes dotsBlink {
-          0% { opacity: 0.35; }
-          30% { opacity: 1; }
-          60% { opacity: 0.35; }
-          100% { opacity: 0.35; }
-        }
-      `}</style>
     </span>
   );
 }
@@ -80,14 +48,16 @@ export default function FullPreview() {
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [reportStage, setReportStage] =
-    useState<"audit" | "owner" | "dev" | "final">("audit");
+  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
 
   const [checks, setChecks] = useState<number[]>([]);
 
   useEffect(() => {
     const cleanup: any[] = [];
 
+    // -----------------------------
+    // 1. ЗЕЛЁНАЯ ПОЛОСА — НАЧИНАЕТСЯ СРАЗУ
+    // -----------------------------
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -101,6 +71,7 @@ export default function FullPreview() {
     }, 1000);
     cleanup.push(auditProgressTimer);
 
+    // Функция запуска интервала факторов
     const startFactorInterval = () => {
       const factorInterval = setInterval(() => {
         setCurrent((p) => {
@@ -112,11 +83,21 @@ export default function FullPreview() {
       cleanup.push(factorInterval);
     };
 
+    // -----------------------------
+    // 2. ЧЕРЕЗ 1.5 секунды — ПОЯВЛЯЮТСЯ:
+    //    • первый фактор
+    //    • первый зелёный кружок
+    //    • запускаем интервалы появления остальных факторов
+    // -----------------------------
     setTimeout(() => {
-      setChecks([0]);
-      setCurrent(0);
-      startFactorInterval();
+      setChecks([0]);   // первый зелёный кружок
+      setCurrent(0);    // первый фактор
+      startFactorInterval(); // запускаем фактор-таймер
     }, 1500);
+
+    // -----------------------------
+    // ОСТАЛЬНАЯ ЛОГИКА — БЕЗ ИЗМЕНЕНИЙ
+    // -----------------------------
 
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
@@ -150,7 +131,7 @@ export default function FullPreview() {
           const resp = await fetch("/api/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "pro", url }),
+            body: JSON.stringify({ mode: "pro", url })
           });
           const json = await resp.json();
           if (json?.url) router.push(json.url);
@@ -168,40 +149,33 @@ export default function FullPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Signal Max
-      </h1>
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">AI Signal Max</h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
         {url} &nbsp; | &nbsp; Date:{" "}
         {new Date().toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
-          day: "numeric",
+          day: "numeric"
         })}
       </p>
 
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          fadeHeader
-            ? "opacity-60 text-neutral-400 translate-y-[-6px]"
-            : "opacity-100 text-neutral-800 translate-y-0"
+          fadeHeader ? "opacity-60 text-neutral-400 translate-y-[-6px]" : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
         <span className="flex items-center justify-center">
           Мы начали полный аудит
-          <span className="inline-flex justify-start ml-1">
-            {fadeHeader && <Dots />}
+          <span className="inline-flex w-[1.7ch] justify-start ml-1">
+            {fadeHeader && <Dots colorClass="text-green-400/70" />}
           </span>
         </span>
       </div>
 
       <div className="rounded-md p-0">
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p
-            key={current}
-            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
-          >
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
             {factors[current]}
           </p>
         </div>
@@ -215,18 +189,13 @@ export default function FullPreview() {
           />
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Аудит завершён
-              </p>
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">Аудит завершён</p>
             </div>
           )}
         </div>
 
         <div className="h-[32px] flex items-center justify-center mb-2">
-          <p
-            key={reportStage}
-            className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
-          >
+          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
             {reportStage === "final"
               ? "Отчёт для владельца • ТЗ для разработчика"
               : reportStage === "audit"
@@ -271,18 +240,14 @@ export default function FullPreview() {
 
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
-              auditDone
-                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
-                : ""
+              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
             }`}
             style={{ width: `${progressReport}%` }}
           />
 
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Отчёты созданы
-              </p>
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">Отчёты созданы</p>
             </div>
           )}
         </div>
@@ -302,7 +267,7 @@ export default function FullPreview() {
           {finished && (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
-                Получить результат <Dots />
+                Получить результат <Dots colorClass="text-white" />
               </p>
             </div>
           )}
@@ -334,6 +299,30 @@ export default function FullPreview() {
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
         }
+        @keyframes aiv-dots {
+          0% {
+            opacity: 0.2;
+          }
+          30% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.2;
+          }
+        }
+        .dot {
+          opacity: 0.2;
+          animation: aiv-dots 1200ms infinite;
+        }
+        .dot2 {
+          animation-delay: 200ms;
+        }
+        .dot3 {
+          animation-delay: 400ms;
+        }
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
@@ -354,9 +343,7 @@ export default function FullPreview() {
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
-        <span className="opacity-60">
-          Visibility scores are estimated. Not legal advice.
-        </span>
+        <span className="opacity-60">Visibility scores are estimated. Not legal advice.</span>
       </footer>
     </main>
   );
