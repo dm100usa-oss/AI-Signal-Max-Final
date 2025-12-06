@@ -56,7 +56,9 @@ export default function FullPreview() {
     const factorTimer = setInterval(() => {
       setCurrent((p) => {
         const next = p < factors.length - 1 ? p + 1 : p;
-        if (!checks.includes(p)) setChecks((c) => [...c, p]);
+
+        if (!checks.includes(p)) setChecks((c) => [...c, p]);   // ← правильная строка
+
         return next;
       });
     }, (auditTime / factors.length) * 1000);
@@ -138,9 +140,7 @@ export default function FullPreview() {
 
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          fadeHeader
-            ? "opacity-60 text-neutral-400 translate-y-[-6px]"
-            : "opacity-100 text-neutral-800 translate-y-0"
+          fadeHeader ? "opacity-60 text-neutral-400 translate-y-[-6px]" : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
         <span className="flex items-center justify-center">
