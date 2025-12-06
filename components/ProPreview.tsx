@@ -53,11 +53,11 @@ export default function FullPreview() {
   const [checks, setChecks] = useState<number[]>([]);
 
   useEffect(() => {
-    setChecks([0]); // первый кружок зелёный — как было в предыдущей версии
-
     const cleanup: any[] = [];
 
-    // Аудит (зелёная полоса) запускается сразу — КАК СЕЙЧАС
+    // -----------------------------
+    // 1. ЗЕЛЁНАЯ ПОЛОСА — НАЧИНАЕТСЯ СРАЗУ
+    // -----------------------------
     const auditProgressTimer = setInterval(() => {
       setProgressAudit((p) => {
         const next = p + 100 / auditTime;
@@ -71,8 +71,8 @@ export default function FullPreview() {
     }, 1000);
     cleanup.push(auditProgressTimer);
 
-    // Факторы и кружки — запускаем через 1 секунду
-    setTimeout(() => {
+    // Функция запуска интервала факторов
+    const startFactorInterval = () => {
       const factorInterval = setInterval(() => {
         setCurrent((p) => {
           const next = p < factors.length - 1 ? p + 1 : p;
@@ -81,9 +81,24 @@ export default function FullPreview() {
         });
       }, (auditTime / factors.length) * 1000);
       cleanup.push(factorInterval);
-    }, 1000);
+    };
 
-    // Отчёты
+    // -----------------------------
+    // 2. ЧЕРЕЗ 1.5 секунды — ПОЯВЛЯЮТСЯ:
+    //    • первый фактор
+    //    • первый зелёный кружок
+    //    • запускаем интервалы появления остальных факторов
+    // -----------------------------
+    setTimeout(() => {
+      setChecks([0]);   // первый зелёный кружок
+      setCurrent(0);    // первый фактор
+      startFactorInterval(); // запускаем фактор-таймер
+    }, 1500);
+
+    // -----------------------------
+    // ОСТАЛЬНАЯ ЛОГИКА — БЕЗ ИЗМЕНЕНИЙ
+    // -----------------------------
+
     const reportStartDelay = auditTime * 1000;
     setTimeout(() => {
       const reportProgressTimer = setInterval(() => {
@@ -99,18 +114,16 @@ export default function FullPreview() {
           return Math.min(next, 100);
         });
       }, 1000);
-
       cleanup.push(reportProgressTimer);
+
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
-    // Основной таймер
     const overallTimer = setInterval(() => {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
     cleanup.push(overallTimer);
 
-    // Завершение
     setTimeout(() => {
       setFinished(true);
       setTimeout(async () => {
