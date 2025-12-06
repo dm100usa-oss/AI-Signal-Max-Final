@@ -50,9 +50,15 @@ export default function FullPreview() {
   const [finished, setFinished] = useState(false);
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
 
+  const [checks, setChecks] = useState<number[]>([]);
+
   useEffect(() => {
     const factorTimer = setInterval(() => {
-      setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
+      setCurrent((p) => {
+        const next = p < factors.length - 1 ? p + 1 : p;
+        if (next !== p) setChecks((c) => [...c, next]);
+        return next;
+      });
     }, (auditTime / factors.length) * 1000);
 
     const auditProgressTimer = setInterval(() => {
@@ -117,9 +123,7 @@ export default function FullPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Signal Max
-      </h1>
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">AI Signal Max</h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
         {url} &nbsp; | &nbsp; Date:{" "}
@@ -132,9 +136,7 @@ export default function FullPreview() {
 
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          fadeHeader
-            ? "opacity-60 text-neutral-400 translate-y-[-6px]"
-            : "opacity-100 text-neutral-800 translate-y-0"
+          fadeHeader ? "opacity-60 text-neutral-400 translate-y-[-6px]" : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
         <span className="flex items-center justify-center">
@@ -157,16 +159,11 @@ export default function FullPreview() {
             className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
               progressAudit < 100 ? "animate-softGreenWave" : ""
             }`}
-            style={{
-              backgroundSize: "200% 100%",
-              width: `${progressAudit}%`
-            }}
+            style={{ backgroundSize: "200% 100%", width: `${progressAudit}%` }}
           />
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Аудит завершён
-              </p>
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">Аудит завершён</p>
             </div>
           )}
         </div>
@@ -184,28 +181,50 @@ export default function FullPreview() {
         </div>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
-          {!auditDone && (
-            <div
-              className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
-              style={{ width: `${progressAudit}%` }}
-            />
-          )}
+          <div
+            className={`absolute inset-0 transition-opacity duration-700 flex items-center justify-between px-3 ${
+              auditDone ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            {Array.from({ length: 15 }).map((_, idx) => {
+              const active = checks.includes(idx);
+              return (
+                <div
+                  key={idx}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center border ${
+                    active ? "border-green-500" : "border-gray-300"
+                  } bg-gray-200 transition-all duration-500`}
+                >
+                  {active && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="w-4 h-4 text-green-500"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
               auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
             }`}
             style={{ width: `${progressReport}%` }}
           />
+
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Отчёты созданы
-              </p>
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">Отчёты созданы</p>
             </div>
           )}
         </div>
-
-        <div className="h-4"></div>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
@@ -243,7 +262,6 @@ export default function FullPreview() {
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease forwards;
         }
-
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -255,7 +273,6 @@ export default function FullPreview() {
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
         }
-
         @keyframes aiv-dots {
           0% {
             opacity: 0.2;
@@ -280,7 +297,6 @@ export default function FullPreview() {
         .dot3 {
           animation-delay: 400ms;
         }
-
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
@@ -301,9 +317,7 @@ export default function FullPreview() {
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
-        <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
-        </span>
+        <span className="opacity-60">Visibility scores are estimated. Not legal advice.</span>
       </footer>
     </main>
   );
