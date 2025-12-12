@@ -39,19 +39,6 @@ function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
   );
 }
 
-function TopLights() {
-  return (
-    <div
-      className="flex justify-center mb-6 h-6 items-center space-x-3"
-      style={{ pointerEvents: "none" }}
-    >
-      <span className="top-light yellow-light"></span>
-      <span className="top-light blue-light"></span>
-      <span className="top-light green-light"></span>
-    </div>
-  );
-}
-
 export default function QuickPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -129,7 +116,10 @@ export default function QuickPreview() {
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
 
-      <TopLights />
+      {/* ДОБАВЛЕНО: такие же точки над заголовком */}
+      <div className="flex justify-center mb-3">
+        <Dots colorClass="text-neutral-400" />
+      </div>
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
@@ -244,51 +234,6 @@ export default function QuickPreview() {
           )}
         </div>
       </div>
-
-      <style jsx global>{`
-        /* ТОЧНО ТА ЖЕ АНИМАЦИЯ ТОЧЕК, ЧТО И В FULL */
-        @keyframes minimalWave {
-          0% {
-            opacity: 0.15;
-          }
-          20% {
-            opacity: 0.15;
-          }
-          32% {
-            opacity: 0.9;
-          }
-          46% {
-            opacity: 0.15;
-          }
-          100% {
-            opacity: 0.15;
-          }
-        }
-
-        .top-light {
-          width: 12px;
-          height: 12px;
-          border-radius: 9999px;
-          border: 1px solid rgba(0,0,0,0.12);
-        }
-
-        .yellow-light {
-          background: #fbbf24;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
-        }
-
-        .blue-light {
-          background: #3b82f6;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
-          animation-delay: 0.35s;
-        }
-
-        .green-light {
-          background: #10b981;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
-          animation-delay: 0.7s;
-        }
-      `}</style>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
