@@ -360,23 +360,19 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* ЛЕГКАЯ ВОЛНА (как ты просил), НО ЦВЕТА ВЕРНУЛИ ОБРАТНО */
-        @keyframes premiumWaveGlow {
+        /* МИНИМАЛИСТИЧНАЯ ВОЛНА БЕЗ GLOW — КАК СДЕЛАЛ БЫ ДИЗАЙНЕР ИИ */
+        @keyframes minimalWave {
           0% {
-            opacity: 0.65;
-            box-shadow: 0 0 0px rgba(0,0,0,0);
+            opacity: 0.45;
           }
           40% {
             opacity: 1;
-            box-shadow: 0 0 8px currentColor;
           }
           80% {
-            opacity: 0.75;
-            box-shadow: 0 0 2px currentColor;
+            opacity: 0.6;
           }
           100% {
-            opacity: 0.65;
-            box-shadow: 0 0 0px rgba(0,0,0,0);
+            opacity: 0.45;
           }
         }
 
@@ -384,26 +380,23 @@ export default function FullPreview() {
           width: 12px;
           height: 12px;
           border-radius: 9999px;
-          border: 1px solid rgba(0,0,0,0.18); /* ЕЛЕ ЗАМЕТНАЯ ОБВОДКА */
+          border: 1px solid rgba(0,0,0,0.12); /* едва заметная, правильная */
         }
 
         .yellow-light {
           background: #fbbf24;
-          color: #fbbf24;
-          animation: premiumWaveGlow 2.4s infinite ease-in-out;
+          animation: minimalWave 2.2s infinite ease-in-out;
         }
 
         .blue-light {
           background: #3b82f6;
-          color: #3b82f6;
-          animation: premiumWaveGlow 2.4s infinite ease-in-out;
+          animation: minimalWave 2.2s infinite ease-in-out;
           animation-delay: 0.35s;
         }
 
         .green-light {
           background: #10b981;
-          color: #10b981;
-          animation: premiumWaveGlow 2.4s infinite ease-in-out;
+          animation: minimalWave 2.2s infinite ease-in-out;
           animation-delay: 0.7s;
         }
 
