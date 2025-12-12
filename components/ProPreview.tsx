@@ -363,15 +363,15 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* МИНИМАЛИСТИЧНАЯ ВОЛНА БЕЗ GLOW — КАК СДЕЛАЛ БЫ ДИЗАЙНЕР ИИ */
+        /* ИИ-СТИЛЬ: ОДИН ИМПУЛЬС, МЕДЛЕННЫЙ ПОДЪЁМ, БЫСТРЫЙ СПАД, ПАУЗА */
         @keyframes minimalWave {
           0% {
             opacity: 0.6;
           }
-          40% {
-            opacity: 0.98;
+          45% {
+            opacity: 0.95;
           }
-          80% {
+          62% {
             opacity: 0.7;
           }
           100% {
@@ -388,18 +388,18 @@ export default function FullPreview() {
 
         .yellow-light {
           background: #fbbf24;
-          animation: minimalWave 3.3s infinite ease-in-out;
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
         }
 
         .blue-light {
           background: #3b82f6;
-          animation: minimalWave 3.3s infinite ease-in-out;
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
           animation-delay: 0.35s;
         }
 
         .green-light {
           background: #10b981;
-          animation: minimalWave 3.3s infinite ease-in-out;
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
           animation-delay: 0.7s;
         }
       `}</style>
