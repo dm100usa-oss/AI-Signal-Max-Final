@@ -3,18 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-function ColorDots() {
+function ColorDots({ visible }: { visible: boolean }) {
   return (
-    <span className="relative inline-flex items-center justify-center ml-1">
-      {/* Абсолютный слой, точки не влияют на текст и не тускнеют */}
-      <span className="absolute left-0 top-1/2 -translate-y-1/2 flex space-x-1">
-        <span className="dot-big text-green-500">•</span>
-        <span className="dot-big dot2 text-yellow-400">•</span>
-        <span className="dot-big dot3 text-blue-500">•</span>
-      </span>
-
-      {/* Пустой невидимый блок для корректного места в тексте */}
-      <span className="opacity-0 select-none">...</span>
+    <span
+      className={`
+        inline-flex items-end ml-2 transition-opacity duration-700 ease-out
+        ${visible ? "opacity-100" : "opacity-0"}
+      `}
+    >
+      <span className="dot-color text-green-500">•</span>
+      <span className="dot-color dot2 text-yellow-400">•</span>
+      <span className="dot-color dot3 text-blue-500">•</span>
     </span>
   );
 }
@@ -152,19 +151,20 @@ export default function FullPreview() {
         })}
       </p>
 
-      {/* Блок надписи + новые точки */}
+      {/* Исправленный идеальный блок надписи + точки */}
       <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          fadeHeader ? "opacity-60 text-neutral-400 translate-y-[-6px]" : "opacity-100 text-neutral-800 translate-y-0"
-        }`}
+        className={`
+          text-[22px] sm:text-[24px] font-bold my-6 flex items-end justify-center
+          transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)]
+          ${fadeHeader ? "opacity-60 text-neutral-400 translate-y-[-6px]" : "opacity-100 text-neutral-800 translate-y-0"}
+        `}
       >
-        <span className="flex items-center justify-center relative">
-          Мы начали полный аудит
-          {fadeHeader && <ColorDots />}
-        </span>
+        <span className="leading-none">Мы начали полный аудит</span>
+
+        {/* точки НЕ тускнеют, едут вместе, стоят по baseline */}
+        <ColorDots visible={true} />
       </div>
 
-      {/* Остальная часть — БЕЗ ИЗМЕНЕНИЙ */}
       <div className="rounded-md p-0">
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
@@ -259,7 +259,7 @@ export default function FullPreview() {
           {finished && (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
-                Получить результат <ColorDots />
+                Получить результат <ColorDots visible={true} />
               </p>
             </div>
           )}
@@ -281,18 +281,6 @@ export default function FullPreview() {
           animation: fadeInUp 0.8s ease forwards;
         }
 
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 1.2s ease forwards;
-        }
-
         @keyframes aiv-dots {
           0% {
             opacity: 0.2;
@@ -308,10 +296,11 @@ export default function FullPreview() {
           }
         }
 
-        .dot-big {
+        .dot-color {
           font-size: 26px;
           line-height: 0;
           animation: aiv-dots 1200ms infinite;
+          filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.25));
         }
         .dot2 {
           animation-delay: 200ms;
