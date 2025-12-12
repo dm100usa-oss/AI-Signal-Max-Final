@@ -3,17 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-function ColorDots({ visible }: { visible: boolean }) {
+function Dots({ colorClass }: { colorClass: string }) {
   return (
-    <span
-      className={`inline-flex items-end ml-2 transition-opacity duration-700 ${
-        visible ? "opacity-100" : "opacity-0"
-      }`}
-      style={{ lineHeight: "0" }}
-    >
-      <span className="dot-green text-[22px] leading-none">•</span>
-      <span className="dot-gold text-[22px] leading-none ml-1">•</span>
-      <span className="dot-blue text-[22px] leading-none ml-1">•</span>
+    <span className={`inline-flex w-[1.7ch] justify-start tabular-nums align-middle ${colorClass}`}>
+      <span className="dot">.</span>
+      <span className="dot dot2">.</span>
+      <span className="dot dot3">.</span>
     </span>
   );
 }
@@ -54,6 +49,7 @@ export default function FullPreview() {
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
+
   const [checks, setChecks] = useState<number[]>([]);
 
   useEffect(() => {
@@ -151,12 +147,16 @@ export default function FullPreview() {
       </p>
 
       <div
-        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-end justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
+        className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
           fadeHeader ? "opacity-60 text-neutral-400 translate-y-[-6px]" : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
-        <span className="leading-none">Мы начали полный аудит</span>
-        <ColorDots visible={fadeHeader} />
+        <span className="flex items-center justify-center">
+          Мы начали полный аудит
+          <span className="inline-flex w-[1.7ch] justify-start ml-1">
+            {fadeHeader && <Dots colorClass="text-green-400/70" />}
+          </span>
+        </span>
       </div>
 
       <div className="rounded-md p-0">
@@ -253,7 +253,7 @@ export default function FullPreview() {
           {finished && (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
-                Получить результат <span className="ml-2 text-white">...</span>
+                Получить результат <Dots colorClass="text-white" />
               </p>
             </div>
           )}
@@ -285,39 +285,30 @@ export default function FullPreview() {
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
         }
-
         @keyframes aiv-dots {
           0% {
-            opacity: 0.3;
+            opacity: 0.2;
           }
-          40% {
+          30% {
             opacity: 1;
           }
+          60% {
+            opacity: 0.2;
+          }
           100% {
-            opacity: 0.3;
+            opacity: 0.2;
           }
         }
-
-        .dot-green {
-          color: #22c55e;
+        .dot {
+          opacity: 0.2;
           animation: aiv-dots 1200ms infinite;
-          text-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
         }
-
-        .dot-gold {
-          color: #facc15;
-          animation: aiv-dots 1200ms infinite;
+        .dot2 {
           animation-delay: 200ms;
-          text-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
         }
-
-        .dot-blue {
-          color: #3b82f6;
-          animation: aiv-dots 1200ms infinite;
+        .dot3 {
           animation-delay: 400ms;
-          text-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
         }
-
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
