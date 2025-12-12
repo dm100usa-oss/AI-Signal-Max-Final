@@ -13,19 +13,19 @@ function Dots({ colorClass }: { colorClass: string }) {
   );
 }
 
-// ТРИ ЦВЕТНЫЕ ТОЧКИ НАД ЗАГОЛОВКОМ
+// ТРИ ТОЧКИ С ПЛАВНЫМ ПОЯВЛЕНИЕМ И ПРОФЕССИОНАЛЬНЫМ GLOW
 function TopLights({ active }: { active: boolean }) {
-  if (!active) return null;
-
   return (
-    <div className="flex justify-center mb-4 space-x-3">
-      {/* Жёлтая */}
+    <div
+      className={`
+        flex justify-center mb-6 h-6 items-center space-x-3 
+        transition-all duration-700 
+        ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[-6px]"}
+      `}
+      style={{ pointerEvents: "none" }}
+    >
       <span className="top-light yellow-light"></span>
-
-      {/* Синяя */}
       <span className="top-light blue-light"></span>
-
-      {/* Зелёная */}
       <span className="top-light green-light"></span>
     </div>
   );
@@ -154,7 +154,7 @@ export default function FullPreview() {
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
 
-      {/* ТРИ ТОЧКИ НАД ЗАГОЛОВКОМ */}
+      {/* Плавные, фиксированные точки без сдвига */}
       <TopLights active={fadeHeader && !finished} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
@@ -288,7 +288,6 @@ export default function FullPreview() {
         </div>
       </div>
 
-      {/* АНИМАЦИЯ ТОЧЕК */}
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -363,16 +362,17 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* Glow animation for colored dots */
-        @keyframes glow {
+        /* ПРЕМИАЛЬНЫЙ GLOW ДЛЯ ТОЧЕК */
+
+        @keyframes glowPulse {
           0% {
             box-shadow: 0 0 0px rgba(255,255,255,0);
           }
           40% {
-            box-shadow: 0 0 6px rgba(255,255,255,0.9);
+            box-shadow: 0 0 10px rgba(255,255,255,0.85);
           }
           80% {
-            box-shadow: 0 0 0px rgba(255,255,255,0);
+            box-shadow: 0 0 2px rgba(255,255,255,0.25);
           }
           100% {
             box-shadow: 0 0 0px rgba(255,255,255,0);
@@ -388,21 +388,21 @@ export default function FullPreview() {
         .yellow-light {
           background: #fbbf24;
           border: 2px solid #d97706;
-          animation: glow 1.8s infinite;
+          animation: glowPulse 2.2s infinite ease-in-out;
         }
 
         .blue-light {
           background: #3b82f6;
           border: 2px solid #1e40af;
-          animation: glow 1.8s infinite;
-          animation-delay: 0.3s;
+          animation: glowPulse 2.2s infinite ease-in-out;
+          animation-delay: 0.35s;
         }
 
         .green-light {
           background: #10b981;
           border: 2px solid #047857;
-          animation: glow 1.8s infinite;
-          animation-delay: 0.6s;
+          animation: glowPulse 2.2s infinite ease-in-out;
+          animation-delay: 0.7s;
         }
       `}</style>
 
