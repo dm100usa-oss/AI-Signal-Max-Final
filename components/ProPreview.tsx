@@ -13,7 +13,6 @@ function Dots({ colorClass }: { colorClass: string }) {
   );
 }
 
-// ТРИ ТОЧКИ С ПЛАВНЫМ ПОЯВЛЕНИЕМ И ПРОФЕССИОНАЛЬНЫМ GLOW
 function TopLights({ active }: { active: boolean }) {
   return (
     <div
@@ -154,7 +153,6 @@ export default function FullPreview() {
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
 
-      {/* Плавные, фиксированные точки без сдвига */}
       <TopLights active={fadeHeader && !finished} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
@@ -362,20 +360,24 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* ПРЕМИАЛЬНЫЙ GLOW ДЛЯ ТОЧЕК */
-
-        @keyframes glowPulse {
+        /* ПРЕМИАЛЬНАЯ ВОЛНА ДЛЯ ТРЁХ ВЕРХНИХ КНОПОК */
+        
+        @keyframes premiumWaveGlow {
           0% {
-            box-shadow: 0 0 0px rgba(255,255,255,0);
+            opacity: 0.6;
+            box-shadow: 0 0 0px rgba(0,0,0,0);
           }
           40% {
-            box-shadow: 0 0 10px rgba(255,255,255,0.85);
+            opacity: 1;
+            box-shadow: 0 0 8px currentColor;
           }
           80% {
-            box-shadow: 0 0 2px rgba(255,255,255,0.25);
+            opacity: 0.7;
+            box-shadow: 0 0 2px currentColor;
           }
           100% {
-            box-shadow: 0 0 0px rgba(255,255,255,0);
+            opacity: 0.6;
+            box-shadow: 0 0 0px rgba(0,0,0,0);
           }
         }
 
@@ -383,27 +385,29 @@ export default function FullPreview() {
           width: 12px;
           height: 12px;
           border-radius: 9999px;
+          border: 1px solid rgba(0,0,0,0.25);
         }
 
         .yellow-light {
-          background: #fbbf24;
-          border: 2px solid #d97706;
-          animation: glowPulse 2.2s infinite ease-in-out;
+          background: #bef264; /* премиальный лайм */
+          color: #84cc16; /* тон для свечения */
+          animation: premiumWaveGlow 2.4s infinite ease-in-out;
         }
 
         .blue-light {
-          background: #3b82f6;
-          border: 2px solid #1e40af;
-          animation: glowPulse 2.2s infinite ease-in-out;
+          background: #5eead4; /* дорогой бирюзовый */
+          color: #0d9488;
+          animation: premiumWaveGlow 2.4s infinite ease-in-out;
           animation-delay: 0.35s;
         }
 
         .green-light {
-          background: #10b981;
-          border: 2px solid #047857;
-          animation: glowPulse 2.2s infinite ease-in-out;
+          background: #34d399; /* премиальный зелёный */
+          color: #059669;
+          animation: premiumWaveGlow 2.4s infinite ease-in-out;
           animation-delay: 0.7s;
         }
+
       `}</style>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
