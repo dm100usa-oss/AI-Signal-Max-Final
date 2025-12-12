@@ -363,19 +363,22 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* ИИ-СТИЛЬ: ОДИН ИМПУЛЬС, МЕДЛЕННЫЙ ПОДЪЁМ, БЫСТРЫЙ СПАД, ПАУЗА */
+        /* ПОЧТИ ИСЧЕЗНОВЕНИЕ + ЧЁТКАЯ ОЧЕРЁДНОСТЬ */
         @keyframes minimalWave {
           0% {
-            opacity: 0.6;
+            opacity: 0.15;
           }
-          45% {
-            opacity: 0.95;
+          20% {
+            opacity: 0.15;
           }
-          62% {
-            opacity: 0.7;
+          32% {
+            opacity: 0.9;
+          }
+          46% {
+            opacity: 0.15;
           }
           100% {
-            opacity: 0.6;
+            opacity: 0.15;
           }
         }
 
