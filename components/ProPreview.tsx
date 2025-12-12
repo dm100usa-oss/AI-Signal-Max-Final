@@ -13,6 +13,24 @@ function Dots({ colorClass }: { colorClass: string }) {
   );
 }
 
+// ТРИ ЦВЕТНЫЕ ТОЧКИ НАД ЗАГОЛОВКОМ
+function TopLights({ active }: { active: boolean }) {
+  if (!active) return null;
+
+  return (
+    <div className="flex justify-center mb-4 space-x-3">
+      {/* Жёлтая */}
+      <span className="top-light yellow-light"></span>
+
+      {/* Синяя */}
+      <span className="top-light blue-light"></span>
+
+      {/* Зелёная */}
+      <span className="top-light green-light"></span>
+    </div>
+  );
+}
+
 export default function FullPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -135,7 +153,13 @@ export default function FullPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">AI Signal Max</h1>
+
+      {/* ТРИ ТОЧКИ НАД ЗАГОЛОВКОМ */}
+      <TopLights active={fadeHeader && !finished} />
+
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
+        AI Signal Max
+      </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
         {url} &nbsp; | &nbsp; Date:{" "}
@@ -175,7 +199,9 @@ export default function FullPreview() {
           />
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">Аудит завершён</p>
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Аудит завершён
+              </p>
             </div>
           )}
         </div>
@@ -233,7 +259,9 @@ export default function FullPreview() {
 
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">Отчёты созданы</p>
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Отчёты созданы
+              </p>
             </div>
           )}
         </div>
@@ -260,6 +288,7 @@ export default function FullPreview() {
         </div>
       </div>
 
+      {/* АНИМАЦИЯ ТОЧЕК */}
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -271,9 +300,11 @@ export default function FullPreview() {
             transform: translateY(0);
           }
         }
+
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease forwards;
         }
+
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -282,9 +313,11 @@ export default function FullPreview() {
             opacity: 1;
           }
         }
+
         .animate-fadeIn {
           animation: fadeIn 1.2s ease forwards;
         }
+
         @keyframes aiv-dots {
           0% {
             opacity: 0.2;
@@ -299,16 +332,20 @@ export default function FullPreview() {
             opacity: 0.2;
           }
         }
+
         .dot {
           opacity: 0.2;
           animation: aiv-dots 1200ms infinite;
         }
+
         .dot2 {
           animation-delay: 200ms;
         }
+
         .dot3 {
           animation-delay: 400ms;
         }
+
         @keyframes softGreenWave {
           0% {
             background-position: 0% 50%;
@@ -320,9 +357,52 @@ export default function FullPreview() {
             background-position: 0% 50%;
           }
         }
+
         .animate-softGreenWave {
           animation: softGreenWave 5s ease-in-out infinite;
           background-size: 200% 100%;
+        }
+
+        /* Glow animation for colored dots */
+        @keyframes glow {
+          0% {
+            box-shadow: 0 0 0px rgba(255,255,255,0);
+          }
+          40% {
+            box-shadow: 0 0 6px rgba(255,255,255,0.9);
+          }
+          80% {
+            box-shadow: 0 0 0px rgba(255,255,255,0);
+          }
+          100% {
+            box-shadow: 0 0 0px rgba(255,255,255,0);
+          }
+        }
+
+        .top-light {
+          width: 12px;
+          height: 12px;
+          border-radius: 9999px;
+        }
+
+        .yellow-light {
+          background: #fbbf24;
+          border: 2px solid #d97706;
+          animation: glow 1.8s infinite;
+        }
+
+        .blue-light {
+          background: #3b82f6;
+          border: 2px solid #1e40af;
+          animation: glow 1.8s infinite;
+          animation-delay: 0.3s;
+        }
+
+        .green-light {
+          background: #10b981;
+          border: 2px solid #047857;
+          animation: glow 1.8s infinite;
+          animation-delay: 0.6s;
         }
       `}</style>
 
