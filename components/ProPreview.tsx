@@ -151,7 +151,10 @@ export default function FullPreview() {
   }, [router, url]);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+    <main
+      className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white"
+      style={{ transform: "translateY(-10vh)" }}
+    >
 
       <TopLights active={fadeHeader && !finished} />
 
@@ -363,16 +366,16 @@ export default function FullPreview() {
         /* МИНИМАЛИСТИЧНАЯ ВОЛНА БЕЗ GLOW — КАК СДЕЛАЛ БЫ ДИЗАЙНЕР ИИ */
         @keyframes minimalWave {
           0% {
-            opacity: 0.45;
-          }
-          40% {
-            opacity: 1;
-          }
-          80% {
             opacity: 0.6;
           }
+          40% {
+            opacity: 0.98;
+          }
+          80% {
+            opacity: 0.7;
+          }
           100% {
-            opacity: 0.45;
+            opacity: 0.6;
           }
         }
 
@@ -380,26 +383,25 @@ export default function FullPreview() {
           width: 12px;
           height: 12px;
           border-radius: 9999px;
-          border: 1px solid rgba(0,0,0,0.12); /* едва заметная, правильная */
+          border: 1px solid rgba(0,0,0,0.12);
         }
 
         .yellow-light {
           background: #fbbf24;
-          animation: minimalWave 2.2s infinite ease-in-out;
+          animation: minimalWave 3.3s infinite ease-in-out;
         }
 
         .blue-light {
           background: #3b82f6;
-          animation: minimalWave 2.2s infinite ease-in-out;
+          animation: minimalWave 3.3s infinite ease-in-out;
           animation-delay: 0.35s;
         }
 
         .green-light {
           background: #10b981;
-          animation: minimalWave 2.2s infinite ease-in-out;
+          animation: minimalWave 3.3s infinite ease-in-out;
           animation-delay: 0.7s;
         }
-
       `}</style>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
