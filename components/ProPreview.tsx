@@ -360,11 +360,10 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* ПРЕМИАЛЬНАЯ ВОЛНА ДЛЯ ТРЁХ ВЕРХНИХ КНОПОК */
-        
+        /* ЛЕГКАЯ ВОЛНА (как ты просил), НО ЦВЕТА ВЕРНУЛИ ОБРАТНО */
         @keyframes premiumWaveGlow {
           0% {
-            opacity: 0.6;
+            opacity: 0.65;
             box-shadow: 0 0 0px rgba(0,0,0,0);
           }
           40% {
@@ -372,11 +371,11 @@ export default function FullPreview() {
             box-shadow: 0 0 8px currentColor;
           }
           80% {
-            opacity: 0.7;
+            opacity: 0.75;
             box-shadow: 0 0 2px currentColor;
           }
           100% {
-            opacity: 0.6;
+            opacity: 0.65;
             box-shadow: 0 0 0px rgba(0,0,0,0);
           }
         }
@@ -385,25 +384,25 @@ export default function FullPreview() {
           width: 12px;
           height: 12px;
           border-radius: 9999px;
-          border: 1px solid rgba(0,0,0,0.25);
+          border: 1px solid rgba(0,0,0,0.18); /* ЕЛЕ ЗАМЕТНАЯ ОБВОДКА */
         }
 
         .yellow-light {
-          background: #bef264; /* премиальный лайм */
-          color: #84cc16; /* тон для свечения */
+          background: #fbbf24;
+          color: #fbbf24;
           animation: premiumWaveGlow 2.4s infinite ease-in-out;
         }
 
         .blue-light {
-          background: #5eead4; /* дорогой бирюзовый */
-          color: #0d9488;
+          background: #3b82f6;
+          color: #3b82f6;
           animation: premiumWaveGlow 2.4s infinite ease-in-out;
           animation-delay: 0.35s;
         }
 
         .green-light {
-          background: #34d399; /* премиальный зелёный */
-          color: #059669;
+          background: #10b981;
+          color: #10b981;
           animation: premiumWaveGlow 2.4s infinite ease-in-out;
           animation-delay: 0.7s;
         }
