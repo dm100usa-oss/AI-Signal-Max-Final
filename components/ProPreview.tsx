@@ -155,6 +155,7 @@ export default function FullPreview() {
       className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white"
       style={{ transform: "translateY(-10vh)" }}
     >
+
       <TopLights active={fadeHeader && !finished} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
@@ -183,33 +184,202 @@ export default function FullPreview() {
         </span>
       </div>
 
+      <div className="rounded-md p-0">
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
+            {factors[current]}
+          </p>
+        </div>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+          <div
+            className={`h-full bg-gradient-to-r from-green-500 via-green-600 to-green-700 transition-[width] duration-1000 ease-linear ${
+              progressAudit < 100 ? "animate-softGreenWave" : ""
+            }`}
+            style={{ backgroundSize: "200% 100%", width: `${progressAudit}%` }}
+          />
+          {auditDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Аудит завершён
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="h-[32px] flex items-center justify-center mb-2">
+          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
+            {reportStage === "final"
+              ? "Отчёт для владельца • ТЗ для разработчика"
+              : reportStage === "audit"
+              ? "Аудит 15 ключевых факторов"
+              : reportStage === "owner"
+              ? "Формируем отчёт для владельца сайта"
+              : "Создаём ТЗ для разработчика"}
+          </p>
+        </div>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-6">
+          <div
+            className={`absolute inset-0 transition-opacity duration-700 flex items-center justify-between px-3 ${
+              auditDone ? "opacity-0" : "opacity-100"
+            }`}
+          >
+            {Array.from({ length: 15 }).map((_, idx) => {
+              const active = checks.includes(idx);
+              return (
+                <div
+                  key={idx}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center border ${
+                    active ? "border-green-500" : "border-gray-300"
+                  } bg-gray-200 transition-all duration-500`}
+                >
+                  {active && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className="w-4 h-4 text-green-500"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                    >
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div
+            className={`h-full transition-[width] duration-1000 ease-linear ${
+              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
+            }`}
+            style={{ width: `${progressReport}%` }}
+          />
+
+          {reportsDone && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
+                Отчёты созданы
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+          {!finished && (
+            <>
+              <div
+                className="absolute left-0 top-0 h-full bg-gray-300 transition-[width] duration-1000 ease-linear"
+                style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+              />
+              <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+                {`Полный аудит завершится через ${timeLeft} сек`}
+              </div>
+            </>
+          )}
+          {finished && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
+                Получить результат <Dots colorClass="text-white" />
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 1.2s ease forwards;
+        }
+
         @keyframes aiv-dots {
-          0% { opacity: 0.2; }
-          30% { opacity: 1; }
-          60% { opacity: 0.2; }
-          100% { opacity: 0.2; }
+          0% {
+            opacity: 0.2;
+          }
+          30% {
+            opacity: 1;
+          }
+          60% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.2;
+          }
         }
 
         .dot {
           opacity: 0.2;
-          animation: aiv-dots 600ms infinite;
+          animation: aiv-dots 1200ms infinite;
         }
 
         .dot2 {
-          animation-delay: 100ms;
-        }
-
-        .dot3 {
           animation-delay: 200ms;
         }
 
+        .dot3 {
+          animation-delay: 400ms;
+        }
+
+        @keyframes softGreenWave {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        .animate-softGreenWave {
+          animation: softGreenWave 5s ease-in-out infinite;
+          background-size: 200% 100%;
+        }
+
+        /* ПОЧТИ ИСЧЕЗНОВЕНИЕ + ЧЁТКАЯ ОЧЕРЁДНОСТЬ */
         @keyframes minimalWave {
-          0% { opacity: 0.15; }
-          20% { opacity: 0.15; }
-          32% { opacity: 0.9; }
-          46% { opacity: 0.15; }
-          100% { opacity: 0.15; }
+          0% {
+            opacity: 0.15;
+          }
+          20% {
+            opacity: 0.15;
+          }
+          32% {
+            opacity: 0.9;
+          }
+          46% {
+            opacity: 0.15;
+          }
+          100% {
+            opacity: 0.15;
+          }
         }
 
         .top-light {
