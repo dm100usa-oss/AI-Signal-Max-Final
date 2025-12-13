@@ -402,7 +402,7 @@ export default function FullPreview() {
 
         .green-light {
           background: #10b981;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
+          animation: minimalWave 1.65s infinite cubic-bezier(0.4,0,0.2,1);
           animation-delay: 0.7s;
         }
       `}</style>
