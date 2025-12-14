@@ -366,19 +366,19 @@ export default function FullPreview() {
         /* ПОЧТИ ИСЧЕЗНОВЕНИЕ + ЧЁТКАЯ ОЧЕРЁДНОСТЬ */
         @keyframes minimalWave {
           0% {
-            opacity: 0.15;
+            opacity: 0;
           }
           20% {
-            opacity: 0.15;
+            opacity: 0;
           }
           32% {
             opacity: 0.9;
           }
           46% {
-            opacity: 0.15;
+            opacity: 0;
           }
           100% {
-            opacity: 0.15;
+            opacity: 0;
           }
         }
 
