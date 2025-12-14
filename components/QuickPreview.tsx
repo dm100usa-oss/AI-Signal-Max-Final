@@ -116,6 +116,7 @@ export default function QuickPreview() {
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
 
+      {/* ДОБАВЛЕНО: такие же точки над заголовком */}
       <div className="flex justify-center mb-3">
         <Dots colorClass="text-neutral-400" />
       </div>
@@ -198,9 +199,7 @@ export default function QuickPreview() {
           )}
         </div>
 
-        <p className="text-center text-sm text-neutral-600 mb-4">
-          Анализ 10 ключевых факторов
-        </p>
+        <p className="text-center text-sm text-neutral-600 mb-4">Анализ 10 ключевых факторов</p>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
