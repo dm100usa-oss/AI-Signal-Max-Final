@@ -65,7 +65,8 @@ export default function FullPreview() {
   const [auditDone, setAuditDone] = useState(false);
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
-  const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
+  const [reportStage, setReportStage] =
+    useState<"audit" | "owner" | "dev" | "final">("audit");
 
   const [checks, setChecks] = useState<number[]>([]);
 
@@ -155,7 +156,6 @@ export default function FullPreview() {
       className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white"
       style={{ transform: "translateY(-10vh)" }}
     >
-
       <TopLights active={fadeHeader && !finished} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
@@ -173,7 +173,9 @@ export default function FullPreview() {
 
       <div
         className={`text-[22px] sm:text-[24px] font-bold my-6 flex items-center justify-center transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
-          fadeHeader ? "opacity-60 text-neutral-400 translate-y-[-6px]" : "opacity-100 text-neutral-800 translate-y-0"
+          fadeHeader
+            ? "opacity-60 text-neutral-400 translate-y-[-6px]"
+            : "opacity-100 text-neutral-800 translate-y-0"
         }`}
       >
         <span className="flex items-center justify-center">
@@ -186,7 +188,10 @@ export default function FullPreview() {
 
       <div className="rounded-md p-0">
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
-          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
+          <p
+            key={current}
+            className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp"
+          >
             {factors[current]}
           </p>
         </div>
@@ -208,7 +213,10 @@ export default function FullPreview() {
         </div>
 
         <div className="h-[32px] flex items-center justify-center mb-2">
-          <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
+          <p
+            key={reportStage}
+            className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp"
+          >
             {reportStage === "final"
               ? "Отчёт для владельца • ТЗ для разработчика"
               : reportStage === "audit"
@@ -253,7 +261,9 @@ export default function FullPreview() {
 
           <div
             className={`h-full transition-[width] duration-1000 ease-linear ${
-              auditDone ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700" : ""
+              auditDone
+                ? "bg-gradient-to-r from-green-500 via-green-600 to-green-700"
+                : ""
             }`}
             style={{ width: `${progressReport}%` }}
           />
@@ -363,7 +373,6 @@ export default function FullPreview() {
           background-size: 200% 100%;
         }
 
-        /* ПОЧТИ ИСЧЕЗНОВЕНИЕ + ЧЁТКАЯ ОЧЕРЁДНОСТЬ */
         @keyframes minimalWave {
           0% {
             opacity: 0;
@@ -386,31 +395,36 @@ export default function FullPreview() {
           width: 12px;
           height: 12px;
           border-radius: 9999px;
-          border: 1px solid rgba(0,0,0,0.12);
+          border: 1px solid rgba(0, 0, 0, 0.12);
         }
 
         .yellow-light {
           background: #fbbf24;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4, 0, 0.2, 1);
+          animation-fill-mode: backwards;
         }
 
         .blue-light {
           background: #3b82f6;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4, 0, 0.2, 1);
           animation-delay: 0.35s;
+          animation-fill-mode: backwards;
         }
 
         .green-light {
           background: #10b981;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4, 0, 0.2, 1);
           animation-delay: 0.7s;
+          animation-fill-mode: backwards;
         }
       `}</style>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
         © 2025 AI Signal Max. All rights reserved.
         <br />
-        <span className="opacity-60">Visibility scores are estimated. Not legal advice.</span>
+        <span className="opacity-60">
+          Visibility scores are estimated. Not legal advice.
+        </span>
       </footer>
     </main>
   );
