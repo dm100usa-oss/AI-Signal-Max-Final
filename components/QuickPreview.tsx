@@ -9,32 +9,6 @@ function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
-      <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-        }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
-        @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
-        }
-      `}</style>
     </span>
   );
 }
@@ -167,21 +141,6 @@ export default function QuickPreview() {
           <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
             {factors[current]}
           </p>
-          <style jsx>{`
-            @keyframes fadeInUp {
-              from {
-                opacity: 0;
-                transform: translateY(10px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
-            }
-            .animate-fadeInUp {
-              animation: fadeInUp 0.8s ease forwards;
-            }
-          `}</style>
         </div>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
@@ -195,19 +154,6 @@ export default function QuickPreview() {
                 Получить результат
                 <Dots colorClass="text-white ml-1" />
               </p>
-              <style jsx>{`
-                @keyframes fadeIn {
-                  from {
-                    opacity: 0;
-                  }
-                  to {
-                    opacity: 1;
-                  }
-                }
-                .animate-fadeIn {
-                  animation: fadeIn 1s ease forwards;
-                }
-              `}</style>
             </div>
           )}
         </div>
@@ -257,25 +203,39 @@ export default function QuickPreview() {
       </footer>
 
       <style jsx global>{`
-        /* Анимация и стили трёх верхних точек — как в FullPreview */
-        @keyframes minimalWave {
-          0% {
-            opacity: 0;
-          }
-          20% {
-            opacity: 0;
-          }
-          32% {
-            opacity: 0.9;
-          }
-          46% {
-            opacity: 0;
-          }
-          100% {
-            opacity: 0;
-          }
+        /* Dots animation (moved to global to avoid duplicates) */
+        @keyframes aiv-dots {
+          0% { opacity: 0.2; }
+          30% { opacity: 1; }
+          60% { opacity: 0.2; }
+          100% { opacity: 0.2; }
         }
+        .dot { opacity: 0.2; animation: aiv-dots 1200ms infinite; }
+        .dot2 { animation-delay: 200ms; }
+        .dot3 { animation-delay: 400ms; }
 
+        /* Text fade in up */
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp { animation: fadeInUp 0.8s ease forwards; }
+
+        /* Simple fade in */
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fadeIn { animation: fadeIn 1s ease forwards; }
+
+        /* Top lights — identical to FullPreview */
+        @keyframes minimalWave {
+          0% { opacity: 0; }
+          20% { opacity: 0; }
+          32% { opacity: 0.9; }
+          46% { opacity: 0; }
+          100% { opacity: 0; }
+        }
         .top-light {
           width: 12px;
           height: 12px;
@@ -284,34 +244,15 @@ export default function QuickPreview() {
           opacity: 0;
           animation: none;
         }
-
         .light-active {
           animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
         }
-
-        .yellow-light {
-          background: #fbbf24;
-        }
-
-        .blue-light {
-          background: #3b82f6;
-        }
-
-        .green-light {
-          background: #10b981;
-        }
-
-        .light-active.yellow-light {
-          animation-delay: 0s;
-        }
-
-        .light-active.blue-light {
-          animation-delay: 0.35s;
-        }
-
-        .light-active.green-light {
-          animation-delay: 0.7s;
-        }
+        .yellow-light { background: #fbbf24; }
+        .blue-light { background: #3b82f6; }
+        .green-light { background: #10b981; }
+        .light-active.yellow-light { animation-delay: 0s; }
+        .light-active.blue-light { animation-delay: 0.35s; }
+        .light-active.green-light { animation-delay: 0.7s; }
       `}</style>
     </main>
   );
