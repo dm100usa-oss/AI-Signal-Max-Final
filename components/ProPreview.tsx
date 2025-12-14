@@ -23,9 +23,9 @@ function TopLights({ active }: { active: boolean }) {
       `}
       style={{ pointerEvents: "none" }}
     >
-      <span className="top-light yellow-light"></span>
-      <span className="top-light blue-light"></span>
-      <span className="top-light green-light"></span>
+      <span className={`top-light yellow-light ${active ? "light-active" : ""}`}></span>
+      <span className={`top-light blue-light ${active ? "light-active" : ""}`}></span>
+      <span className={`top-light green-light ${active ? "light-active" : ""}`}></span>
     </div>
   );
 }
@@ -288,7 +288,6 @@ export default function FullPreview() {
           )}
         </div>
       </div>
-
       <style jsx global>{`
         @keyframes fadeInUp {
           from {
@@ -387,22 +386,35 @@ export default function FullPreview() {
           height: 12px;
           border-radius: 9999px;
           border: 1px solid rgba(0,0,0,0.12);
+          opacity: 0;
+          animation: none;
+        }
+
+        .light-active {
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
         }
 
         .yellow-light {
           background: #fbbf24;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
         }
 
         .blue-light {
           background: #3b82f6;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
-          animation-delay: 0.35s;
         }
 
         .green-light {
           background: #10b981;
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .light-active.yellow-light {
+          animation-delay: 0s;
+        }
+
+        .light-active.blue-light {
+          animation-delay: 0.35s;
+        }
+
+        .light-active.green-light {
           animation-delay: 0.7s;
         }
       `}</style>
