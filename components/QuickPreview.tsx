@@ -115,12 +115,6 @@ export default function QuickPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
-
-      {/* ДОБАВЛЕНО: такие же точки над заголовком */}
-      <div className="flex justify-center mb-3">
-        <Dots colorClass="text-neutral-400" />
-      </div>
-
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
