@@ -39,6 +39,70 @@ function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
   );
 }
 
+function TopLights({ active }: { active: boolean }) {
+  return (
+    <div
+      className={`flex justify-center mb-6 h-6 items-center space-x-3 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]
+        ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[-6px]"}`}
+      style={{ pointerEvents: "none" }}
+    >
+      <span className={`top-light yellow-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light blue-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light green-light ${active ? "light-active" : ""}`} />
+
+      <style jsx>{`
+        .top-light {
+          width: 12px;
+          height: 12px;
+          border-radius: 9999px;
+          opacity: 0;
+          border: 1px solid rgba(255, 255, 255, 0.35);
+        }
+
+        .yellow-light {
+          background-color: #fbbf24;
+        }
+
+        .blue-light {
+          background-color: #3b82f6;
+        }
+
+        .green-light {
+          background-color: #10b981;
+        }
+
+        .light-active {
+          animation: minimalWave 3.3s infinite;
+          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .blue-light.light-active {
+          animation-delay: 0.35s;
+        }
+
+        .green-light.light-active {
+          animation-delay: 0.7s;
+        }
+
+        @keyframes minimalWave {
+          0% {
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.9;
+          }
+          30% {
+            opacity: 0;
+          }
+          100% {
+            opacity: 0;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default function QuickPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -115,6 +179,8 @@ export default function QuickPreview() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+      <TopLights active={showDots} />
+
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
         AI Signal Max
       </h1>
@@ -193,7 +259,9 @@ export default function QuickPreview() {
           )}
         </div>
 
-        <p className="text-center text-sm text-neutral-600 mb-4">Анализ 10 ключевых факторов</p>
+        <p className="text-center text-sm text-neutral-600 mb-4">
+          Анализ 10 ключевых факторов
+        </p>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
           {!finished && (
