@@ -1,17 +1,17 @@
-export const runtime = "nodejs";  // обязательно первая строка
+export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+  url: process.env.KV_REST_API_URL!,
+  token: process.env.KV_REST_API_TOKEN!,
 });
 
 export async function GET() {
   try {
-    // Читаем реальные отзывы из reviews:list
-    const raw = await redis.lrange("reviews:list", 0, -1);
+    // Читаем одобренные отзывы
+    const raw = await redis.lrange("reviews:approved", 0, -1);
 
     if (!raw || raw.length === 0) {
       return NextResponse.json({ ok: true, reviews: [] });
@@ -20,7 +20,7 @@ export async function GET() {
     const reviews = raw
       .map((item) => {
         try {
-          return JSON.parse(item);
+          return JSON.parse(item as string);
         } catch {
           return null;
         }
