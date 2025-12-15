@@ -56,24 +56,24 @@ function TopLights({ active }: { active: boolean }) {
           height: 12px;
           border-radius: 9999px;
           opacity: 0;
-          border: 1px solid rgba(255, 255, 255, 0.35);
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          box-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.6);
         }
 
         .yellow-light {
-          background-color: #e0b84c;
+          background: radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 65%);
         }
 
         .blue-light {
-          background-color: #2563eb;
+          background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 65%);
         }
 
         .green-light {
-          background-color: #059669;
+          background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669 65%);
         }
 
         .light-active {
-          animation: minimalWave 3.3s infinite;
-          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+          animation: minimalWave 3.3s infinite cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .blue-light.light-active {
@@ -89,7 +89,7 @@ function TopLights({ active }: { active: boolean }) {
             opacity: 0;
           }
           15% {
-            opacity: 0.9;
+            opacity: 0.85;
           }
           30% {
             opacity: 0;
