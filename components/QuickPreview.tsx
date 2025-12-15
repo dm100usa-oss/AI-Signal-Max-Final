@@ -60,15 +60,15 @@ function TopLights({ active }: { active: boolean }) {
         }
 
         .yellow-light {
-          background-color: #fbbf24;
+          background-color: #e0b84c;
         }
 
         .blue-light {
-          background-color: #3b82f6;
+          background-color: #2563eb;
         }
 
         .green-light {
-          background-color: #10b981;
+          background-color: #059669;
         }
 
         .light-active {
