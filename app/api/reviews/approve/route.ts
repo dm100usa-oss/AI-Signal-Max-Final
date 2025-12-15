@@ -30,11 +30,11 @@ export async function POST(req: Request) {
       await redis.rpush("reviews:pending", ...filtered);
     }
 
-    // 2. Добавляем в approved (правильный ключ!)
+    // 2. Добавляем в approved
     const approvedReview = {
       name,
       text,
-      rating: rating || 5, // если рейтинг не передан, ставим 5
+      rating: rating || 5,
       date: new Date().toISOString(),
       approved: true,
     };
