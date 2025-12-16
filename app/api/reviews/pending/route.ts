@@ -1,4 +1,5 @@
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
@@ -11,7 +12,7 @@ const redis = new Redis({
 export async function GET() {
   try {
     const raw = await redis.lrange("reviews:pending", 0, -1);
-
+    
     if (!raw || raw.length === 0) {
       return NextResponse.json({ ok: true, reviews: [] });
     }
