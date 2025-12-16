@@ -23,16 +23,15 @@ input:-webkit-autofill:focus {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Page transition between routes */
+/* REAL page transition */
 .page-transition {
-  animation: pageFade 180ms ease-out;
+  transition: opacity 220ms ease-out;
 }
 
-@keyframes pageFade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.page-transition.out {
+  opacity: 0;
+}
+
+.page-transition.in {
+  opacity: 1;
 }
