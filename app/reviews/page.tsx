@@ -53,7 +53,7 @@ function ReviewsPage() {
 
   const [name, setName] = useState("");
   const [text, setText] = useState("");
-  const [userRating, setUserRating] = useState<number>(5); // НОВОЕ: рейтинг от пользователя
+  const [userRating, setUserRating] = useState<number>(0); // НОВОЕ: рейтинг от пользователя
   const [hoverRating, setHoverRating] = useState<number>(0); // НОВОЕ: для hover эффекта
   
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -192,9 +192,9 @@ function ReviewsPage() {
             className="border border-gray-300 rounded-md p-2 h-32 resize-none"
             required
           />
-          <button
-            type="submit"
-            disabled={status === "loading"}
+         <button
+  type="submit"
+  disabled={status === "loading" || userRating === 0}
             className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
           >
             {status === "loading" ? (
