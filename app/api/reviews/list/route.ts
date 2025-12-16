@@ -5,7 +5,8 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const raw = await redis.lrange("reviews:approved", 0, -1);
+    // ЧИТАЕМ ПРАВИЛЬНЫЙ КЛЮЧ
+    const raw = await redis.lrange("reviews:list", 0, -1);
 
     if (!raw || raw.length === 0) {
       return NextResponse.json({ ok: true, reviews: [] });
@@ -13,18 +14,10 @@ export async function GET() {
 
     const reviews = raw
       .map((item: any) => {
-        if (typeof item === "string") {
-          return JSON.parse(item);
-        }
-
-        if (item instanceof Uint8Array) {
+        if (typeof item === "string") return JSON.parse(item);
+        if (item instanceof Uint8Array)
           return JSON.parse(new TextDecoder().decode(item));
-        }
-
-        if (typeof item === "object" && item !== null) {
-          return item;
-        }
-
+        if (typeof item === "object" && item !== null) return item;
         return null;
       })
       .filter(Boolean);
