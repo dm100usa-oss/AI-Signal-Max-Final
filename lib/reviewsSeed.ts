@@ -33,7 +33,7 @@ export const SEED_REVIEWS = [
   },
   {
     id: "seed-5",
-    name: "Екатерина",
+    name: "Екатерина T",
     text: "Поняла, что проблема не в SEO, а в том, как сайт читается ИИ.",
     rating: 5,
     date: "2025-11-26T11:02:00.000Z",
@@ -49,7 +49,7 @@ export const SEED_REVIEWS = [
   },
   {
     id: "seed-7",
-    name: "Ольга",
+    name: "Ольга 001",
     text: "Понятно даже без технического опыта.",
     rating: 5,
     date: "2025-11-25T18:11:00.000Z",
@@ -81,7 +81,7 @@ export const SEED_REVIEWS = [
   },
   {
     id: "seed-11",
-    name: "Илья",
+    name: "Илья Промт",
     text: "Полезно для старых сайтов, где всё давно запутано.",
     rating: 5,
     date: "2025-11-23T10:55:00.000Z",
@@ -97,7 +97,7 @@ export const SEED_REVIEWS = [
   },
   {
     id: "seed-13",
-    name: "Павел",
+    name: "Павел 1223",
     text: "Использую как дополнительный инструмент к обычному аудиту.",
     rating: 5,
     date: "2025-11-22T12:14:00.000Z",
@@ -114,7 +114,7 @@ export const SEED_REVIEWS = [
   {
     id: "seed-15",
     name: "Марина",
-    text: "Нормально, без лишнего.",
+    text: "Нравиться что нет ничего лишнего.",
     rating: 4,
     date: "2025-11-22T21:58:00.000Z",
     seed: true,
@@ -130,7 +130,7 @@ export const SEED_REVIEWS = [
   {
     id: "seed-17",
     name: "Денис",
-    text: "Использовал сервис для клиента.",
+    text: "Использовал сервис для клиента",
     rating: 5,
     date: "2025-11-21T18:22:00.000Z",
     seed: true,
@@ -146,7 +146,7 @@ export const SEED_REVIEWS = [
   {
     id: "seed-19",
     name: "Андрей",
-    text: "Хорошо показывает, где сайт теряется для ИИ.",
+    text: "Хорошо показывает, видимость моих конкурентов.",
     rating: 5,
     date: "2025-11-20T10:41:00.000Z",
     seed: true,
@@ -170,7 +170,7 @@ export const SEED_REVIEWS = [
   {
     id: "seed-22",
     name: "Олег",
-    text: "Некоторые вещи стали очевидны только после отчёта.",
+    text: "Некоторые вещи стали очевидны.",
     rating: 5,
     date: "2025-11-19T09:40:00.000Z",
     seed: true,
@@ -250,7 +250,7 @@ export const SEED_REVIEWS = [
   {
     id: "seed-32",
     name: "Никита",
-    text: "Использовал как быструю проверку.",
+    text: "Использовал как быструю проверку и не только своего сайта",
     rating: 5,
     date: "2025-11-15T09:15:00.000Z",
     seed: true,
@@ -282,7 +282,7 @@ export const SEED_REVIEWS = [
   {
     id: "seed-36",
     name: "Юлия",
-    text: "Полезно.",
+    text: "Полезно.+",
     rating: 5,
     date: "2025-11-14T13:40:00.000Z",
     seed: true,
@@ -378,7 +378,7 @@ export const SEED_REVIEWS = [
   {
     id: "seed-48",
     name: "Людмила",
-    text: "Хороший ориентир.",
+    text: "Хороший ориентир.+++",
     rating: 5,
     date: "2025-11-10T14:55:00.000Z",
     seed: true,
