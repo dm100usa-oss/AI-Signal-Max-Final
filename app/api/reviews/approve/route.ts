@@ -6,12 +6,15 @@ export async function POST(req: Request) {
     const { name, text, rating } = await req.json();
 
     if (!name || !text) {
-      return NextResponse.json({ ok: false, error: "Invalid data" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "Invalid data" },
+        { status: 400 }
+      );
     }
 
     const pending = await redis.lrange("reviews:pending", 0, -1);
 
-    const normalizePendingItemToString = (item: any): string | null => {
+    const normalizeToString = (item: any): string | null => {
       if (typeof item === "string") return item;
       if (item instanceof Uint8Array) return new TextDecoder().decode(item);
       if (typeof item === "object" && item !== null) return JSON.stringify(item);
@@ -19,7 +22,7 @@ export async function POST(req: Request) {
     };
 
     const filtered = (pending || []).filter((item: any) => {
-      const s = normalizePendingItemToString(item);
+      const s = normalizeToString(item);
       if (!s) return true;
 
       try {
@@ -33,7 +36,7 @@ export async function POST(req: Request) {
     await redis.del("reviews:pending");
     if (filtered.length > 0) {
       const toPush = filtered
-        .map((item: any) => normalizePendingItemToString(item))
+        .map((item: any) => normalizeToString(item))
         .filter(Boolean) as string[];
       if (toPush.length > 0) {
         await redis.rpush("reviews:pending", ...toPush);
@@ -48,11 +51,15 @@ export async function POST(req: Request) {
       approved: true,
     };
 
-    await redis.lpush("reviews:approved", JSON.stringify(approvedReview));
+    // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ
+    await redis.lpush("reviews:list", JSON.stringify(approvedReview));
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Error approving review:", err);
-    return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: "Server error" },
+      { status: 500 }
+    );
   }
 }
