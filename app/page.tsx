@@ -111,12 +111,8 @@ export default function Home() {
 
   const clear = () => setUrl("");
 
-  const handleStarsClick = async () => {
-    setWave(true);
-    await new Promise((r) => setTimeout(r, 450));
-    document.body.style.transition = "opacity 0.6s ease";
-    document.body.style.opacity = "0";
-    setTimeout(() => router.push("/reviews"), 600);
+  const handleStarsClick = () => {
+    router.push("/reviews");
   };
 
   return (
@@ -201,7 +197,6 @@ export default function Home() {
         15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на экран и email
       </p>
 
-      {/* ЗВЁЗДЫ + РЕЙТИНГ + ОТЗЫВЫ */}
       <div className="flex flex-col items-center mb-10">
         <style jsx>{`
           .ratingText {
@@ -243,16 +238,12 @@ export default function Home() {
             font-size: 26px;
             cursor: pointer;
             user-select: none;
-
-            /* ЧИСТЫЙ РАБОЧИЙ ЦВЕТ */
             background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-
             text-shadow:
               0 0 1px rgba(255,180,0,0.55),
               0 0 1px rgba(255,160,0,0.55);
-
             transition: transform 0.2s ease, filter 0.2s ease;
           }
           .flash .star {
