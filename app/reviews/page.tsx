@@ -54,7 +54,7 @@ function ReviewsPage() {
   const [text, setText] = useState("");
   const [userRating, setUserRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
-  
+
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
   const [hideForm, setHideForm] = useState(false);
@@ -109,7 +109,7 @@ function ReviewsPage() {
     e.preventDefault();
     setStatus("loading");
     await new Promise((resolve) => setTimeout(resolve, 3000));
-    
+
     try {
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
@@ -148,30 +148,31 @@ function ReviewsPage() {
         </span>
       </p>
 
-      {/* блок: что отмечают пользователи */}
-      <div className="mb-12">
-        <h2 className="text-sm font-medium text-neutral-500 mb-4 text-center">
+      {/* что отмечают пользователи */}
+      <div className="mb-12 text-center">
+        <h2 className="text-sm font-medium text-neutral-500 mb-4">
           что отмечают пользователи
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+
+        <div className="flex flex-wrap justify-center gap-3 text-sm font-medium">
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
             полезно
-          </div>
-          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+          </span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
             понятно
-          </div>
-          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+          </span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
             удобно
-          </div>
-          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+          </span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
             экономит время и деньги
-          </div>
-          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+          </span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
             можно переслать разработчику
-          </div>
-          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+          </span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
             подходит для повседневной работы
-          </div>
+          </span>
         </div>
       </div>
 
