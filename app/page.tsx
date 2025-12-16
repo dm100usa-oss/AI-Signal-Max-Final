@@ -198,7 +198,7 @@ export default function Home() {
       </button>
 
       <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
-        15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на email
+        15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на экран и email
       </p>
 
       {/* ЗВЁЗДЫ + РЕЙТИНГ + ОТЗЫВЫ */}
