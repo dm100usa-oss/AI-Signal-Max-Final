@@ -1,36 +1,45 @@
 import { NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
-
-const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
-});
+import { redis } from "@/lib/reviews";
 
 export async function POST(req: Request) {
   try {
     const { name, text, rating } = await req.json();
-    
+
     if (!name || !text) {
       return NextResponse.json({ ok: false, error: "Invalid data" }, { status: 400 });
     }
 
-    // 1. Удаляем из pending
     const pending = await redis.lrange("reviews:pending", 0, -1);
-    const filtered = pending.filter((item) => {
+
+    const normalizePendingItemToString = (item: any): string | null => {
+      if (typeof item === "string") return item;
+      if (item instanceof Uint8Array) return new TextDecoder().decode(item);
+      if (typeof item === "object" && item !== null) return JSON.stringify(item);
+      return null;
+    };
+
+    const filtered = (pending || []).filter((item: any) => {
+      const s = normalizePendingItemToString(item);
+      if (!s) return true;
+
       try {
-        const r = JSON.parse(item as string);
+        const r = JSON.parse(s);
         return !(r.name === name && r.text === text);
       } catch {
         return true;
       }
     });
-    
+
     await redis.del("reviews:pending");
     if (filtered.length > 0) {
-      await redis.rpush("reviews:pending", ...filtered);
+      const toPush = filtered
+        .map((item: any) => normalizePendingItemToString(item))
+        .filter(Boolean) as string[];
+      if (toPush.length > 0) {
+        await redis.rpush("reviews:pending", ...toPush);
+      }
     }
 
-    // 2. Добавляем в approved
     const approvedReview = {
       name,
       text,
@@ -38,7 +47,7 @@ export async function POST(req: Request) {
       date: new Date().toISOString(),
       approved: true,
     };
-    
+
     await redis.lpush("reviews:approved", JSON.stringify(approvedReview));
 
     return NextResponse.json({ ok: true });
