@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const redis = new Redis({
-  url: process.env.KV_REST_API_URL!,
-  token: process.env.KV_REST_API_TOKEN!,
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
 export async function POST(req: Request) {
@@ -11,7 +14,10 @@ export async function POST(req: Request) {
     const { name, text, rating } = await req.json();
 
     if (!name || !text || !rating) {
-      return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "Missing fields" },
+        { status: 400 }
+      );
     }
 
     const review = {
@@ -22,12 +28,14 @@ export async function POST(req: Request) {
       approved: false,
     };
 
-    // Сохраняем в очередь "ожидающих"
     await redis.lpush("reviews:pending", JSON.stringify(review));
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Ошибка при добавлении отзыва:", err);
-    return NextResponse.json({ ok: false, error: "Server error" }, { status: 500 });
+    console.error("Error submitting review:", err);
+    return NextResponse.json(
+      { ok: false, error: "Server error" },
+      { status: 500 }
+    );
   }
 }
