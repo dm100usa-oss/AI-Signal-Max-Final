@@ -6,13 +6,13 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/reviews/stats
- * Возвращает: { rating: число, reviews: число }
+ * Возвращает: { rating: number, reviews: number }
  */
 export async function GET() {
   try {
     // Получаем одобренные отзывы из Redis
-    const approved = await redis.lrange("reviews:approved", 0, -1);
-    
+    const approved = await redis.lrange("reviews:list", 0, -1);
+
     // Если отзывов нет - возвращаем дефолтные значения
     if (!approved || approved.length === 0) {
       return NextResponse.json({
@@ -28,12 +28,12 @@ export async function GET() {
     for (const item of approved) {
       try {
         const review = typeof item === "string" ? JSON.parse(item) : item;
-        if (review.rating && typeof review.rating === "number") {
+
+        if (typeof review.rating === "number") {
           totalRating += review.rating;
           validCount++;
         }
       } catch {
-        // Пропускаем невалидные записи
         continue;
       }
     }
@@ -49,13 +49,12 @@ export async function GET() {
     const averageRating = totalRating / validCount;
 
     return NextResponse.json({
-      rating: parseFloat(averageRating.toFixed(1)), // округляем до 1 знака
+      rating: parseFloat(averageRating.toFixed(1)),
       reviews: validCount,
     });
-    
   } catch (error) {
     console.error("Error in /api/reviews/stats:", error);
-    
+
     // В случае ошибки Redis - возвращаем дефолт
     return NextResponse.json({
       rating: 4.9,
