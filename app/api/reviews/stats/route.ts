@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { redis } from "@/lib/reviews";
+import { SEED_REVIEWS } from "@/lib/reviewsSeed";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,32 +14,34 @@ export async function GET() {
     // Получаем одобренные отзывы из Redis
     const approved = await redis.lrange("reviews:list", 0, -1);
 
-    // Если отзывов нет - возвращаем дефолтные значения
-    if (!approved || approved.length === 0) {
-      return NextResponse.json({
-        rating: 4.9,
-        reviews: 128,
-      });
-    }
-
-    // Парсим отзывы и считаем средний рейтинг
     let totalRating = 0;
     let validCount = 0;
 
-    for (const item of approved) {
-      try {
-        const review = typeof item === "string" ? JSON.parse(item) : item;
-
-        if (typeof review.rating === "number") {
-          totalRating += review.rating;
-          validCount++;
-        }
-      } catch {
-        continue;
+    // Учитываем seed-отзывы
+    for (const review of SEED_REVIEWS) {
+      if (typeof review.rating === "number") {
+        totalRating += review.rating;
+        validCount++;
       }
     }
 
-    // Если не удалось распарсить ни одного отзыва
+    // Учитываем отзывы из Redis
+    if (approved && approved.length > 0) {
+      for (const item of approved) {
+        try {
+          const review = typeof item === "string" ? JSON.parse(item) : item;
+
+          if (typeof review.rating === "number") {
+            totalRating += review.rating;
+            validCount++;
+          }
+        } catch {
+          continue;
+        }
+      }
+    }
+
+    // Если нет ни одного валидного отзыва
     if (validCount === 0) {
       return NextResponse.json({
         rating: 4.9,
