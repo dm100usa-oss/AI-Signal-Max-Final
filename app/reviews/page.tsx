@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 export default function ReviewsPageWrapper() {
   return (
-    <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
+    <Suspense fallback={null}>
       <ReviewsPage />
     </Suspense>
   );
@@ -60,7 +60,6 @@ function ReviewsPage() {
   const [hideForm, setHideForm] = useState(false);
 
   useEffect(() => {
-    document.body.style.opacity = "1";
     async function fetchData() {
       try {
         const [statsResp, reviewsResp] = await Promise.all([
@@ -155,24 +154,12 @@ function ReviewsPage() {
         </h2>
 
         <div className="flex flex-wrap justify-center gap-3 text-sm font-medium">
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
-            полезно
-          </span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
-            понятно
-          </span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
-            удобно
-          </span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
-            экономит время и деньги
-          </span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
-            можно переслать разработчику
-          </span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">
-            подходит для повседневной работы
-          </span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">полезно</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">понятно</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">удобно</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">экономит время и деньги</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">можно переслать разработчику</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">подходит для повседневной работы</span>
         </div>
       </div>
 
