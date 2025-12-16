@@ -60,10 +60,13 @@ export default function Home() {
         const resp = await fetch("/api/reviews/stats");
         if (resp.ok) {
           const data = await resp.json();
-          if (data?.rating && data?.reviews) {
-            setRating(data.rating);
-            setReviews(data.reviews);
-          }
+          if (
+  typeof data?.rating === "number" &&
+  typeof data?.reviews === "number"
+) {
+  setRating(data.rating);
+  setReviews(data.reviews);
+}
         }
       } catch {}
     }
