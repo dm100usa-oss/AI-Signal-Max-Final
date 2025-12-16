@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import React from "react";
 
 export default function PageTransition({
@@ -9,9 +10,16 @@ export default function PageTransition({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    setVisible(false);
+    const id = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(id);
+  }, [pathname]);
 
   return (
-    <div key={pathname} className="page-transition">
+    <div className={`page-transition ${visible ? "in" : "out"}`}>
       {children}
     </div>
   );
