@@ -1,10 +1,8 @@
 "use client";
-
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-// Обёртка для Suspense (Next.js 14)
 export default function ReviewsPageWrapper() {
   return (
     <Suspense fallback={<div className="p-10 text-center text-gray-500">Загрузка...</div>}>
@@ -13,7 +11,6 @@ export default function ReviewsPageWrapper() {
   );
 }
 
-// Анимация точек
 function Dots() {
   return (
     <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-baseline">
@@ -52,15 +49,17 @@ function ReviewsPage() {
   const [sortMode, setSortMode] = useState<"new" | "popular">("new");
   const [rating, setRating] = useState<number>(4.9);
   const [reviewsCount, setReviewsCount] = useState<number>(128);
-
   const [reviews, setReviews] = useState<any[]>([]);
+
   const [name, setName] = useState("");
   const [text, setText] = useState("");
+  const [userRating, setUserRating] = useState<number>(5); // НОВОЕ: рейтинг от пользователя
+  const [hoverRating, setHoverRating] = useState<number>(0); // НОВОЕ: для hover эффекта
+  
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
   const [hideForm, setHideForm] = useState(false);
 
-  // Загружаем статистику и реальные отзывы
   useEffect(() => {
     document.body.style.opacity = "1";
     async function fetchData() {
@@ -71,7 +70,6 @@ function ReviewsPage() {
         ]);
         const stats = await statsResp.json();
         const data = await reviewsResp.json();
-
         if (stats?.rating) setRating(stats.rating);
         if (stats?.reviews) setReviewsCount(stats.reviews);
         if (data?.ok && Array.isArray(data.reviews)) setReviews(data.reviews);
@@ -81,7 +79,7 @@ function ReviewsPage() {
     }
     fetchData();
   }, []);
-  // Автоматическое скрытие карточки "Спасибо!"
+
   useEffect(() => {
     if (showSuccess) {
       const timer = setTimeout(() => setShowSuccess(false), 4000);
@@ -111,23 +109,22 @@ function ReviewsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-
     await new Promise((resolve) => setTimeout(resolve, 3000));
-
+    
     try {
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, text }),
+        body: JSON.stringify({ name, text, rating: userRating }), // ИСПРАВЛЕНО: добавлен rating
       });
       const data = await res.json();
-
       if (data.ok) {
         setStatus("success");
         setShowSuccess(true);
         setHideForm(true);
         setName("");
         setText("");
+        setUserRating(5);
       } else setStatus("error");
     } catch {
       setStatus("error");
@@ -142,7 +139,6 @@ function ReviewsPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
-      {/* Рейтинг и количество */}
       <p className="text-center mb-8 text-lg">
         <span
           className="inline-block"
@@ -157,13 +153,58 @@ function ReviewsPage() {
 
       {isAddMode && !hideForm && (
         <form onSubmit={handleSubmit} className="mb-12 flex flex-col gap-4 w-full max-w-md mx-auto">
-          <input type="text" placeholder="Ваше имя" value={name} onChange={(e) => setName(e.target.value)}
-            className="border border-gray-300 rounded-md p-2" required />
-          <textarea placeholder="Ваш отзыв..." value={text} onChange={(e) => setText(e.target.value)}
-            className="border border-gray-300 rounded-md p-2 h-32 resize-none" required />
-          <button type="submit" disabled={status === "loading"}
-            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center">
-            {status === "loading" ? <span className="inline-flex items-center">Отправка<Dots /></span> : "Отправить"}
+          <input
+            type="text"
+            placeholder="Ваше имя"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border border-gray-300 rounded-md p-2"
+            required
+          />
+          
+          {/* НОВОЕ: Выбор рейтинга */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600">Ваша оценка:</label>
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setUserRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="text-3xl transition-all hover:scale-110"
+                  style={{
+                    color: star <= (hoverRating || userRating) ? "#facc15" : "#d1d5db",
+                    WebkitTextStroke: "1px #eab308",
+                  }}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <textarea
+            placeholder="Ваш отзыв..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="border border-gray-300 rounded-md p-2 h-32 resize-none"
+            required
+          />
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
+          >
+            {status === "loading" ? (
+              <span className="inline-flex items-center">
+                Отправка
+                <Dots />
+              </span>
+            ) : (
+              "Отправить"
+            )}
           </button>
         </form>
       )}
@@ -179,23 +220,41 @@ function ReviewsPage() {
       </p>
 
       <div className="flex justify-center space-x-4 mt-6 mb-10 text-sm font-medium">
-        <button onClick={() => setSortMode("new")} className={`px-3 py-1 rounded-full transition-colors ${
-          sortMode === "new" ? "text-blue-600 bg-blue-50" : "text-neutral-600 hover:bg-neutral-100"
-        }`}>Сначала новые</button>
-        <button onClick={() => setSortMode("popular")} className={`px-3 py-1 rounded-full transition-colors ${
-          sortMode === "popular" ? "text-blue-600 bg-blue-50" : "text-neutral-600 hover:bg-neutral-100"
-        }`}>Сначала популярные</button>
+        <button
+          onClick={() => setSortMode("new")}
+          className={`px-3 py-1 rounded-full transition-colors ${
+            sortMode === "new" ? "text-blue-600 bg-blue-50" : "text-neutral-600 hover:bg-neutral-100"
+          }`}
+        >
+          Сначала новые
+        </button>
+        <button
+          onClick={() => setSortMode("popular")}
+          className={`px-3 py-1 rounded-full transition-colors ${
+            sortMode === "popular" ? "text-blue-600 bg-blue-50" : "text-neutral-600 hover:bg-neutral-100"
+          }`}
+        >
+          Сначала популярные
+        </button>
       </div>
 
       <div className="space-y-6">
         {sortedReviews.map((r, i) => (
-          <div key={i} className="bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
+          <div
+            key={i}
+            className="bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+          >
             <div className="flex items-center justify-start space-x-2 mb-3">
               <div className="flex">{renderStars(r.rating || 5)}</div>
               <span className="font-semibold text-gray-800">{r.name}</span>
               {r.date && (
                 <span className="text-neutral-400 text-sm">
-                  · {new Date(r.date).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })}
+                  ·{" "}
+                  {new Date(r.date).toLocaleDateString("ru-RU", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
                 </span>
               )}
             </div>
@@ -204,8 +263,11 @@ function ReviewsPage() {
         ))}
       </div>
 
-      <button onClick={handleBack} className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
-        style={{ background: "linear-gradient(90deg,#2563eb 0%,#3b82f6 100%)", opacity: 0.9 }}>
+      <button
+        onClick={handleBack}
+        className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
+        style={{ background: "linear-gradient(90deg,#2563eb 0%,#3b82f6 100%)", opacity: 0.9 }}
+      >
         На главную
       </button>
 
