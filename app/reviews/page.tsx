@@ -46,15 +46,14 @@ function ReviewsPage() {
   const params = useSearchParams();
   const isAddMode = params.get("add") === "true";
 
-  const [sortMode, setSortMode] = useState<"new" | "popular">("new");
   const [rating, setRating] = useState<number>(4.9);
   const [reviewsCount, setReviewsCount] = useState<number>(128);
   const [reviews, setReviews] = useState<any[]>([]);
 
   const [name, setName] = useState("");
   const [text, setText] = useState("");
-  const [userRating, setUserRating] = useState<number>(0); // НОВОЕ: рейтинг от пользователя
-  const [hoverRating, setHoverRating] = useState<number>(0); // НОВОЕ: для hover эффекта
+  const [userRating, setUserRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
   
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -115,7 +114,7 @@ function ReviewsPage() {
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, text, rating: userRating }), // ИСПРАВЛЕНО: добавлен rating
+        body: JSON.stringify({ name, text, rating: userRating }),
       });
       const data = await res.json();
       if (data.ok) {
@@ -131,10 +130,8 @@ function ReviewsPage() {
     }
   };
 
-  const sortedReviews = [...reviews].sort((a, b) =>
-    sortMode === "new"
-      ? new Date(b.date).getTime() - new Date(a.date).getTime()
-      : (b.rating || 0) - (a.rating || 0)
+  const sortedReviews = [...reviews].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
   return (
@@ -151,6 +148,33 @@ function ReviewsPage() {
         </span>
       </p>
 
+      {/* блок: что отмечают пользователи */}
+      <div className="mb-12">
+        <h2 className="text-sm font-medium text-neutral-500 mb-4 text-center">
+          что отмечают пользователи
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+            полезно
+          </div>
+          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+            понятно
+          </div>
+          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+            удобно
+          </div>
+          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+            экономит время и деньги
+          </div>
+          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+            можно переслать разработчику
+          </div>
+          <div className="rounded-xl border border-neutral-200 px-4 py-2 text-sm text-neutral-800 text-center">
+            подходит для повседневной работы
+          </div>
+        </div>
+      </div>
+
       {isAddMode && !hideForm && (
         <form onSubmit={handleSubmit} className="mb-12 flex flex-col gap-4 w-full max-w-md mx-auto">
           <input
@@ -161,8 +185,7 @@ function ReviewsPage() {
             className="border border-gray-300 rounded-md p-2"
             required
           />
-          
-          {/* НОВОЕ: Выбор рейтинга */}
+
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-600">Ваша оценка:</label>
             <div className="flex gap-1">
@@ -192,9 +215,10 @@ function ReviewsPage() {
             className="border border-gray-300 rounded-md p-2 h-32 resize-none"
             required
           />
-         <button
-  type="submit"
-  disabled={status === "loading" || userRating === 0}
+
+          <button
+            type="submit"
+            disabled={status === "loading" || userRating === 0}
             className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
           >
             {status === "loading" ? (
@@ -218,25 +242,6 @@ function ReviewsPage() {
       <p className="text-center leading-relaxed text-[16px] mb-14" style={{ color: "#475569" }}>
         Поделитесь своим мнением, расскажите о себе или своей компании, вашу историю увидят тысячи пользователей по всему миру
       </p>
-
-      <div className="flex justify-center space-x-4 mt-6 mb-10 text-sm font-medium">
-        <button
-          onClick={() => setSortMode("new")}
-          className={`px-3 py-1 rounded-full transition-colors ${
-            sortMode === "new" ? "text-blue-600 bg-blue-50" : "text-neutral-600 hover:bg-neutral-100"
-          }`}
-        >
-          Сначала новые
-        </button>
-        <button
-          onClick={() => setSortMode("popular")}
-          className={`px-3 py-1 rounded-full transition-colors ${
-            sortMode === "popular" ? "text-blue-600 bg-blue-50" : "text-neutral-600 hover:bg-neutral-100"
-          }`}
-        >
-          Сначала популярные
-        </button>
-      </div>
 
       <div className="space-y-6">
         {sortedReviews.map((r, i) => (
