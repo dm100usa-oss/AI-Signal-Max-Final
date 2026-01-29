@@ -124,7 +124,7 @@ export default function Home() {
         новое конкурентное преимущество
       </p>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Проверьте как ИИ ассистенты видят и оценивают ваш сайт: ChatGPT · Copilot · Gemini · Perplexity · Grok и другие
+        Проверьте, насколько ваш сайт готов к появлению в рекомендациях AI-ассистентов: ChatGPT · Copilot · Gemini · Claude · Perplexity · Grok и других
       </p>
 
       <div className="mb-2 relative">
@@ -179,7 +179,7 @@ export default function Home() {
       </button>
 
       <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
-        Мгновенный результат, 10 ключевых факторов, краткие рекомендации
+        Мгновенный результат, 10 ключевых факторов, краткие рекомендации на экране
       </p>
 
       <button
@@ -194,7 +194,7 @@ export default function Home() {
       </button>
 
       <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
-        15 факторов, детальный PDF-отчёт, чек-лист для разработчика, результат на экран и email
+        15 факторов, результат на экране и по email, отчёт и рекомендации для владельца и ТЗ для разработчика
       </p>
 
       <div className="flex flex-col items-center mb-10">
