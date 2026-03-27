@@ -83,29 +83,8 @@ export default function Home() {
       if (!u.startsWith("http://") && !u.startsWith("https://")) {
         u = "https://" + u;
     if (!isValidUrl(u)) {
+  if (!isValidUrl(u)) {
   setError("Введите корректный URL, включая https://");
-  return;
-}
-
-const hostname = new URL(u).hostname.toLowerCase();
-
-const blockedDomains = [
-  "example.com",
-  "example.org",
-  "example.net",
-  "test.com",
-  "test.org",
-  "localhost",
-  "127.0.0.1",
-  "0.0.0.0",
-  "dummy.com",
-  "invalid",
-  "example.local",
-  "test.local",
-];
-
-if (blockedDomains.includes(hostname)) {
-  setError("Не удалось выполнить анализ сайта. Укажите другой сайт с реальным контентом");
   return;
 }
       setError(null);
