@@ -105,7 +105,7 @@ const blockedDomains = [
 ];
 
 if (blockedDomains.includes(hostname)) {
-  setError("Не удалось выполнить анализ сайта. Укажите другой сайт с реальным контентом");
+  setError("Не удалось выполнить анализ сайта. Укажите другой сайт");
   return;
       }
       setError(null);
