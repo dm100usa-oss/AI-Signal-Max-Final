@@ -82,11 +82,11 @@ export default function Home() {
       let u = normalizeUrl(url);
       if (!u.startsWith("http://") && !u.startsWith("https://")) {
         u = "https://" + u;
-    if (!isValidUrl(u)) {
-  if (!isValidUrl(u)) {
-  setError("Введите корректный URL, включая https://");
-  return;
-}
+      }
+      if (!isValidUrl(u)) {
+        setError("Введите корректный URL, включая https://");
+        return;
+      }
       setError(null);
       setLoading(mode);
 
