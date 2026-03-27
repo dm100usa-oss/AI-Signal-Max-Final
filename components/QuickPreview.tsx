@@ -186,8 +186,8 @@ export default function QuickPreview() {
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
-        https://www.magicofdiscoveries.com/english &nbsp; | &nbsp; Дата: {today}
-      </p>
+  {url} &nbsp; | &nbsp; Дата: {today}
+</p>
 
       <div className="my-6 flex items-center justify-center">
         <div
