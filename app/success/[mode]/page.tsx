@@ -28,7 +28,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const targetUrl = currentUrl.searchParams.get("url") || "";
         setUrl(targetUrl);
 
-        const res = await fetch(`/api/result?url=${encodeURIComponent(targetUrl)}`);
+        const res = await fetch(`/api/result?url=${encodeURIComponent(targetUrl)}&mode=${mode}`);
         const data = await res.json();
 
         if (!data || !data.score) throw new Error("No valid data");
@@ -82,7 +82,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 С уважением, команда AI Signal Max.`;
 
           const proText = `Ваш сайт частично готов к рекомендациям со стороны ИИ-систем. <strong>Вы близки к хорошему результату</strong> – достаточно доработать детали, чтобы структура стала понятнее для ИИ. Тогда сайт сможет чаще появляться в ответах, и вы получите больше переходов и обращений.<br/><br/>
-Отдельные параметры пока настроены не полностью, из-за этого сайт не всегда попадает в ответы ИИ. <strong>Их точечная корректировка повысит готовность сайта к рекомендациям и позволит чаще появляться в ответах.</strong><br/><br/>
+Отдельные параметры пока настроены не полностью, из-за этого сайт не всегда попадает в ответы ИИ. <strong>Их точечная корректировка даёт основной рост готовности и видимости.</strong><br/><br/>
 Мы отправили вам два PDF-файла на email: <strong>подробный отчёт с разъяснениями и техническое задание для разработчика</strong>. Это готовый план действий, который можно сразу передать в работу и затем проверить результат повторно.<br/><br/>
 С уважением, команда AI Signal Max.`;
 
@@ -161,9 +161,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                 ? "Средняя готовность сайта"
                 : "Низкая готовность сайта"}
             </p>
-            <p className="text-base text-gray-700 leading-relaxed">
-  {summary}
-</p>
+            <p
+              className="text-base text-gray-700 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: summary }}
+            />
           </>
         )}
       </div>
