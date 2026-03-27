@@ -30,14 +30,20 @@ const normalizeUrl = (v: string) =>
 const isValidUrl = (u: string): boolean => {
   try {
     const url = new URL(u.trim());
+
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+
     const hostname = url.hostname;
+
+    if (!hostname.includes(".")) return false;
+
+    if (hostname === "localhost") return false;
+
     const parts = hostname.split(".");
-    if (parts.length < 2) return false;
-    const tld = parts[parts.length - 1];
-    if (!/^[a-zA-Z]{2,6}$/.test(tld)) return false;
-    const lastBeforeTld = parts[parts.length - 2];
-    if (lastBeforeTld.length < 2) return false;
+    const lastTwo = parts.slice(-2).join(".");
+
+    if (!/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/.test(lastTwo)) return false;
+
     return true;
   } catch {
     return false;
