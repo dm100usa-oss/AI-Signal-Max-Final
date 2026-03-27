@@ -28,7 +28,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const targetUrl = currentUrl.searchParams.get("url") || "";
         setUrl(targetUrl);
 
-        const res = await fetch(`/api/result?url=${encodeURIComponent(targetUrl)}&mode=${mode}`);
+        const res = await fetch(`/api/result?url=${encodeURIComponent(targetUrl)}`);
         const data = await res.json();
 
         if (!data || !data.score) throw new Error("No valid data");
