@@ -161,10 +161,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                 ? "Средняя готовность сайта"
                 : "Низкая готовность сайта"}
             </p>
-            <p
-              className="text-base text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: summary }}
-            />
+            <p className="text-base text-gray-700 leading-relaxed">
+  {summary}
+</p>
           </>
         )}
       </div>
