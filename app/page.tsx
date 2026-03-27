@@ -101,7 +101,14 @@ export default function Home() {
           body: JSON.stringify({ url: u }),
         });
         const json = await resp.json();
-        status = json?.ok ? "ok" : "error";
+
+if (!json?.ok) {
+  setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
+  setLoading(null);
+  return;
+}
+
+status = "ok";
       } catch {
         status = "error";
       }
