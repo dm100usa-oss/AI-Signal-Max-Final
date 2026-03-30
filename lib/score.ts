@@ -15,7 +15,8 @@ export type CheckKey =
   | "https"
   | "alt_attributes"
   | "favicon"
-  | "page_404";
+  | "page_404"
+  | "site_speed";
 
 export interface CheckMeta {
   key: CheckKey;
