@@ -14,8 +14,8 @@ export type CheckKey =
   | "mobile_friendly"
   | "https"
   | "alt_attributes"
-  | "page_404"
-  | "site_speed";
+  | "favicon"
+  | "page_404";
 
 export interface CheckMeta {
   key: CheckKey;
@@ -37,8 +37,8 @@ export const CHECKS: CheckMeta[] = [
   { key: "mobile_friendly",  name: "Mobile friendly (viewport)", weight: 7  },
   { key: "https",            name: "HTTPS / SSL",                weight: 6  },
   { key: "alt_attributes",   name: "Alt attributes",             weight: 4  },
+  { key: "favicon",          name: "Favicon",                    weight: 2  },
   { key: "page_404",         name: "404 page",                   weight: 2  },
-  { key: "site_speed",       name: "Скорость загрузки сайта",    weight: 2  },
 ]; // total = 100
 
 export const PRO_KEYS: CheckKey[] = CHECKS.map((c) => c.key);
