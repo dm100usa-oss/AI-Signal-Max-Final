@@ -14,7 +14,7 @@ export type CheckKey =
   | "mobile_friendly"
   | "https"
   | "alt_attributes"
-  | "site_speed"
+  | "favicon"
   | "page_404";
 
 export interface CheckMeta {
@@ -37,10 +37,8 @@ export const CHECKS: CheckMeta[] = [
   { key: "mobile_friendly",  name: "Mobile friendly (viewport)", weight: 7  },
   { key: "https",            name: "HTTPS / SSL",                weight: 6  },
   { key: "alt_attributes",   name: "Alt attributes",             weight: 4  },
-
-  { key: "site_speed",       name: "Site speed",                 weight: 2 },
-
-  { key: "page_404",         name: "404 page",                   weight: 2 },
+  { key: "favicon",          name: "Favicon",                    weight: 2  },
+  { key: "page_404",         name: "404 page",                   weight: 2  },
 ]; // total = 100
 
 export const PRO_KEYS: CheckKey[] = CHECKS.map((c) => c.key);
@@ -72,6 +70,7 @@ export function interpret(
   return "Poor";
 }
 
+// Color for factor status (used in UI)
 export function statusColor(
   passed: boolean | null
 ): "green" | "yellow" | "red" {
