@@ -54,10 +54,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
       description: schemeOk ? "HTTPS detected" : "Page is not served via HTTPS",
     },
     alt_attributes: checkAltAttributes(html),
-
-    // ЗАМЕНА favicon → site_speed (пока заглушка)
-    site_speed: item("site_speed", null, "Speed not measured yet"),
-
+    favicon: await checkFavicon(html, origin),
     page_404: await check404(origin),
   };
 
@@ -302,6 +299,25 @@ function checkAltAttributes(html: string | null): CheckItem {
   if (ratio >= 0.3)
     return item("alt_attributes", null, `Partial alts: ${withAlt}/${imgTags.length}`);
   return item("alt_attributes", false, `Poor alts: ${withAlt}/${imgTags.length}`);
+}
+
+async function checkFavicon(
+  html: string | null,
+  origin: string
+): Promise<CheckItem> {
+  const linkHref =
+    textMatch(
+      html,
+      /<link[^>]+rel=["'](?:shortcut\s+icon|icon)["'][^>]+href=["']([^"']+)["'][^>]*>/i
+    ) || "";
+  if (linkHref) return item("favicon", true, `Icon: ${linkHref}`);
+  try {
+    const res = await fetchWithTimeout(origin + "/favicon.ico", { method: "HEAD" });
+    if (res.ok) return item("favicon", null, "/favicon.ico found but no <link>");
+    return item("favicon", false, "No favicon");
+  } catch {
+    return item("favicon", false, "No favicon");
+  }
 }
 
 async function check404(origin: string): Promise<CheckItem> {
