@@ -34,13 +34,12 @@ const DEFAULT_UA =
 export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult> {
   const { origin, url } = normalizeUrl(rawUrl);
 
-  // 🔥 ДОБАВИЛИ ЗАМЕР СКОРОСТИ
   const startTime = Date.now();
   const { html, headers, schemeOk } = await fetchHTML(url);
   const endTime = Date.now();
   const loadTime = (endTime - startTime) / 1000;
 
-  const all: Record<CheckKey | "site_speed", CheckItem> = {
+  const all: Record<CheckKey, CheckItem> = {
     robots_txt: await checkRobotsTxt(origin),
     sitemap_xml: await checkSitemap(origin),
     x_robots_tag: checkXRobots(headers),
@@ -59,16 +58,14 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
       description: schemeOk ? "HTTPS detected" : "Page is not served via HTTPS",
     },
     alt_attributes: checkAltAttributes(html),
-    favicon: await checkFavicon(html, origin),
     page_404: await check404(origin),
 
-    // 🔥 НОВЫЙ ФАКТОР
     site_speed: checkSiteSpeed(loadTime),
   };
 
-  const score = calcWeightedScore(all as Record<CheckKey, CheckItem>);
+  const score = calcWeightedScore(all);
   const keysToShow = mode === "quick" ? QUICK_KEYS : PRO_KEYS;
-  const items = keysToShow.map((k) => (all as any)[k]);
+  const items = keysToShow.map((k) => all[k]);
 
   const results: Record<string, "Good" | "Moderate" | "Poor"> = {};
   const factors: Record<string, { status: "Good" | "Moderate" | "Poor" }> = {};
@@ -142,27 +139,26 @@ async function fetchHTML(
   return { html, headers: res.headers, schemeOk };
 }
 
-// 🔥 ФУНКЦИЯ СКОРОСТИ
 function checkSiteSpeed(loadTime: number): CheckItem {
   if (loadTime < 1.5) {
     return {
-      key: "site_speed" as any,
-      name: "Скорость загрузки сайта",
+      key: "site_speed",
+      name: nameOf("site_speed"),
       passed: true,
       description: `Fast (${loadTime.toFixed(2)}s)`,
     };
   }
   if (loadTime < 3) {
     return {
-      key: "site_speed" as any,
-      name: "Скорость загрузки сайта",
+      key: "site_speed",
+      name: nameOf("site_speed"),
       passed: null,
       description: `Moderate (${loadTime.toFixed(2)}s)`,
     };
   }
   return {
-    key: "site_speed" as any,
-    name: "Скорость загрузки сайта",
+    key: "site_speed",
+    name: nameOf("site_speed"),
     passed: false,
     description: `Slow (${loadTime.toFixed(2)}s)`,
   };
@@ -324,7 +320,7 @@ function checkAltAttributes(html: string | null): CheckItem {
   if (!imgTags.length) return item("alt_attributes", null, "No images on page");
   let withAlt = 0;
   for (const tag of imgTags) {
-    const alt = (tag.match(/alt\s*=\s*["']([^"']*)["']/i) || [, ""])[1].trim();
+    const alt = (tag.match(/alt\s*=\s*["']([^"']*)["']/i) || [,""])[1].trim();
     if (alt.length > 0) withAlt++;
   }
   const ratio = withAlt / imgTags.length;
@@ -333,25 +329,6 @@ function checkAltAttributes(html: string | null): CheckItem {
   if (ratio >= 0.3)
     return item("alt_attributes", null, `Partial alts: ${withAlt}/${imgTags.length}`);
   return item("alt_attributes", false, `Poor alts: ${withAlt}/${imgTags.length}`);
-}
-
-async function checkFavicon(
-  html: string | null,
-  origin: string
-): Promise<CheckItem> {
-  const linkHref =
-    textMatch(
-      html,
-      /<link[^>]+rel=["'](?:shortcut\s+icon|icon)["'][^>]+href=["']([^"']+)["'][^>]*>/i
-    ) || "";
-  if (linkHref) return item("favicon", true, `Icon: ${linkHref}`);
-  try {
-    const res = await fetchWithTimeout(origin + "/favicon.ico", { method: "HEAD" });
-    if (res.ok) return item("favicon", null, "/favicon.ico found but no <link>");
-    return item("favicon", false, "No favicon");
-  } catch {
-    return item("favicon", false, "No favicon");
-  }
 }
 
 async function check404(origin: string): Promise<CheckItem> {
