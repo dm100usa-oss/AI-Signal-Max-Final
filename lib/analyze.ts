@@ -33,11 +33,7 @@ const DEFAULT_UA =
 
 export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult> {
   const { origin, url } = normalizeUrl(rawUrl);
-
-  const startTime = Date.now();
   const { html, headers, schemeOk } = await fetchHTML(url);
-  const endTime = Date.now();
-  const loadTime = (endTime - startTime) / 1000;
 
   const all: Record<CheckKey, CheckItem> = {
     robots_txt: await checkRobotsTxt(origin),
@@ -58,9 +54,8 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
       description: schemeOk ? "HTTPS detected" : "Page is not served via HTTPS",
     },
     alt_attributes: checkAltAttributes(html),
+    favicon: await checkFavicon(html, origin),
     page_404: await check404(origin),
-
-    site_speed: checkSiteSpeed(loadTime),
   };
 
   const score = calcWeightedScore(all);
@@ -137,31 +132,6 @@ async function fetchHTML(
   const schemeOk = url.startsWith("https://") && res.ok;
   const html = res.ok ? await res.text() : null;
   return { html, headers: res.headers, schemeOk };
-}
-
-function checkSiteSpeed(loadTime: number): CheckItem {
-  if (loadTime < 1.5) {
-    return {
-      key: "site_speed",
-      name: nameOf("site_speed"),
-      passed: true,
-      description: `Fast (${loadTime.toFixed(2)}s)`,
-    };
-  }
-  if (loadTime < 3) {
-    return {
-      key: "site_speed",
-      name: nameOf("site_speed"),
-      passed: null,
-      description: `Moderate (${loadTime.toFixed(2)}s)`,
-    };
-  }
-  return {
-    key: "site_speed",
-    name: nameOf("site_speed"),
-    passed: false,
-    description: `Slow (${loadTime.toFixed(2)}s)`,
-  };
 }
 
 function item(key: CheckKey, passed: boolean | null, description: string): CheckItem {
@@ -329,6 +299,25 @@ function checkAltAttributes(html: string | null): CheckItem {
   if (ratio >= 0.3)
     return item("alt_attributes", null, `Partial alts: ${withAlt}/${imgTags.length}`);
   return item("alt_attributes", false, `Poor alts: ${withAlt}/${imgTags.length}`);
+}
+
+async function checkFavicon(
+  html: string | null,
+  origin: string
+): Promise<CheckItem> {
+  const linkHref =
+    textMatch(
+      html,
+      /<link[^>]+rel=["'](?:shortcut\s+icon|icon)["'][^>]+href=["']([^"']+)["'][^>]*>/i
+    ) || "";
+  if (linkHref) return item("favicon", true, `Icon: ${linkHref}`);
+  try {
+    const res = await fetchWithTimeout(origin + "/favicon.ico", { method: "HEAD" });
+    if (res.ok) return item("favicon", null, "/favicon.ico found but no <link>");
+    return item("favicon", false, "No favicon");
+  } catch {
+    return item("favicon", false, "No favicon");
+  }
 }
 
 async function check404(origin: string): Promise<CheckItem> {
