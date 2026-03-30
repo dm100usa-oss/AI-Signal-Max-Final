@@ -40,7 +40,8 @@ export const CHECKS: CheckMeta[] = [
   { key: "alt_attributes",   name: "Alt attributes",             weight: 4  },
   { key: "favicon",          name: "Favicon",                    weight: 2  },
   { key: "page_404",         name: "404 page",                   weight: 2  },
-]; // total = 100
+  { key: "site_speed",       name: "Скорость загрузки сайта",    weight: 5  },
+];
 
 export const PRO_KEYS: CheckKey[] = CHECKS.map((c) => c.key);
 
