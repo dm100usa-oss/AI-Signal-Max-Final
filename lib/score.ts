@@ -14,7 +14,7 @@ export type CheckKey =
   | "mobile_friendly"
   | "https"
   | "alt_attributes"
-  | "favicon"
+  | "site_speed"
   | "page_404";
 
 export interface CheckMeta {
@@ -31,13 +31,18 @@ export const CHECKS: CheckMeta[] = [
   { key: "canonical",        name: "Canonical",                  weight: 7  },
   { key: "title_tag",        name: "Title tag",                  weight: 7  },
   { key: "meta_description", name: "Meta description",           weight: 7  },
-  { key: "open_graph",       name: "Open Graph",                 weight: 5  },
+
+  { key: "open_graph",       name: "Open Graph",                 weight: 4  }, // было 5 → стало 4
+
   { key: "h1_present",       name: "H1",                         weight: 6  },
   { key: "structured_data",  name: "Structured Data (JSON-LD)",  weight: 10 },
   { key: "mobile_friendly",  name: "Mobile friendly (viewport)", weight: 7  },
   { key: "https",            name: "HTTPS / SSL",                weight: 6  },
-  { key: "alt_attributes",   name: "Alt attributes",             weight: 4  },
-  { key: "favicon",          name: "Favicon",                    weight: 2  },
+
+  { key: "alt_attributes",   name: "Alt attributes",             weight: 2  }, // было 4 → стало 2
+
+  { key: "site_speed",       name: "Site speed",                 weight: 5  },
+
   { key: "page_404",         name: "404 page",                   weight: 2  },
 ]; // total = 100
 
@@ -70,7 +75,6 @@ export function interpret(
   return "Poor";
 }
 
-// Color for factor status (used in UI)
 export function statusColor(
   passed: boolean | null
 ): "green" | "yellow" | "red" {
