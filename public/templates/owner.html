@@ -111,6 +111,7 @@
   <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения видимости в ИИ-платформах и объясняет, какие параметры на это влияют. Результаты собраны в сводке, а далее даны подробные объяснения и рекомендации. Итоговый раздел отчёта содержит техническое задание для разработчика, которое можно сразу передать для внедрения улучшений.</p>
 
   <h2>Проверенные параметры</h2>
+
   <!-- 1. robots.txt -->
   <div class="factor">
     <div class="factor-head">
@@ -230,6 +231,7 @@
     </div>
     <p class="factor-desc"><strong>Назначение:</strong> Структурированные данные помогают ИИ-платформам понимать контекст контента — например, где описание компании, товара, услуги или статьи.</p>
   </div>
+
   <!-- 11. Mobile Friendly -->
   <div class="factor">
     <div class="factor-head">
@@ -266,16 +268,16 @@
     <p class="factor-desc"><strong>Назначение:</strong> Атрибуты alt описывают изображения. Без них ИИ теряет смысловую часть контента и не может учитывать изображения при анализе.</p>
   </div>
 
-  <!-- 14. Favicon -->
+  <!-- 14. Page Speed -->
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_favicon_class}}">
+      <div class="factor-lead {{status_page_speed_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Favicon</div>
+        <div class="factor-name">Page Speed</div>
       </div>
-      <div class="status {{status_favicon_class}}">{{status_favicon}}</div>
+      <div class="status {{status_page_speed_class}}">{{status_page_speed}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Маленький значок сайта (favicon) помогает системам распознавания бренда. Его отсутствие снижает узнаваемость ресурса.</p>
+    <p class="factor-desc"><strong>Назначение:</strong> Скорость ответа сервера влияет на то, успевает ли ИИ-краулер получить данные. Медленный сайт может быть пропущен при индексации.</p>
   </div>
 
   <!-- 15. Custom 404 Page -->
