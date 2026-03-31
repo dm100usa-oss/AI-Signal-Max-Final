@@ -33,16 +33,22 @@ const isValidUrl = (u: string): boolean => {
 
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
 
-    const hostname = url.hostname;
+    const hostname = url.hostname.toLowerCase();
 
     if (!hostname.includes(".")) return false;
-
     if (hostname === "localhost") return false;
 
-    const parts = hostname.split(".");
-    const lastTwo = parts.slice(-2).join(".");
+    // блокируем IP-адреса
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return false;
 
-    if (!/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/.test(lastTwo)) return false;
+    const parts = hostname.split(".");
+    const tld = parts[parts.length - 1];
+
+    // TLD только буквы, минимум 2 символа
+    if (!/^[a-z]{2,}$/.test(tld)) return false;
+
+    // все части домена непустые
+    if (parts.some((p) => p.length === 0)) return false;
 
     return true;
   } catch {
@@ -84,36 +90,36 @@ export default function Home() {
         u = "https://" + u;
       }
       if (!isValidUrl(u)) {
-  setError("Введите корректный URL, включая https://");
-  return;
-}
-
-const hostname = new URL(u).hostname.toLowerCase();
-
-const blockedDomains = [
-  "example.com",
-  "example.org",
-  "example.net",
-  "test.com",
-  "test.org",
-  "127.0.0.1",
-  "0.0.0.0",
-  "dummy.com",
-  "invalid",
-  "example.local",
-  "test.local",
-];
-
-if (blockedDomains.includes(hostname)) {
-  setError("Не удалось выполнить анализ сайта. Укажите другой сайт");
-  return;
+        setError("Введите корректный URL, включая https://");
+        return;
       }
+
+      const hostname = new URL(u).hostname.toLowerCase();
+
+      const blockedDomains = [
+        "example.com",
+        "example.org",
+        "example.net",
+        "test.com",
+        "test.org",
+        "127.0.0.1",
+        "0.0.0.0",
+        "dummy.com",
+        "invalid",
+        "example.local",
+        "test.local",
+      ];
+
+      if (blockedDomains.includes(hostname)) {
+        setError("Не удалось выполнить анализ сайта. Укажите другой сайт");
+        return;
+      }
+
       setError(null);
       setLoading(mode);
 
       const minDuration = 2200;
       const started = Date.now();
-      let status: "ok" | "error" = "ok";
 
       try {
         const resp = await fetch("/api/precheck", {
@@ -123,21 +129,21 @@ if (blockedDomains.includes(hostname)) {
         });
         const json = await resp.json();
 
-if (!json?.ok) {
-  setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
-  setLoading(null);
-  return;
-}
-
-status = "ok";
+        if (!json?.ok) {
+          setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
+          setLoading(null);
+          return;
+        }
       } catch {
-        status = "error";
+        setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
+        setLoading(null);
+        return;
       }
 
       const left = Math.max(0, minDuration - (Date.now() - started));
       await new Promise((r) => setTimeout(r, left));
 
-      const q = new URLSearchParams({ url: u, status }).toString();
+      const q = new URLSearchParams({ url: u, status: "ok" }).toString();
       router.push(`/preview/${mode}?${q}`);
     },
     [url, loading, router]
