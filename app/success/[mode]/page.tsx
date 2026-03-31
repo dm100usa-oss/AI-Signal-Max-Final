@@ -12,11 +12,17 @@ interface Factor {
   status: "Good" | "Moderate" | "Poor";
 }
 
+interface CheckItem {
+  key: string;
+  value?: string;
+}
+
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [factors, setFactors] = useState<Factor[]>([]);
+  const [items, setItems] = useState<CheckItem[]>([]);
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
   const [showSummary, setShowSummary] = useState(false);
@@ -33,6 +39,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
         if (!data || !data.score) throw new Error("No valid data");
         setScore(data.score);
+        if (data.items) setItems(data.items);
 
         const allFactors = [
           { key: "robots_txt", name: "Открыт ли сайт для ИИ", desc: "Проверяет, разрешён ли доступ ИИ-платформам к вашему сайту." },
@@ -158,6 +165,69 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
               className="text-base text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: summary }}
             />
+          </>
+        )}
+      </div>
+
+      <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-4">
+        Материалы проверки
+      </h2>
+
+      <div className="max-w-xl mx-auto rounded-xl border border-gray-200 bg-gray-50 px-6 py-4 mb-10 font-mono text-sm text-gray-700 leading-relaxed">
+        <div className="flex gap-2">
+          <span className="text-gray-400 w-28 shrink-0">Сайт:</span>
+          <span className="text-gray-800">{new URL(url).hostname}</span>
+        </div>
+        {items.find(i => i.key === "title_tag")?.value && (
+          <div className="flex gap-2 mt-1">
+            <span className="text-gray-400 w-28 shrink-0">Заголовок:</span>
+            <span className="text-gray-800 truncate">"{items.find(i => i.key === "title_tag")?.value}"</span>
+          </div>
+        )}
+        {items.find(i => i.key === "h1_present")?.value && (
+          <div className="flex gap-2 mt-1">
+            <span className="text-gray-400 w-28 shrink-0">H1:</span>
+            <span className="text-gray-800 truncate">"{items.find(i => i.key === "h1_present")?.value}"</span>
+          </div>
+        )}
+        {items.find(i => i.key === "meta_description")?.value && (
+          <div className="flex gap-2 mt-1">
+            <span className="text-gray-400 w-28 shrink-0">Описание:</span>
+            <span className="text-gray-800 truncate">"{items.find(i => i.key === "meta_description")?.value}"</span>
+          </div>
+        )}
+        {mode === "pro" && (
+          <>
+            {items.find(i => i.key === "https")?.value && (
+              <div className="flex gap-2 mt-1">
+                <span className="text-gray-400 w-28 shrink-0">Протокол:</span>
+                <span className="text-gray-800">{items.find(i => i.key === "https")?.value}</span>
+              </div>
+            )}
+            {items.find(i => i.key === "page_speed")?.value && (
+              <div className="flex gap-2 mt-1">
+                <span className="text-gray-400 w-28 shrink-0">Ответ:</span>
+                <span className="text-gray-800">{items.find(i => i.key === "page_speed")?.value}</span>
+              </div>
+            )}
+            {items.find(i => i.key === "robots_txt")?.value && (
+              <div className="flex gap-2 mt-1">
+                <span className="text-gray-400 w-28 shrink-0">robots.txt:</span>
+                <span className="text-gray-800">{items.find(i => i.key === "robots_txt")?.value}</span>
+              </div>
+            )}
+            {items.find(i => i.key === "sitemap_xml")?.value && (
+              <div className="flex gap-2 mt-1">
+                <span className="text-gray-400 w-28 shrink-0">sitemap.xml:</span>
+                <span className="text-gray-800">{items.find(i => i.key === "sitemap_xml")?.value}</span>
+              </div>
+            )}
+            {items.find(i => i.key === "structured_data")?.value && (
+              <div className="flex gap-2 mt-1">
+                <span className="text-gray-400 w-28 shrink-0">JSON-LD:</span>
+                <span className="text-gray-800">{items.find(i => i.key === "structured_data")?.value}</span>
+              </div>
+            )}
           </>
         )}
       </div>
