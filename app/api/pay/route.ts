@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     // анализ сайта
     const analysis = await analyze(url, mode);
-    const { score, results, factors } = analysis;
+    const { score, results, factors, items, allItems } = analysis;
 
     // временное сохранение результата (до оплаты)
     const tempKey = `pending:${url}`;
@@ -82,10 +82,11 @@ export async function POST(req: NextRequest) {
       score,
       results,
       factors,
-      items: analysis.items,
+      items,
+      allItems,
     });
 
-    await saveData(url, { url, mode, score, results, factors, items: analysis.items });
+    await saveData(url, { url, mode, score, results, factors, items, allItems });
 
     return NextResponse.json({ url: session.url });
   } catch (e: any) {
