@@ -16,6 +16,7 @@ export interface CheckItem {
   passed: boolean | null;
   description: string;
   status?: "Good" | "Moderate" | "Poor";
+  value?: string;
 }
 
 export interface AnalyzeResult {
@@ -52,6 +53,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
       name: nameOf("https"),
       passed: schemeOk,
       description: schemeOk ? "HTTPS detected" : "Page is not served via HTTPS",
+      value: schemeOk ? "HTTPS" : "HTTP",
     },
     alt_attributes: checkAltAttributes(html),
     page_speed: checkPageSpeed(responseTimeMs),
@@ -136,8 +138,8 @@ async function fetchHTML(
   return { html, headers: res.headers, schemeOk, responseTimeMs };
 }
 
-function item(key: CheckKey, passed: boolean | null, description: string): CheckItem {
-  return { key, name: nameOf(key), passed, description };
+function item(key: CheckKey, passed: boolean | null, description: string, value?: string): CheckItem {
+  return { key, name: nameOf(key), passed, description, value };
 }
 
 function textMatch(html: string | null, re: RegExp) {
@@ -154,7 +156,7 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
   const url = origin + "/robots.txt";
   try {
     const res = await fetchWithTimeout(url, { method: "GET" });
-    if (!res.ok) return item("robots_txt", false, "robots.txt not found");
+    if (!res.ok) return item("robots_txt", false, "robots.txt not found", "Не найден");
     const text = await res.text();
     const blocksAll =
       /Disallow:\s*\/\s*$/im.test(text) ||
@@ -162,10 +164,11 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
     return item(
       "robots_txt",
       blocksAll ? false : true,
-      blocksAll ? "robots.txt blocks all" : "robots.txt valid"
+      blocksAll ? "robots.txt blocks all" : "robots.txt valid",
+      "Найден"
     );
   } catch {
-    return item("robots_txt", null, "robots.txt not accessible");
+    return item("robots_txt", null, "robots.txt not accessible", "Не найден");
   }
 }
 
@@ -174,10 +177,10 @@ async function checkSitemap(origin: string): Promise<CheckItem> {
   for (const p of paths) {
     try {
       const res = await fetchWithTimeout(origin + p, { method: "GET" });
-      if (res.ok) return item("sitemap_xml", true, `Found ${p}`);
+      if (res.ok) return item("sitemap_xml", true, `Found ${p}`, "Найден");
     } catch {}
   }
-  return item("sitemap_xml", false, "Sitemap not found");
+  return item("sitemap_xml", false, "Sitemap not found", "Не найден");
 }
 
 function checkXRobots(headers: Headers): CheckItem {
@@ -214,7 +217,7 @@ function checkTitle(html: string | null): CheckItem {
   const t = stripTags(
     textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || ""
   );
-  return item("title_tag", t.length ? true : false, t.length ? `Title: ${t}` : "Missing <title>");
+  return item("title_tag", t.length ? true : false, t.length ? `Title: ${t}` : "Missing <title>", t || "Не найден");
 }
 
 function checkMetaDescription(html: string | null): CheckItem {
@@ -226,7 +229,8 @@ function checkMetaDescription(html: string | null): CheckItem {
   return item(
     "meta_description",
     d.trim().length ? true : false,
-    d ? `Meta description: ${d}` : "Missing meta description"
+    d ? `Meta description: ${d}` : "Missing meta description",
+    d || "Не найдено"
   );
 }
 
@@ -241,34 +245,40 @@ function checkOpenGraph(html: string | null): CheckItem {
       html,
       /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["'][^>]*>/i
     ) || "";
-  if (t && d) return item("open_graph", true, "OG tags found");
-  if (!t && !d) return item("open_graph", false, "OG tags missing");
-  return item("open_graph", null, "OG tags partially found");
+  if (t && d) return item("open_graph", true, "OG tags found", t);
+  if (!t && !d) return item("open_graph", false, "OG tags missing", "Не найдено");
+  return item("open_graph", null, "OG tags partially found", t || "Частично");
 }
 
 function checkH1(html: string | null): CheckItem {
   const h1 = stripTags(
     textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || ""
   );
-  return item("h1_present", h1.length ? true : false, h1 ? `H1: ${h1}` : "Missing H1");
+  return item("h1_present", h1.length ? true : false, h1 ? `H1: ${h1}` : "Missing H1", h1 || "Не найден");
 }
 
 function checkJSONLD(html: string | null): CheckItem {
-  if (!html) return item("structured_data", false, "No JSON-LD structured data");
+  if (!html) return item("structured_data", false, "No JSON-LD structured data", "Не обнаружен");
   const re =
     /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   let ok = false;
+  let schemaType = "";
   let m: RegExpExecArray | null;
   while ((m = re.exec(html)) !== null) {
     try {
       const json = JSON.parse(m[1]);
-      if (json) { ok = true; break; }
+      if (json) {
+        ok = true;
+        schemaType = json["@type"] || "";
+        break;
+      }
     } catch {}
   }
   return item(
     "structured_data",
     ok ? true : false,
-    ok ? "Valid JSON-LD present" : "No JSON-LD structured data"
+    ok ? "Valid JSON-LD present" : "No JSON-LD structured data",
+    ok ? (schemaType || "Найден") : "Не обнаружен"
   );
 }
 
@@ -301,11 +311,12 @@ function checkAltAttributes(html: string | null): CheckItem {
 }
 
 function checkPageSpeed(responseTimeMs: number): CheckItem {
+  const valueStr = `${responseTimeMs} мс`;
   if (responseTimeMs <= 1500)
-    return item("page_speed", true, `Response time: ${responseTimeMs}ms — fast`);
+    return item("page_speed", true, `Response time: ${responseTimeMs}ms — fast`, valueStr);
   if (responseTimeMs <= 3000)
-    return item("page_speed", null, `Response time: ${responseTimeMs}ms — moderate`);
-  return item("page_speed", false, `Response time: ${responseTimeMs}ms — slow`);
+    return item("page_speed", null, `Response time: ${responseTimeMs}ms — moderate`, valueStr);
+  return item("page_speed", false, `Response time: ${responseTimeMs}ms — slow`, valueStr);
 }
 
 async function check404(origin: string): Promise<CheckItem> {
