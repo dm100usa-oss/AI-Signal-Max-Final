@@ -23,6 +23,7 @@ export interface AnalyzeResult {
   url: string;
   mode: Mode;
   items: CheckItem[];
+  allItems: CheckItem[];
   score: number;
   interpretation: ReturnType<typeof interpret>;
   results: Record<string, "Good" | "Moderate" | "Poor">;
@@ -63,6 +64,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
   const score = calcWeightedScore(all);
   const keysToShow = mode === "quick" ? QUICK_KEYS : PRO_KEYS;
   const items = keysToShow.map((k) => all[k]);
+  const allItems = Object.values(all);
 
   const results: Record<string, "Good" | "Moderate" | "Poor"> = {};
   const factors: Record<string, { status: "Good" | "Moderate" | "Poor" }> = {};
@@ -78,6 +80,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     url,
     mode,
     items,
+    allItems,
     score,
     interpretation: interpret(score),
     results,
