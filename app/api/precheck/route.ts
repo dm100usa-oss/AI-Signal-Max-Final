@@ -29,41 +29,42 @@ export async function POST(req: Request) {
 
     const res = await fetchWithTimeout(url, 8000).catch(() => null);
 
-    if (!res || !res.ok) {
-      return NextResponse.json({ ok: false });
+    // таймаут или сеть недоступна
+    if (!res) {
+      return NextResponse.json({ ok: false, reason: "unreachable" });
     }
 
-    // читаем HTML (без падения)
+    // сайт не существует или сервер сломан
+    if (res.status === 404 || res.status === 410 || res.status >= 500) {
+      return NextResponse.json({ ok: false, reason: "not_available" });
+    }
+
+    // всё остальное (200, 301, 302, 403, 429 и т.д.) — сайт живой, читаем HTML
     let html = "";
     try {
       html = await res.text();
     } catch {
-      html = "";
+      // не смогли прочитать тело — но сайт ответил
+      return NextResponse.json({ ok: true });
+    }
+
+    // нет HTML вообще
+    if (!html || html.length < 200) {
+      return NextResponse.json({ ok: false, reason: "no_content" });
     }
 
     const lower = html.toLowerCase();
 
-    // 1. нет HTML или это не HTML
-    if (!html || !lower.includes("<html")) {
-      return NextResponse.json({ ok: false });
-    }
+    // только очевидные припаркованные домены
+    const parkingPhrases = [
+      "domain for sale",
+      "buy this domain",
+      "this domain is for sale",
+      "parked domain",
+    ];
 
-    // 2. слишком маленький контент
-    if (html.length < 500) {
-      return NextResponse.json({ ok: false });
-    }
-
-    // 3. признаки парковки (расширили список)
-    if (
-      lower.includes("domain for sale") ||
-      lower.includes("buy this domain") ||
-      lower.includes("this domain is for sale") ||
-      lower.includes("parking") ||
-      lower.includes("parked domain") ||
-      lower.includes("sedo") ||
-      lower.includes("godaddy")
-    ) {
-      return NextResponse.json({ ok: false });
+    if (parkingPhrases.some((p) => lower.includes(p))) {
+      return NextResponse.json({ ok: false, reason: "parked" });
     }
 
     return NextResponse.json({ ok: true });
