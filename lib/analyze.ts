@@ -33,7 +33,7 @@ const DEFAULT_UA =
 
 export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult> {
   const { origin, url } = normalizeUrl(rawUrl);
-  const { html, headers, schemeOk } = await fetchHTML(url);
+  const { html, headers, schemeOk, responseTimeMs } = await fetchHTML(url);
 
   const all: Record<CheckKey, CheckItem> = {
     robots_txt: await checkRobotsTxt(origin),
@@ -54,7 +54,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
       description: schemeOk ? "HTTPS detected" : "Page is not served via HTTPS",
     },
     alt_attributes: checkAltAttributes(html),
-    favicon: await checkFavicon(html, origin),
+    page_speed: checkPageSpeed(responseTimeMs),
     page_404: await check404(origin),
   };
 
@@ -127,11 +127,13 @@ async function fetchWithTimeout(
 
 async function fetchHTML(
   url: string
-): Promise<{ html: string | null; headers: Headers; schemeOk: boolean }> {
+): Promise<{ html: string | null; headers: Headers; schemeOk: boolean; responseTimeMs: number }> {
+  const start = Date.now();
   const res = await fetchWithTimeout(url);
+  const responseTimeMs = Date.now() - start;
   const schemeOk = url.startsWith("https://") && res.ok;
   const html = res.ok ? await res.text() : null;
-  return { html, headers: res.headers, schemeOk };
+  return { html, headers: res.headers, schemeOk, responseTimeMs };
 }
 
 function item(key: CheckKey, passed: boolean | null, description: string): CheckItem {
@@ -260,10 +262,7 @@ function checkJSONLD(html: string | null): CheckItem {
   while ((m = re.exec(html)) !== null) {
     try {
       const json = JSON.parse(m[1]);
-      if (json) {
-        ok = true;
-        break;
-      }
+      if (json) { ok = true; break; }
     } catch {}
   }
   return item(
@@ -290,7 +289,7 @@ function checkAltAttributes(html: string | null): CheckItem {
   if (!imgTags.length) return item("alt_attributes", null, "No images on page");
   let withAlt = 0;
   for (const tag of imgTags) {
-    const alt = (tag.match(/alt\s*=\s*["']([^"']*)["']/i) || [,""])[1].trim();
+    const alt = (tag.match(/alt\s*=\s*["']([^"']*)["']/i) || [, ""])[1].trim();
     if (alt.length > 0) withAlt++;
   }
   const ratio = withAlt / imgTags.length;
@@ -301,23 +300,12 @@ function checkAltAttributes(html: string | null): CheckItem {
   return item("alt_attributes", false, `Poor alts: ${withAlt}/${imgTags.length}`);
 }
 
-async function checkFavicon(
-  html: string | null,
-  origin: string
-): Promise<CheckItem> {
-  const linkHref =
-    textMatch(
-      html,
-      /<link[^>]+rel=["'](?:shortcut\s+icon|icon)["'][^>]+href=["']([^"']+)["'][^>]*>/i
-    ) || "";
-  if (linkHref) return item("favicon", true, `Icon: ${linkHref}`);
-  try {
-    const res = await fetchWithTimeout(origin + "/favicon.ico", { method: "HEAD" });
-    if (res.ok) return item("favicon", null, "/favicon.ico found but no <link>");
-    return item("favicon", false, "No favicon");
-  } catch {
-    return item("favicon", false, "No favicon");
-  }
+function checkPageSpeed(responseTimeMs: number): CheckItem {
+  if (responseTimeMs <= 1500)
+    return item("page_speed", true, `Response time: ${responseTimeMs}ms — fast`);
+  if (responseTimeMs <= 3000)
+    return item("page_speed", null, `Response time: ${responseTimeMs}ms — moderate`);
+  return item("page_speed", false, `Response time: ${responseTimeMs}ms — slow`);
 }
 
 async function check404(origin: string): Promise<CheckItem> {
