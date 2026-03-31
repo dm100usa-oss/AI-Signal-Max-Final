@@ -14,6 +14,7 @@ interface Factor {
 
 interface CheckItem {
   key: string;
+  name?: string;
   value?: string;
 }
 
@@ -23,6 +24,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const [score, setScore] = useState(0);
   const [factors, setFactors] = useState<Factor[]>([]);
   const [items, setItems] = useState<CheckItem[]>([]);
+  const [allItems, setAllItems] = useState<CheckItem[]>([]);
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
   const [showSummary, setShowSummary] = useState(false);
@@ -40,6 +42,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (!data || !data.score) throw new Error("No valid data");
         setScore(data.score);
         if (data.items) setItems(data.items);
+        if (data.allItems) setAllItems(data.allItems);
 
         const allFactors = [
           { key: "robots_txt", name: "Открыт ли сайт для ИИ", desc: "Проверяет, разрешён ли доступ ИИ-платформам к вашему сайту." },
@@ -173,64 +176,12 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         Материалы проверки
       </h2>
 
-      <div className="max-w-xl mx-auto rounded-xl border border-gray-200 bg-gray-50 px-6 py-4 mb-10 font-mono text-sm text-gray-700 leading-relaxed">
-        <div className="flex gap-2">
-          <span className="text-gray-400 w-28 shrink-0">Сайт:</span>
-          <span className="text-gray-800">{new URL(url).hostname}</span>
-        </div>
-        {items.find(i => i.key === "title_tag")?.value && (
-          <div className="flex gap-2 mt-1">
-            <span className="text-gray-400 w-28 shrink-0">Заголовок:</span>
-            <span className="text-gray-800 truncate">"{items.find(i => i.key === "title_tag")?.value}"</span>
-          </div>
-        )}
-        {items.find(i => i.key === "h1_present")?.value && (
-          <div className="flex gap-2 mt-1">
-            <span className="text-gray-400 w-28 shrink-0">H1:</span>
-            <span className="text-gray-800 truncate">"{items.find(i => i.key === "h1_present")?.value}"</span>
-          </div>
-        )}
-        {items.find(i => i.key === "meta_description")?.value && (
-          <div className="flex gap-2 mt-1">
-            <span className="text-gray-400 w-28 shrink-0">Описание:</span>
-            <span className="text-gray-800 truncate">"{items.find(i => i.key === "meta_description")?.value}"</span>
-          </div>
-        )}
-        {mode === "pro" && (
-          <>
-            {items.find(i => i.key === "https")?.value && (
-              <div className="flex gap-2 mt-1">
-                <span className="text-gray-400 w-28 shrink-0">Протокол:</span>
-                <span className="text-gray-800">{items.find(i => i.key === "https")?.value}</span>
-              </div>
-            )}
-            {items.find(i => i.key === "page_speed")?.value && (
-              <div className="flex gap-2 mt-1">
-                <span className="text-gray-400 w-28 shrink-0">Ответ:</span>
-                <span className="text-gray-800">{items.find(i => i.key === "page_speed")?.value}</span>
-              </div>
-            )}
-            {items.find(i => i.key === "robots_txt")?.value && (
-              <div className="flex gap-2 mt-1">
-                <span className="text-gray-400 w-28 shrink-0">robots.txt:</span>
-                <span className="text-gray-800">{items.find(i => i.key === "robots_txt")?.value}</span>
-              </div>
-            )}
-            {items.find(i => i.key === "sitemap_xml")?.value && (
-              <div className="flex gap-2 mt-1">
-                <span className="text-gray-400 w-28 shrink-0">sitemap.xml:</span>
-                <span className="text-gray-800">{items.find(i => i.key === "sitemap_xml")?.value}</span>
-              </div>
-            )}
-            {items.find(i => i.key === "structured_data")?.value && (
-              <div className="flex gap-2 mt-1">
-                <span className="text-gray-400 w-28 shrink-0">JSON-LD:</span>
-                <span className="text-gray-800">{items.find(i => i.key === "structured_data")?.value}</span>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+      <MaterialsBlock
+        url={url}
+        mode={mode}
+        items={items}
+        allItems={allItems}
+      />
 
       <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-6">
         Проверенные параметры
@@ -328,6 +279,107 @@ function FactorItem({ factor }: { factor: Factor }) {
       <div className="w-24 text-right">
         <StatusText status={factor.status} />
       </div>
+    </div>
+  );
+}
+
+// Ключи, которые показываются явно (primary)
+const PRIMARY_QUICK_KEYS = ["title_tag", "h1_present", "meta_description"];
+const PRIMARY_PRO_KEYS = [
+  "title_tag", "h1_present", "meta_description",
+  "https", "page_speed", "robots_txt", "sitemap_xml", "structured_data",
+];
+
+const LABEL_MAP: Record<string, string> = {
+  title_tag:       "Заголовок",
+  h1_present:      "H1",
+  meta_description:"Описание",
+  https:           "Протокол",
+  page_speed:      "Ответ",
+  robots_txt:      "robots.txt",
+  sitemap_xml:     "sitemap.xml",
+  structured_data: "JSON-LD",
+  open_graph:      "Open Graph",
+  canonical:       "Canonical",
+  x_robots_tag:    "X-Robots",
+  meta_robots:     "Meta robots",
+  mobile_friendly: "Мобильный",
+  alt_attributes:  "ALT атрибуты",
+  page_404:        "Страница 404",
+};
+
+// Обрамляет текстовые значения в кавычки (без обрезки)
+function quoted(value: string): string {
+  if (!value || value === "Не найден" || value === "Не найдено" || value === "Не обнаружен") {
+    return value;
+  }
+  return `«${value}»`;
+}
+
+// Значения, не требующие кавычек
+const RAW_VALUE_KEYS = new Set([
+  "https", "page_speed", "robots_txt", "sitemap_xml",
+  "structured_data", "open_graph", "canonical",
+  "x_robots_tag", "meta_robots", "mobile_friendly", "alt_attributes", "page_404",
+]);
+
+function MaterialRow({ label, value, withQuotes }: { label: string; value: string; withQuotes: boolean }) {
+  const display = withQuotes ? quoted(value) : value;
+  return (
+    <div className="flex items-baseline gap-0 min-w-0">
+      <span className="text-gray-400 shrink-0" style={{ width: "8rem" }}>{label}:</span>
+      <span className="text-gray-800 min-w-0 break-all">{display}</span>
+    </div>
+  );
+}
+
+function MaterialsBlock({
+  url,
+  mode,
+  items,
+  allItems,
+}: {
+  url: string;
+  mode: Mode;
+  items: CheckItem[];
+  allItems: CheckItem[];
+}) {
+  const primaryKeys = mode === "pro" ? PRIMARY_PRO_KEYS : PRIMARY_QUICK_KEYS;
+
+  // Объединяем items + allItems в один lookup (allItems приоритетнее)
+  const lookup = new Map<string, string>();
+  for (const item of [...items, ...allItems]) {
+    if (item.value) lookup.set(item.key, item.value);
+  }
+
+  // Дополнительные строки — те что не в primary и есть в allItems с value
+  const extraRows = allItems.filter(
+    (item) => !primaryKeys.includes(item.key) && item.value && LABEL_MAP[item.key]
+  );
+
+  let hostname = "";
+  try { hostname = new URL(url).hostname; } catch {}
+
+  return (
+    <div className="max-w-xl mx-auto rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 mb-10 font-mono text-xs sm:text-sm text-gray-700 leading-relaxed">
+      {/* Сайт */}
+      <MaterialRow label="Сайт" value={hostname} withQuotes={false} />
+
+      {/* Primary строки */}
+      {primaryKeys.map((key) => {
+        const value = lookup.get(key);
+        if (!value) return null;
+        const label = LABEL_MAP[key] || key;
+        const withQuotes = !RAW_VALUE_KEYS.has(key);
+        return (
+          <div className="mt-1" key={key}>
+            <MaterialRow label={label} value={value} withQuotes={withQuotes} />
+          </div>
+        );
+      })}
+
+      {/* Подсказка */}
+      <div className="mt-2 text-gray-400 text-xs">и другие данные...</div>
     </div>
   );
 }
