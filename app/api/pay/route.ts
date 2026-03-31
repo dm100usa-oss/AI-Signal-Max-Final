@@ -78,12 +78,14 @@ export async function POST(req: NextRequest) {
     // сохранение данных
     await saveData(`session:${session.id}`, {
       url,
+      mode,
       score,
       results,
       factors,
+      items: analysis.items,
     });
 
-    await saveData(url, { score, results, factors });
+    await saveData(url, { url, mode, score, results, factors, items: analysis.items });
 
     return NextResponse.json({ url: session.url });
   } catch (e: any) {
