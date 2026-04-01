@@ -1,4 +1,4 @@
-<!-- === OWNER.HTML (ФИНАЛЬНАЯ ВЕРСИЯ — ОДНА КАРТОЧКА, ВСЕ ТЕКСТЫ СОХРАНЕНЫ) === -->
+<!-- === OWNER.HTML === -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -30,7 +30,8 @@
     h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
     .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
 
-    h2 { font-size: 14pt; margin-top: 26px; font-weight: 700; color: rgb(15,23,42); }
+    h2 { font-size: 14pt; margin-top: 28px; margin-bottom: 6px; font-weight: 700; color: rgb(15,23,42); }
+    h3 { font-size: 12.5pt; margin-top: 20px; margin-bottom: 4px; font-weight: 700; color: rgb(30,64,175); }
     p { margin: 8px 0; color: rgb(15,23,42); }
     .donut-wrap { display: flex; justify-content: center; margin: 20px 0 18px; }
 
@@ -50,7 +51,6 @@
       margin-bottom: 10px;
       color: rgb(15,23,42);
     }
-
     .summary-box.good { border-color: rgb(16,185,129); background: rgba(16,185,129,0.05); }
     .summary-box.moderate { border-color: rgb(245,158,11); background: rgba(245,158,11,0.05); }
     .summary-box.poor { border-color: rgb(239,68,68); background: rgba(239,68,68,0.05); }
@@ -58,6 +58,65 @@
     .summary-box.moderate h3 { color: rgb(245,158,11); }
     .summary-box.poor h3 { color: rgb(239,68,68); }
 
+    /* ── Блок "Как сайты попадают в ответы ИИ" ── */
+    .ai-section { margin-top: 28px; }
+    .ai-section h2 { border-bottom: 2px solid rgb(30,64,175); padding-bottom: 6px; }
+    .ai-requirements {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 18px;
+    }
+    .ai-requirements td {
+      padding: 10px 14px;
+      border: 1px solid rgb(229,231,235);
+      vertical-align: top;
+      font-size: 11.5pt;
+    }
+    .ai-requirements td.num {
+      width: 36px;
+      text-align: center;
+      font-weight: 700;
+      color: #fff;
+      background: rgb(30,64,175);
+      border-color: rgb(30,64,175);
+    }
+    .ai-requirements td.text { background: rgb(249,250,251); }
+    .highlight-box {
+      background: rgba(30,64,175,0.05);
+      border-left: 4px solid rgb(30,64,175);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 14px 0;
+    }
+    .highlight-box p { margin: 0; }
+    .example-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 16px;
+      font-size: 11pt;
+    }
+    .example-table td {
+      padding: 8px 12px;
+      border: 1px solid rgb(229,231,235);
+      vertical-align: middle;
+    }
+    .example-table td.icon {
+      width: 32px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 13pt;
+    }
+    .example-table tr.bad td { background: rgba(239,68,68,0.06); color: rgb(153,27,27); }
+    .example-table tr.bad td.icon { color: rgb(220,38,38); }
+    .example-table tr.good td { background: rgba(16,185,129,0.06); color: rgb(6,78,59); }
+    .example-table tr.good td.icon { color: rgb(5,150,105); }
+    .divider {
+      border: none;
+      border-top: 1px solid rgb(229,231,235);
+      margin: 28px 0;
+    }
+
+    /* ── Карточки параметров ── */
     .factor {
       margin-top: 14px;
       padding: 12px 16px;
@@ -79,17 +138,49 @@
     .status.good { color: rgb(16,185,129); }
     .status.moderate { color: rgb(245,158,11); }
     .status.poor { color: rgb(239,68,68); }
+
+    /* ── Заключение ── */
+    .conclusion-box {
+      margin-top: 32px;
+      padding: 20px 24px;
+      border-radius: 12px;
+      background: rgb(249,250,251);
+      border: 1px solid rgb(229,231,235);
+    }
+    .conclusion-box h2 { margin-top: 0; color: rgb(15,23,42); }
+    .deliverables {
+      margin: 16px 0;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .deliverable-item {
+      flex: 1;
+      min-width: 160px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid rgb(209,213,219);
+      font-size: 11pt;
+    }
+    .deliverable-item .di-icon { font-size: 18pt; margin-bottom: 6px; }
+    .deliverable-item .di-title { font-weight: 700; color: rgb(30,64,175); margin-bottom: 4px; }
+    .deliverable-item .di-desc { color: rgb(75,85,99); font-size: 10.5pt; }
+
     .footer { margin-top: 40px; text-align: center; font-size: 10pt; }
     .footer .disclaimer { opacity: 0.6; color: rgb(55,65,81); font-size: 10pt; }
   </style>
 </head>
 <body>
+
+  <!-- ШАПКА -->
   <div class="center">
     <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
     <h1>Отчёт о видимости сайта в ИИ-платформах</h1>
-    <div class="meta">Сайт: {{website}} &nbsp; | &nbsp; Дата: {{date}}</div>
+    <div class="meta">Сайт: {{website}} &nbsp;|&nbsp; Дата: {{date}}</div>
   </div>
 
+  <!-- ДИАГРАММА -->
   <div class="donut-wrap">
     <svg width="260" height="260" viewBox="0 0 260 260">
       <circle cx="130" cy="130" r="90" stroke="#e5e7eb" stroke-width="14" fill="none" />
@@ -101,14 +192,85 @@
     </svg>
   </div>
 
-  <!-- ЕДИНАЯ КАРТОЧКА -->
+  <!-- КАРТОЧКА СТАТУСА -->
   <div class="summary-box {{visibility_class}}">
     <h3>{{visibility_title}}</h3>
     <p>{{visibility_text}}</p>
   </div>
 
+  <!-- ВВЕДЕНИЕ -->
   <h2>Введение</h2>
-  <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения видимости в ИИ-платформах и объясняет, какие параметры на это влияют. Результаты собраны в сводке, а далее даны подробные объяснения и рекомендации. Итоговый раздел отчёта содержит техническое задание для разработчика, которое можно сразу передать для внедрения улучшений.</p>
+  <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения видимости в ИИ-платформах и объясняет, какие параметры на это влияют. Прежде чем перейти к результатам проверки, мы коротко объясним логику работы ИИ — это поможет вам понять, почему каждый параметр важен и что именно нужно исправить.</p>
+
+  <!-- БЛОК: КАК САЙТЫ ПОПАДАЮТ В ОТВЕТЫ ИИ -->
+  <div class="ai-section">
+    <h2>Как сайты попадают в ответы ИИ</h2>
+    <p>Сегодня пользователь предпочитает получать готовые ответы на свои вопросы, а не набор ссылок в поисковике. ИИ-платформы подстраиваются под это: они формируют готовые ответы, выбирая самые подходящие источники. Чтобы чаще появляться в этих ответах, сайт должен отвечать трём требованиям:</p>
+
+    <table class="ai-requirements">
+      <tr>
+        <td class="num">1</td>
+        <td class="text">Быть технически доступным для ИИ</td>
+      </tr>
+      <tr>
+        <td class="num">2</td>
+        <td class="text">Иметь простой и понятный контент — давать точные и готовые ответы в определённой категории</td>
+      </tr>
+      <tr>
+        <td class="num">3</td>
+        <td class="text">Вызывать доверие у ИИ как надёжный и безопасный источник информации</td>
+      </tr>
+    </table>
+
+    <h3>1. Техническая доступность</h3>
+    <p>ИИ-платформы сканируют сайты автоматически. Чтобы сайт был доступен для анализа, он должен: быть открытым для ботов, быть проиндексированным в Google и Bing, быстро загружаться (до 2–3 секунд), корректно работать на мобильных устройствах, иметь чистые URL и не содержать дублей страниц.</p>
+
+    <h3>2. Понятный контент и готовые ответы</h3>
+    <p>Это важное различие: ИИ при запросе не ищет нужный сайт — он ищет нужный ответ. Он сначала выбирает страницы с нужным ответом, а потом оценивает сам сайт и приводит ссылку. Каждая страница должна прямо отвечать на конкретный вопрос пользователя, а не просто описывать услугу или компанию.</p>
+
+    <p>Например, для компании по ремонту труб:</p>
+    <table class="example-table">
+      <tr class="bad">
+        <td class="icon">✗</td>
+        <td>Наша компания понимает даже особенности ремонта труб, а не только обычные ситуации с ними</td>
+      </tr>
+      <tr class="good">
+        <td class="icon">✓</td>
+        <td>Наша компания ремонтирует водопроводные трубы</td>
+      </tr>
+      <tr class="good">
+        <td class="icon">✓</td>
+        <td>Сколько стоит ремонт трубы в городе</td>
+      </tr>
+      <tr class="good">
+        <td class="icon">✓</td>
+        <td>Как быстро устранить протечку трубы</td>
+      </tr>
+      <tr class="good">
+        <td class="icon">✓</td>
+        <td>Когда нужно менять трубы в доме</td>
+      </tr>
+    </table>
+
+    <p>ИИ обычно не переписывает сложный текст — он берёт уже готовые, понятные куски и использует их в ответах. Текст на странице должен содержать простые формулировки, короткие абзацы и понятные блоки. Также важно, чтобы сайт был посвящён одной теме и воспринимался ИИ как тематический авторитет в своей категории.</p>
+
+    <div class="highlight-box">
+      <p><strong>Главный принцип:</strong> контент должен быть написан так, чтобы его можно было взять и вставить как готовый ответ пользователю.</p>
+    </div>
+
+    <h3>3. Доверие как надёжный источник</h3>
+    <p>ИИ выбирает те сайты, которые выглядят надёжно и подтверждают это фактами. На сайте обязательно должны быть: информация о компании и контакты, понятно кто автор или эксперт, реальные отзывы и примеры работ, конкретные результаты и цифры. Также важна единая информация на всех страницах — если данные противоречат друг другу, ИИ снижает доверие к сайту.</p>
+    <p>Дополнительный сигнал доверия — упоминания вне сайта: профиль в Google, каталоги компаний, ссылки в статьях. ИИ смотрит не только на ваш сайт, но и на то, есть ли вы «в интернете вообще».</p>
+
+    <div class="highlight-box">
+      <p><strong>Главный принцип:</strong> ИИ выбирает не просто информацию, а надёжный источник. Он должен быть понятен, проверяем и подтверждён.</p>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ПЕРЕХОД К РЕЗУЛЬТАТАМ -->
+  <p>Теперь посмотрим, как ваш сайт выглядит по каждому из этих параметров прямо сейчас.</p>
 
   <h2>Проверенные параметры</h2>
 
@@ -292,9 +454,32 @@
     <p class="factor-desc"><strong>Назначение:</strong> Кастомная страница ошибки 404 удерживает посетителя и помогает ИИ корректно оценить стабильность сайта и работу ссылок.</p>
   </div>
 
-  <h2>Заключение</h2>
-  <p>Данный отчёт предназначен для того, чтобы предоставить владельцам и разработчикам чёткие и практические ориентиры по повышению видимости сайта в современных ИИ-платформах. Следуя этим рекомендациям, можно добиться корректного индексирования и интерпретации контента системами искусственного интеллекта, улучшения доверия и цитируемости сайта в ответах ИИ-сервисов, повышения устойчивости ресурса к техническим ошибкам и сбоям, а также улучшения общего пользовательского опыта.</p>
-  <p>Рекомендации AI Signal Max основаны на наблюдениях и анализе реального поведения ИИ-платформ при взаимодействии с веб-страницами и отражают лучшие технические практики 2025 года.</p>
+  <!-- ЗАКЛЮЧЕНИЕ -->
+  <div class="conclusion-box">
+    <h2>Что дальше</h2>
+    <p>Вы получили полную картину того, как ваш сайт выглядит с точки зрения ИИ-платформ. Это уже первый шаг — большинство владельцев сайтов даже не знают, что именно мешает им появляться в ответах ИИ.</p>
+    <p>Вместе с этим отчётом вы получили всё необходимое для того, чтобы это исправить:</p>
+
+    <div class="deliverables">
+      <div class="deliverable-item">
+        <div class="di-icon">📋</div>
+        <div class="di-title">Этот отчёт</div>
+        <div class="di-desc">Понятное объяснение каждого параметра и его влияния на видимость в ИИ</div>
+      </div>
+      <div class="deliverable-item">
+        <div class="di-icon">🛠️</div>
+        <div class="di-title">ТЗ для разработчика</div>
+        <div class="di-desc">Готовый список конкретных задач — можно сразу передать разработчику</div>
+      </div>
+      <div class="deliverable-item">
+        <div class="di-icon">📱</div>
+        <div class="di-title">Результаты на экране</div>
+        <div class="di-desc">Наглядная сводка параметров — удобно показать команде или подрядчику</div>
+      </div>
+    </div>
+
+    <p>Рекомендации AI Signal Max основаны на анализе реального поведения ИИ-платформ и отражают лучшие практики работы с контентом и технической оптимизацией сайтов.</p>
+  </div>
 
   <div class="footer">
     <p>© 2025 AI Signal Max. All rights reserved.</p>
@@ -304,6 +489,7 @@
       All actions must comply with U.S. law.
     </p>
   </div>
+
 </body>
 </html>
-<!-- === OWNER.HTML (ФИНАЛЬНАЯ ВЕРСИЯ — ОДНА КАРТОЧКА, ВСЕ ТЕКСТЫ СОХРАНЕНЫ) === -->
+<!-- === OWNER.HTML === -->
