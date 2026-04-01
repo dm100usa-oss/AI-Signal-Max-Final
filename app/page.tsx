@@ -234,7 +234,7 @@ export default function Home() {
       </button>
 
       <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
-        15 факторов, результат на экране и по email, понятные рекомендации для владельца и ТЗ для разработчика
+        15 факторов, результат на экране и по email, расширенные рекомендации для владельца и готовое ТЗ для разработчика
       </p>
 
       <div className="flex flex-col items-center mb-10">
