@@ -295,26 +295,29 @@ function FactorItem({ factor }: { factor: Factor }) {
 // Ключи, которые показываются явно (primary)
 const PRIMARY_QUICK_KEYS = ["title_tag", "h1_present", "meta_description"];
 const PRIMARY_PRO_KEYS = [
-  "title_tag", "h1_present", "meta_description",
-  "https", "page_speed", "robots_txt", "sitemap_xml", "structured_data",
+  "title_tag", "meta_description", "h1_present", "h2_present",
+  "contacts", "robots_txt", "sitemap_xml", "sitemap_lastmod",
 ];
 
 const LABEL_MAP: Record<string, string> = {
-  title_tag:       "Заголовок",
-  h1_present:      "H1",
-  meta_description:"Описание",
-  https:           "Протокол",
-  page_speed:      "Ответ",
-  robots_txt:      "robots.txt",
-  sitemap_xml:     "sitemap.xml",
-  structured_data: "JSON-LD",
-  open_graph:      "Open Graph",
-  canonical:       "Canonical",
-  x_robots_tag:    "X-Robots",
-  meta_robots:     "Meta robots",
-  mobile_friendly: "Мобильный",
-  alt_attributes:  "ALT атрибуты",
-  page_404:        "Страница 404",
+  title_tag:        "Заголовок",
+  h1_present:       "H1",
+  h2_present:       "H2",
+  meta_description: "Описание",
+  contacts:         "Контакт",
+  robots_txt:       "Доступ для ИИ",
+  sitemap_xml:      "Страниц",
+  sitemap_lastmod:  "Обновлён",
+  https:            "Протокол",
+  page_speed:       "Ответ",
+  structured_data:  "JSON-LD",
+  open_graph:       "Open Graph",
+  canonical:        "Canonical",
+  x_robots_tag:     "X-Robots",
+  meta_robots:      "Meta robots",
+  mobile_friendly:  "Мобильный",
+  alt_attributes:   "ALT атрибуты",
+  page_404:         "Страница 404",
 };
 
 // Обрамляет текстовые значения в кавычки (без обрезки)
@@ -327,8 +330,8 @@ function quoted(value: string): string {
 
 // Значения, не требующие кавычек
 const RAW_VALUE_KEYS = new Set([
-  "https", "page_speed", "robots_txt", "sitemap_xml",
-  "structured_data", "open_graph", "canonical",
+  "https", "page_speed", "robots_txt", "sitemap_xml", "sitemap_lastmod",
+  "structured_data", "open_graph", "canonical", "contacts",
   "x_robots_tag", "meta_robots", "mobile_friendly", "alt_attributes", "page_404",
 ]);
 
@@ -337,7 +340,7 @@ function MaterialRow({ label, value, withQuotes }: { label: string; value: strin
   return (
     <div className="flex items-baseline gap-0 min-w-0">
       <span className="text-gray-400 shrink-0" style={{ width: "8rem" }}>{label}:</span>
-      <span className="text-gray-800 min-w-0 break-all">{display}</span>
+      <span className="text-gray-800 min-w-0 break-words">{display}</span>
     </div>
   );
 }
@@ -370,7 +373,7 @@ function MaterialsBlock({
   try { hostname = new URL(url).hostname; } catch {}
 
   return (
-    <div className="max-w-xl mx-auto rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 mb-10 font-mono text-xs sm:text-sm text-gray-700 leading-relaxed">
+    <div className="max-w-xl mx-auto rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 mb-10 text-xs sm:text-sm text-gray-700 leading-relaxed">
       {/* Сайт */}
       <MaterialRow label="Сайт" value={hostname} withQuotes={false} />
 
