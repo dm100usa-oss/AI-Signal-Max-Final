@@ -177,7 +177,7 @@ export default function FullPreview() {
         }`}
       >
         <span className="flex items-center justify-center">
-          Мы начали детальный аудит
+          Мы начали детальную проверку
           <span className="inline-flex w-[1.7ch] justify-start ml-1">
             {fadeHeader && <Dots colorClass="text-green-400/70" />}
           </span>
@@ -201,7 +201,7 @@ export default function FullPreview() {
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Аудит завершён
+                Проверка завершена
               </p>
             </div>
           )}
