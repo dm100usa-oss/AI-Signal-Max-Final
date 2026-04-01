@@ -219,7 +219,7 @@ function buildPriorityLists(results: Record<string, string>): { urgent: string; 
   };
 }
 
-(results: Record<string, string>): Record<string, string> {
+function buildFactorStatuses(results: Record<string, string>): Record<string, string> {
   const map: Record<string, string> = {};
   for (const [key, status] of Object.entries(results)) {
     const lower = (status || "").toLowerCase();
