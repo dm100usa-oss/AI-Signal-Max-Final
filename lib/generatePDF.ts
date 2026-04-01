@@ -38,6 +38,9 @@ export async function generatePDF({
     donut_color: donutColor,
     donut_offset: donutOffset.toString(),
     visibility_level: visibilityLevel,
+    visibility_class: getVisibilityClass(scoreValue),
+    visibility_title: getVisibilityTitle(scoreValue),
+    visibility_text: getVisibilityTextFull(scoreValue),
     ...buildFactorStatuses(data.results),
     ...buildFactorClasses(data.results),
     assessment_p1: getAssessmentText1(scoreValue),
@@ -135,6 +138,26 @@ function getVisibilityText(score: number): string {
   if (score >= 80) return "High visibility";
   if (score >= 40) return "Moderate visibility";
   return "Low visibility";
+}
+
+function getVisibilityClass(score: number): string {
+  if (score >= 80) return "good";
+  if (score >= 40) return "moderate";
+  return "poor";
+}
+
+function getVisibilityTitle(score: number): string {
+  if (score >= 80) return "Высокая готовность к ИИ-рекомендациям";
+  if (score >= 40) return "Средняя готовность к ИИ-рекомендациям";
+  return "Низкая готовность к ИИ-рекомендациям";
+}
+
+function getVisibilityTextFull(score: number): string {
+  if (score >= 80)
+    return "Ваш сайт хорошо оптимизирован для ИИ-платформ. Незначительные улучшения помогут ещё больше повысить видимость в ответах ИИ.";
+  if (score >= 40)
+    return "Ваш сайт частично готов к работе с ИИ-платформами. Ряд параметров требует улучшения для более стабильного появления в ответах ИИ.";
+  return "Ваш сайт пока плохо виден для ИИ-платформ. Необходимо устранить несколько критических проблем, чтобы начать появляться в ответах ИИ.";
 }
 
 function getAssessmentText1(score: number): string {
