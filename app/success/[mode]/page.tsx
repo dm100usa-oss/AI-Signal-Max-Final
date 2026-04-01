@@ -144,7 +144,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       <h1 className="text-2xl font-semibold text-center mb-2">
         {mode === "quick"
           ? "Результаты быстрой проверки"
-          : "Результаты детальной проверки сайта"}
+          : "Результаты детальной проверки"}
       </h1>
 
       {url && (
@@ -236,7 +236,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
       {mode === "pro" && (
         <p className="text-sm text-gray-600 text-center mt-4">
-          Полный отчёт и чек-лист разработчика отправлены вам на email.
+          Полный отчёт для владельца и ТЗ для разработчика отправлены вам на email.
         </p>
       )}
 
