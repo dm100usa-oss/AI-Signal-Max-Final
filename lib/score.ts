@@ -18,7 +18,8 @@ export type CheckKey =
   | "page_speed"
   | "page_404"
   | "contacts"
-  | "sitemap_lastmod";
+  | "sitemap_lastmod"
+  | "site_language";
 
 export interface CheckMeta {
   key: CheckKey;
@@ -45,6 +46,7 @@ export const CHECKS: CheckMeta[] = [
   { key: "h2_present",      name: "H2",                         weight: 0  },
   { key: "contacts",        name: "Контакты",                   weight: 0  },
   { key: "sitemap_lastmod", name: "Дата обновления",            weight: 0  },
+  { key: "site_language",  name: "Язык сайта",                 weight: 0  },
 ]; // total = 100
 
 export const PRO_KEYS: CheckKey[] = CHECKS.map((c) => c.key);
