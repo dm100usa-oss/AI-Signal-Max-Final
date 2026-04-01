@@ -398,7 +398,7 @@ function checkViewport(html: string | null): CheckItem {
     ) || "";
   if (!v) return item("mobile_friendly", false, "Missing viewport meta", "Нет");
   const ok = /width\s*=\s*device-width/i.test(v);
-  return item("mobile_friendly", ok ? true : null, `viewport: ${v}`, ok ? "Да" : "Частично");
+  return item("mobile_friendly", ok ? true : null, `viewport: ${v}`, ok ? "Да" : "Нет");
 }
 
 function checkAltAttributes(html: string | null): CheckItem {
