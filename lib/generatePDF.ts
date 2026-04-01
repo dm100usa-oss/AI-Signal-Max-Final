@@ -97,7 +97,7 @@ function escapeRegExp(s: string): string {
 
 async function getBase64Logo(): Promise<string> {
   try {
-    const logoPath = path.join(process.cwd(), "public", "logo.png");
+    const logoPath = path.join(process.cwd(), "public", "templates", "logo.png");
     const buffer = await fs.readFile(logoPath);
     return buffer.toString("base64");
   } catch {
@@ -111,7 +111,7 @@ function getDonutColor(score: number): string {
 }
 
 function getDonutOffset(score: number): number {
-  const circumference = 2 * Math.PI * 90; // radius = 90
+  const circumference = 2 * Math.PI * 90;
   return circumference - (score / 100) * circumference;
 }
 
