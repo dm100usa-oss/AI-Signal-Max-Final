@@ -46,9 +46,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
         const allFactors = [
           { key: "robots_txt", name: "Открыт ли сайт для ИИ", desc: "Проверяет, разрешён ли доступ ИИ-платформам к вашему сайту." },
-          { key: "h1_present", name: "Понимает ли ИИ, о чём ваш сайт", desc: "Проверяет наличие главного заголовка H1, объясняющего содержание страницы." },
+          { key: "meta_description", name: "Понимает ли ИИ, о чём ваш сайт", desc: "Проверяет мета-описание сайта, которое помогает ИИ понять его тематику и содержание." },
           { key: "title_tag", name: "Видит ли ИИ заголовки страниц", desc: "Проверяет наличие и корректность тега Title." },
-          { key: "meta_description", name: "Понимает ли ИИ категорию вашего сайта", desc: "Проверяет описание сайта для правильной тематической классификации." },
+          { key: "h2_present", name: "Понимает ли ИИ категорию вашего сайта", desc: "Проверяет наличие подзаголовков H2, которые помогают ИИ определить категорию и структуру контента." },
           { key: "sitemap_xml", name: "Понятна ли ИИ структура сайта", desc: "Проверяет наличие карты сайта sitemap.xml, чтобы ИИ знал все страницы." },
           { key: "https", name: "Считает ли ИИ ваш сайт безопасным", desc: "Проверяет, используется ли защищённое соединение HTTPS." },
           { key: "page_speed", name: "Достаточна ли скорость сайта для ИИ", desc: "Проверяет скорость ответа сервера — медленный сайт может быть пропущен ИИ-краулером." },
@@ -73,7 +73,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         }));
 
         const QUICK_FACTOR_KEYS = [
-          "robots_txt", "h1_present", "title_tag", "meta_description",
+          "robots_txt", "meta_description", "title_tag", "h2_present",
           "sitemap_xml", "https", "page_speed", "structured_data", "open_graph", "score",
         ];
         const quickFactors = mappedFactors.filter(f => QUICK_FACTOR_KEYS.includes(f.key));
