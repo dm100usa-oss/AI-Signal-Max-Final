@@ -229,12 +229,12 @@ export default function Home() {
         {loading === "pro" ? (
           <span className="inline-flex items-center">Проверяем<Dots /></span>
         ) : (
-          "Полная проверка $19.99"
+          "Детальная проверка $19.99"
         )}
       </button>
 
       <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
-        15 факторов, результат на экране и по email, отчёт и рекомендации для владельца и ТЗ для разработчика
+        15 факторов, результат на экране и по email, понятные рекомендации для владельца и ТЗ для разработчика
       </p>
 
       <div className="flex flex-col items-center mb-10">
