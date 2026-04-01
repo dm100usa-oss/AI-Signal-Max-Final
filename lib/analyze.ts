@@ -37,9 +37,12 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
   const { origin, url } = normalizeUrl(rawUrl);
   const { html, headers, schemeOk, responseTimeMs } = await fetchHTML(url);
 
+  const sitemapResult = await checkSitemap(origin);
+
   const all: Record<CheckKey, CheckItem> = {
     robots_txt: await checkRobotsTxt(origin),
-    sitemap_xml: await checkSitemap(origin),
+    sitemap_xml: sitemapResult.pageCount,
+    sitemap_lastmod: sitemapResult.lastmod,
     x_robots_tag: checkXRobots(headers),
     meta_robots: checkMetaRobots(html),
     canonical: checkCanonical(html, origin),
@@ -47,6 +50,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     meta_description: checkMetaDescription(html),
     open_graph: checkOpenGraph(html),
     h1_present: checkH1(html),
+    h2_present: checkH2(html),
     structured_data: checkJSONLD(html),
     mobile_friendly: checkViewport(html),
     https: {
@@ -59,6 +63,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     alt_attributes: checkAltAttributes(html),
     page_speed: checkPageSpeed(responseTimeMs),
     page_404: await check404(origin),
+    contacts: checkContacts(html),
   };
 
   const score = calcWeightedScore(all);
@@ -159,7 +164,7 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
   const url = origin + "/robots.txt";
   try {
     const res = await fetchWithTimeout(url, { method: "GET" });
-    if (!res.ok) return item("robots_txt", false, "robots.txt not found", "Не найден");
+    if (!res.ok) return item("robots_txt", false, "robots.txt not found", "Закрыт");
     const text = await res.text();
     const blocksAll =
       /Disallow:\s*\/\s*$/im.test(text) ||
@@ -168,22 +173,49 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
       "robots_txt",
       blocksAll ? false : true,
       blocksAll ? "robots.txt blocks all" : "robots.txt valid",
-      "Найден"
+      blocksAll ? "Закрыт" : "Открыт"
     );
   } catch {
-    return item("robots_txt", null, "robots.txt not accessible", "Не найден");
+    return item("robots_txt", null, "robots.txt not accessible", "Закрыт");
   }
 }
 
-async function checkSitemap(origin: string): Promise<CheckItem> {
+async function checkSitemap(origin: string): Promise<{ pageCount: CheckItem; lastmod: CheckItem }> {
   const paths = ["/sitemap.xml", "/sitemap_index.xml", "/sitemap-index.xml"];
   for (const p of paths) {
     try {
       const res = await fetchWithTimeout(origin + p, { method: "GET" });
-      if (res.ok) return item("sitemap_xml", true, `Found ${p}`, "Найден");
+      if (res.ok) {
+        const text = await res.text();
+        const count = (text.match(/<url>/gi) || []).length;
+        const lastmodRaw = textMatch(text, /<lastmod>([^<]+)<\/lastmod>/i);
+
+        // Форматируем дату
+        let lastmodFormatted = "Не найдено";
+        if (lastmodRaw) {
+          try {
+            const d = new Date(lastmodRaw.trim());
+            lastmodFormatted = d.toLocaleDateString("ru-RU", {
+              day: "numeric", month: "long", year: "numeric",
+            });
+          } catch {
+            lastmodFormatted = lastmodRaw.trim();
+          }
+        }
+
+        const countStr = count > 0 ? `${count}` : "Найден";
+
+        return {
+          pageCount: item("sitemap_xml", true, `Found ${p}`, countStr),
+          lastmod: item("sitemap_lastmod", lastmodRaw ? true : null, `lastmod: ${lastmodRaw}`, lastmodFormatted),
+        };
+      }
     } catch {}
   }
-  return item("sitemap_xml", false, "Sitemap not found", "Не найден");
+  return {
+    pageCount: item("sitemap_xml", false, "Sitemap not found", "Не найден"),
+    lastmod: item("sitemap_lastmod", null, "Sitemap not found", "Не найдено"),
+  };
 }
 
 function checkXRobots(headers: Headers): CheckItem {
@@ -258,6 +290,22 @@ function checkH1(html: string | null): CheckItem {
     textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || ""
   );
   return item("h1_present", h1.length ? true : false, h1 ? `H1: ${h1}` : "Missing H1", h1 || "Не найден");
+}
+
+function checkH2(html: string | null): CheckItem {
+  const h2 = stripTags(
+    textMatch(html, /<h2[^>]*>([\s\S]*?)<\/h2>/i) || ""
+  );
+  return item("h2_present", h2.length ? true : null, h2 ? `H2: ${h2}` : "Missing H2", h2 || "Не найден");
+}
+
+function checkContacts(html: string | null): CheckItem {
+  if (!html) return item("contacts", null, "No contacts found", "Не найдено");
+  const phone = textMatch(html, /href=["']tel:([^"']+)["']/i);
+  if (phone) return item("contacts", true, `Phone: ${phone}`, phone.trim());
+  const email = textMatch(html, /href=["']mailto:([^"']+)["']/i);
+  if (email) return item("contacts", true, `Email: ${email}`, email.trim());
+  return item("contacts", null, "No contacts found", "Не найдено");
 }
 
 function checkJSONLD(html: string | null): CheckItem {
