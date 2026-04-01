@@ -160,6 +160,18 @@ function stripTags(s: string) {
   return s.replace(/<[^>]*>/g, "").trim();
 }
 
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 async function checkRobotsTxt(origin: string): Promise<CheckItem> {
   const url = origin + "/robots.txt";
   try {
@@ -187,7 +199,9 @@ async function checkSitemap(origin: string): Promise<{ pageCount: CheckItem; las
       const res = await fetchWithTimeout(origin + p, { method: "GET" });
       if (res.ok) {
         const text = await res.text();
-        const count = (text.match(/<url>/gi) || []).length;
+        const urlCount = (text.match(/<url>/gi) || []).length;
+        const sitemapCount = (text.match(/<sitemap>/gi) || []).length;
+        const count = urlCount > 0 ? urlCount : sitemapCount;
         const lastmodRaw = textMatch(text, /<lastmod>([^<]+)<\/lastmod>/i);
 
         // Форматируем дату
@@ -293,9 +307,9 @@ function checkH1(html: string | null): CheckItem {
 }
 
 function checkH2(html: string | null): CheckItem {
-  const h2 = stripTags(
+  const h2 = decodeEntities(stripTags(
     textMatch(html, /<h2[^>]*>([\s\S]*?)<\/h2>/i) || ""
-  );
+  ));
   return item("h2_present", h2.length ? true : null, h2 ? `H2: ${h2}` : "Missing H2", h2 || "Не найден");
 }
 
