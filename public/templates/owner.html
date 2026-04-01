@@ -6,10 +6,10 @@
   <title>Отчёт о видимости сайта в ИИ-платформах — AI Signal Max</title>
   <style>
     @page {
-      size: Letter;
-      margin: 40px 50px;
+      size: A4;
+      margin: 18mm 14mm;
       @bottom-center {
-        content: "Page " counter(page) " of " counter(pages);
+        content: "Страница " counter(page) " из " counter(pages);
         font-size: 10pt;
         color: rgb(107,114,128);
       }
@@ -27,20 +27,19 @@
     p, .factor-desc, .summary-box p { text-align: justify; text-align-last: left; }
     .center { text-align: center; }
     .logo { display: block; margin: 0 auto; width: 160px; }
-    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; }
+    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; color: rgb(15,23,42); }
     .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
 
-    h2 { font-size: 14pt; margin-top: 28px; margin-bottom: 6px; font-weight: 700; color: rgb(15,23,42); }
-    h3 { font-size: 12.5pt; margin-top: 20px; margin-bottom: 4px; font-weight: 700; color: rgb(30,64,175); }
-    p { margin: 8px 0; color: rgb(15,23,42); }
+    h2 { font-size: 14pt; margin-top: 32px; margin-bottom: 8px; font-weight: 700; color: rgb(15,23,42); }
+    h3 { font-size: 12.5pt; margin-top: 24px; margin-bottom: 6px; font-weight: 700; color: rgb(30,64,175); }
+    p { margin: 10px 0; color: rgb(15,23,42); }
     .donut-wrap { display: flex; justify-content: center; margin: 20px 0 18px; }
 
     .summary-box {
       margin: 20px auto;
-      padding: 16px 20px;
+      padding: 18px 22px;
       border-radius: 10px;
       width: 90%;
-      text-align: center;
       border: 1px solid rgb(229,231,235);
       background: rgb(249,250,251);
       color: rgb(55,65,81);
@@ -49,25 +48,29 @@
       font-size: 15pt;
       font-weight: 700;
       margin-bottom: 10px;
+      text-align: center;
       color: rgb(15,23,42);
     }
+    .summary-box p { text-align: left; margin: 8px 0; }
     .summary-box.good { border-color: rgb(16,185,129); background: rgba(16,185,129,0.05); }
     .summary-box.moderate { border-color: rgb(245,158,11); background: rgba(245,158,11,0.05); }
     .summary-box.poor { border-color: rgb(239,68,68); background: rgba(239,68,68,0.05); }
-    .summary-box.good h3 { color: rgb(16,185,129); }
-    .summary-box.moderate h3 { color: rgb(245,158,11); }
-    .summary-box.poor h3 { color: rgb(239,68,68); }
+    .summary-box.good h3 { color: rgb(15,23,42); }
+    .summary-box.moderate h3 { color: rgb(15,23,42); }
+    .summary-box.poor h3 { color: rgb(15,23,42); }
 
-    /* ── Блок "Как сайты попадают в ответы ИИ" ── */
-    .ai-section { margin-top: 28px; }
+    .ai-section { margin-top: 32px; }
     .ai-section h2 { border-bottom: 2px solid rgb(30,64,175); padding-bottom: 6px; }
+    .ai-section p { margin: 14px 0; }
+    .ai-section h3 { margin-top: 28px; }
+
     .ai-requirements {
       width: 100%;
       border-collapse: collapse;
-      margin: 14px 0 18px;
+      margin: 16px 0 20px;
     }
     .ai-requirements td {
-      padding: 10px 14px;
+      padding: 12px 16px;
       border: 1px solid rgb(229,231,235);
       vertical-align: top;
       font-size: 11.5pt;
@@ -85,18 +88,18 @@
       background: rgba(30,64,175,0.05);
       border-left: 4px solid rgb(30,64,175);
       border-radius: 0 8px 8px 0;
-      padding: 12px 16px;
-      margin: 14px 0;
+      padding: 14px 18px;
+      margin: 18px 0;
     }
     .highlight-box p { margin: 0; }
     .example-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 12px 0 16px;
+      margin: 14px 0 18px;
       font-size: 11pt;
     }
     .example-table td {
-      padding: 8px 12px;
+      padding: 10px 12px;
       border: 1px solid rgb(229,231,235);
       vertical-align: middle;
     }
@@ -113,20 +116,19 @@
     .divider {
       border: none;
       border-top: 1px solid rgb(229,231,235);
-      margin: 28px 0;
+      margin: 32px 0;
     }
 
-    /* ── Карточки параметров ── */
     .factor {
       margin-top: 14px;
-      padding: 12px 16px;
+      padding: 14px 18px;
       border: 1px solid rgb(229,231,235);
       border-radius: 10px;
       background: #fff;
     }
     .factor-head {
       display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .factor-lead { display: flex; align-items: center; gap: 8px; color: rgb(15,23,42); }
     .factor-lead.good .dot { border-color: rgb(16,185,129); }
@@ -134,22 +136,23 @@
     .factor-lead.poor .dot { border-color: rgb(239,68,68); }
     .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; }
     .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
-    .status { font-weight: 700; font-size: 11pt; }
+    .factor-tech { font-size: 10pt; color: rgb(107,114,128); margin: 2px 0 6px 22px; }
+    .status { font-weight: 700; font-size: 11pt; white-space: nowrap; }
     .status.good { color: rgb(16,185,129); }
     .status.moderate { color: rgb(245,158,11); }
     .status.poor { color: rgb(239,68,68); }
 
-    /* ── Заключение ── */
     .conclusion-box {
       margin-top: 32px;
-      padding: 20px 24px;
+      padding: 22px 26px;
       border-radius: 12px;
       background: rgb(249,250,251);
       border: 1px solid rgb(229,231,235);
     }
     .conclusion-box h2 { margin-top: 0; color: rgb(15,23,42); }
+    .conclusion-box p { margin: 12px 0; }
     .deliverables {
-      margin: 16px 0;
+      margin: 18px 0;
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
@@ -157,7 +160,7 @@
     .deliverable-item {
       flex: 1;
       min-width: 160px;
-      padding: 12px 14px;
+      padding: 14px 16px;
       border-radius: 8px;
       background: #fff;
       border: 1px solid rgb(209,213,219);
@@ -167,8 +170,8 @@
     .deliverable-item .di-title { font-weight: 700; color: rgb(30,64,175); margin-bottom: 4px; }
     .deliverable-item .di-desc { color: rgb(75,85,99); font-size: 10.5pt; }
 
-    .footer { margin-top: 40px; text-align: center; font-size: 10pt; }
-    .footer .disclaimer { opacity: 0.6; color: rgb(55,65,81); font-size: 10pt; }
+    .footer { margin-top: 40px; text-align: center; font-size: 10pt; color: rgb(107,114,128); }
+    .footer .disclaimer { opacity: 0.7; font-size: 10pt; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -176,7 +179,7 @@
   <!-- ШАПКА -->
   <div class="center">
     <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
-    <h1>Отчёт о видимости сайта в ИИ-платформах</h1>
+    <h1>Отчёт о готовности сайта к появлению в рекомендациях ИИ-ассистентов</h1>
     <div class="meta">Сайт: {{website}} &nbsp;|&nbsp; Дата: {{date}}</div>
   </div>
 
@@ -200,12 +203,13 @@
 
   <!-- ВВЕДЕНИЕ -->
   <h2>Введение</h2>
-  <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения видимости в ИИ-платформах и объясняет, какие параметры на это влияют. Прежде чем перейти к результатам проверки, мы коротко объясним логику работы ИИ — это поможет вам понять, почему каждый параметр важен и что именно нужно исправить.</p>
+  <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения готовности к появлению в рекомендациях ИИ-ассистентов и объясняет, какие параметры на это влияют. Ниже вы найдёте подробный разбор важных параметров вашего сайта и объяснение того, как сайты обычно попадают в рекомендации ИИ, основанные на нашем опыте и практике.</p>
 
-  <!-- БЛОК: КАК САЙТЫ ПОПАДАЮТ В ОТВЕТЫ ИИ -->
+  <!-- КАК САЙТЫ ПОПАДАЮТ В РЕКОМЕНДАЦИИ ИИ -->
   <div class="ai-section">
-    <h2>Как сайты попадают в ответы ИИ</h2>
-    <p>Сегодня пользователь предпочитает получать готовые ответы на свои вопросы, а не набор ссылок в поисковике. ИИ-платформы подстраиваются под это: они формируют готовые ответы, выбирая самые подходящие источники. Чтобы чаще появляться в этих ответах, сайт должен отвечать трём требованиям:</p>
+    <h2>Как сайты попадают в рекомендации ИИ</h2>
+
+    <p>Сегодня пользователь предпочитает получать готовые ответы на свои вопросы, а не набор ссылок в поисковике. ИИ-ассистенты подстраиваются под это: они формируют готовые ответы, выбирая самые подходящие источники. Чтобы чаще появляться в этих ответах, сайт должен отвечать трём требованиям:</p>
 
     <table class="ai-requirements">
       <tr>
@@ -223,9 +227,11 @@
     </table>
 
     <h3>1. Техническая доступность</h3>
-    <p>ИИ-платформы сканируют сайты автоматически. Чтобы сайт был доступен для анализа, он должен: быть открытым для ботов, быть проиндексированным в Google и Bing, быстро загружаться (до 2–3 секунд), корректно работать на мобильных устройствах, иметь чистые URL и не содержать дублей страниц.</p>
+
+    <p>ИИ-платформы сканируют сайты автоматически. Чтобы сайт был доступен для анализа, он должен быть открытым для ботов, проиндексированным в Google и Bing, быстро загружаться (до 2–3 секунд), корректно работать на мобильных устройствах, иметь чистые URL и не содержать дублей страниц.</p>
 
     <h3>2. Понятный контент и готовые ответы</h3>
+
     <p>Это важное различие: ИИ при запросе не ищет нужный сайт — он ищет нужный ответ. Он сначала выбирает страницы с нужным ответом, а потом оценивает сам сайт и приводит ссылку. Каждая страница должна прямо отвечать на конкретный вопрос пользователя, а не просто описывать услугу или компанию.</p>
 
     <p>Например, для компании по ремонту труб:</p>
@@ -259,8 +265,10 @@
     </div>
 
     <h3>3. Доверие как надёжный источник</h3>
-    <p>ИИ выбирает те сайты, которые выглядят надёжно и подтверждают это фактами. На сайте обязательно должны быть: информация о компании и контакты, понятно кто автор или эксперт, реальные отзывы и примеры работ, конкретные результаты и цифры. Также важна единая информация на всех страницах — если данные противоречат друг другу, ИИ снижает доверие к сайту.</p>
-    <p>Дополнительный сигнал доверия — упоминания вне сайта: профиль в Google, каталоги компаний, ссылки в статьях. ИИ смотрит не только на ваш сайт, но и на то, есть ли вы «в интернете вообще».</p>
+
+    <p>ИИ выбирает те сайты, которые выглядят надёжно и подтверждают это фактами. На сайте обязательно должны быть: информация о компании и контакты, понятно кто автор или эксперт, реальные отзывы и примеры работ, конкретные результаты и цифры.</p>
+
+    <p>Также важна единая информация на всех страницах — если данные противоречат друг другу, ИИ снижает доверие к сайту. Дополнительный сигнал доверия — упоминания вне сайта: профиль в Google, каталоги компаний, ссылки в статьях. ИИ смотрит не только на ваш сайт, но и на то, есть ли вы «в интернете вообще».</p>
 
     <div class="highlight-box">
       <p><strong>Главный принцип:</strong> ИИ выбирает не просто информацию, а надёжный источник. Он должен быть понятен, проверяем и подтверждён.</p>
@@ -269,189 +277,190 @@
 
   <hr class="divider" />
 
-  <!-- ПЕРЕХОД К РЕЗУЛЬТАТАМ -->
   <p>Теперь посмотрим, как ваш сайт выглядит по каждому из этих параметров прямо сейчас.</p>
 
   <h2>Проверенные параметры</h2>
 
-  <!-- 1. robots.txt -->
+  <!-- 1 -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_robots_txt_class}}">
         <span class="dot"></span>
-        <div class="factor-name">robots.txt</div>
+        <div class="factor-name">Открыт ли сайт для ИИ</div>
       </div>
       <div class="status {{status_robots_txt_class}}">{{status_robots_txt}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Этот файл сообщает поисковым и ИИ-системам, какие разделы сайта можно сканировать. Ошибки в нём могут полностью скрыть ваш сайт из результатов ИИ-поиска и ChatGPT.</p>
+    <div class="factor-tech">Основной фактор проверки: robots.txt</div>
+    <p class="factor-desc">Этот файл говорит ИИ-платформам, какие страницы они могут читать. Если доступ закрыт — сайт невидим для ИИ полностью.</p>
   </div>
 
-  <!-- 2. sitemap.xml -->
-  <div class="factor">
-    <div class="factor-head">
-      <div class="factor-lead {{status_sitemap_xml_class}}">
-        <span class="dot"></span>
-        <div class="factor-name">sitemap.xml</div>
-      </div>
-      <div class="status {{status_sitemap_xml_class}}">{{status_sitemap_xml}}</div>
-    </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Карта сайта показывает ИИ-платформам, какие страницы существуют и как они связаны. Без неё часть контента остаётся «невидимой» для анализа моделей.</p>
-  </div>
-
-  <!-- 3. X-Robots-Tag -->
-  <div class="factor">
-    <div class="factor-head">
-      <div class="factor-lead {{status_x_robots_tag_class}}">
-        <span class="dot"></span>
-        <div class="factor-name">X-Robots-Tag</div>
-      </div>
-      <div class="status {{status_x_robots_tag_class}}">{{status_x_robots_tag}}</div>
-    </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Это HTTP-заголовок, который управляет индексированием файлов (PDF, изображения, страницы). Если он настроен неправильно, ИИ не сможет использовать эти данные.</p>
-  </div>
-
-  <!-- 4. Meta Robots -->
-  <div class="factor">
-    <div class="factor-head">
-      <div class="factor-lead {{status_meta_robots_class}}">
-        <span class="dot"></span>
-        <div class="factor-name">Meta Robots</div>
-      </div>
-      <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
-    </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Мета-тег robots в HTML управляет доступом ИИ к конкретной странице. Он должен использоваться корректно и не конфликтовать с другими настройками индексации.</p>
-  </div>
-
-  <!-- 5. Canonical -->
-  <div class="factor">
-    <div class="factor-head">
-      <div class="factor-lead {{status_canonical_class}}">
-        <span class="dot"></span>
-        <div class="factor-name">Canonical</div>
-      </div>
-      <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
-    </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Атрибут rel="canonical" помогает ИИ-платформам определить основную версию страницы и избежать путаницы при анализе дубликатов контента.</p>
-  </div>
-
-  <!-- 6. Title Tag -->
-  <div class="factor">
-    <div class="factor-head">
-      <div class="factor-lead {{status_title_tag_class}}">
-        <span class="dot"></span>
-        <div class="factor-name">Title Tag</div>
-      </div>
-      <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
-    </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Заголовок страницы отображается в результатах поиска и помогает ИИ определить тему контента. Он должен быть уникальным и информативным.</p>
-  </div>
-
-  <!-- 7. Meta Description -->
+  <!-- 2 -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_meta_description_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Meta Description</div>
+        <div class="factor-name">Понимает ли ИИ, о чём ваш сайт</div>
       </div>
       <div class="status {{status_meta_description_class}}">{{status_meta_description}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Краткое описание страницы помогает ИИ понять контент и повысить вероятность включения в ответы моделей. Дублирующиеся или отсутствующие описания снижают видимость.</p>
+    <div class="factor-tech">Основной фактор проверки: meta description</div>
+    <p class="factor-desc">Это короткий текст который ИИ читает чтобы понять тему сайта. Без него ИИ угадывает тему самостоятельно — и часто ошибается.</p>
   </div>
 
-  <!-- 8. Open Graph -->
+  <!-- 3 -->
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_open_graph_class}}">
+      <div class="factor-lead {{status_title_tag_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Open Graph</div>
+        <div class="factor-name">Видит ли ИИ заголовки страниц</div>
       </div>
-      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+      <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Open Graph-теги обеспечивают корректное отображение ссылок на сайт в соцсетях и ИИ-интерфейсах. Их отсутствие ухудшает восприятие контента.</p>
+    <div class="factor-tech">Основной фактор проверки: title tag</div>
+    <p class="factor-desc">Это главный заголовок страницы который ИИ использует чтобы понять о чём она. Без него страница теряет смысл для ИИ.</p>
   </div>
 
-  <!-- 9. H1 Headings -->
+  <!-- 4 -->
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_h1_present_class}}">
+      <div class="factor-lead {{status_h2_present_class}}">
         <span class="dot"></span>
-        <div class="factor-name">H1 Headings</div>
+        <div class="factor-name">Понимает ли ИИ категорию вашего сайта</div>
       </div>
-      <div class="status {{status_h1_present_class}}">{{status_h1_present}}</div>
+      <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Главный заголовок H1 определяет основную тему страницы. Его отсутствие или повторение на других страницах снижает понятность сайта для ИИ.</p>
+    <div class="factor-tech">Основной фактор проверки: подзаголовки H2</div>
+    <p class="factor-desc">Подзаголовки показывают ИИ структуру и разделы сайта — помогают понять в какой категории работает бизнес.</p>
   </div>
 
-  <!-- 10. Structured Data -->
+  <!-- 5 -->
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_structured_data_class}}">
+      <div class="factor-lead {{status_sitemap_xml_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Structured Data (Schema)</div>
+        <div class="factor-name">Понятна ли ИИ структура сайта</div>
       </div>
-      <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
+      <div class="status {{status_sitemap_xml_class}}">{{status_sitemap_xml}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Структурированные данные помогают ИИ-платформам понимать контекст контента — например, где описание компании, товара, услуги или статьи.</p>
+    <div class="factor-tech">Основной фактор проверки: sitemap.xml</div>
+    <p class="factor-desc">Без карты сайта ИИ может не найти часть страниц и не знает как они связаны между собой.</p>
   </div>
 
-  <!-- 11. Mobile Friendly -->
-  <div class="factor">
-    <div class="factor-head">
-      <div class="factor-lead {{status_mobile_friendly_class}}">
-        <span class="dot"></span>
-        <div class="factor-name">Mobile Friendly</div>
-      </div>
-      <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
-    </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Адаптивность влияет на восприятие качества сайта. ИИ-модели учитывают мобильную оптимизацию при формировании ответов и рекомендаций.</p>
-  </div>
-
-  <!-- 12. HTTPS -->
+  <!-- 6 -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_https_class}}">
         <span class="dot"></span>
-        <div class="factor-name">HTTPS</div>
+        <div class="factor-name">Считает ли ИИ ваш сайт безопасным</div>
       </div>
       <div class="status {{status_https_class}}">{{status_https}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> HTTPS защищает соединение и показывает ИИ-системам, что сайт безопасен. Отсутствие SSL-сертификата снижает доверие и рейтинг.</p>
+    <div class="factor-tech">Основной фактор проверки: HTTPS</div>
+    <p class="factor-desc">Сайты без HTTPS автоматически получают низкий уровень доверия от ИИ-платформ.</p>
   </div>
 
-  <!-- 13. Alt Attributes -->
-  <div class="factor">
-    <div class="factor-head">
-      <div class="factor-lead {{status_alt_attributes_class}}">
-        <span class="dot"></span>
-        <div class="factor-name">Alt Attributes</div>
-      </div>
-      <div class="status {{status_alt_attributes_class}}">{{status_alt_attributes}}</div>
-    </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Атрибуты alt описывают изображения. Без них ИИ теряет смысловую часть контента и не может учитывать изображения при анализе.</p>
-  </div>
-
-  <!-- 14. Page Speed -->
+  <!-- 7 -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_page_speed_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Page Speed</div>
+        <div class="factor-name">Достаточна ли скорость сайта для ИИ</div>
       </div>
       <div class="status {{status_page_speed_class}}">{{status_page_speed}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Скорость ответа сервера влияет на то, успевает ли ИИ-краулер получить данные. Медленный сайт может быть пропущен при индексации.</p>
+    <div class="factor-tech">Основной фактор проверки: скорость ответа сервера</div>
+    <p class="factor-desc">Медленный сайт ИИ-краулер может просто пропустить при сканировании.</p>
   </div>
 
-  <!-- 15. Custom 404 Page -->
+  <!-- 8 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_structured_data_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Видит ли ИИ разметку страниц</div>
+      </div>
+      <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
+    </div>
+    <div class="factor-tech">Основной фактор проверки: structured data (JSON-LD)</div>
+    <p class="factor-desc">Это специальная разметка которая точно объясняет ИИ что на странице — компания, услуга, товар или статья.</p>
+  </div>
+
+  <!-- 9 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_open_graph_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Содержит ли ссылка заголовок, описание и изображение</div>
+      </div>
+      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+    </div>
+    <div class="factor-tech">Основной фактор проверки: Open Graph</div>
+    <p class="factor-desc">Эти теги определяют как выглядит ссылка на ваш сайт когда её публикуют или анализируют ИИ-платформы.</p>
+  </div>
+
+  <!-- 10 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_robots_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Не запрещена ли индексация страниц</div>
+      </div>
+      <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
+    </div>
+    <div class="factor-tech">Основной фактор проверки: meta robots</div>
+    <p class="factor-desc">Если этот тег запрещает индексацию — страница скрыта от ИИ даже если всё остальное настроено правильно.</p>
+  </div>
+
+  <!-- 11 -->
   <div class="factor">
     <div class="factor-head">
       <div class="factor-lead {{status_page_404_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Custom 404 Page</div>
+        <div class="factor-name">Считает ли ИИ ваш сайт качественным</div>
       </div>
       <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
     </div>
-    <p class="factor-desc"><strong>Назначение:</strong> Кастомная страница ошибки 404 удерживает посетителя и помогает ИИ корректно оценить стабильность сайта и работу ссылок.</p>
+    <div class="factor-tech">Основной фактор проверки: обработка страницы 404</div>
+    <p class="factor-desc">Сайт который корректно отвечает на плохие запросы воспринимается ИИ как качественный и надёжный.</p>
+  </div>
+
+  <!-- 12 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_canonical_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Указана ли основная страница сайта</div>
+      </div>
+      <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
+    </div>
+    <div class="factor-tech">Основной фактор проверки: canonical</div>
+    <p class="factor-desc">Говорит ИИ какая версия страницы главная — без этого ИИ может путаться в дублях и снижать доверие к сайту.</p>
+  </div>
+
+  <!-- 13 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_mobile_friendly_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Удобен ли ваш сайт на мобильных устройствах</div>
+      </div>
+      <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
+    </div>
+    <div class="factor-tech">Основной фактор проверки: mobile viewport</div>
+    <p class="factor-desc">ИИ-платформы учитывают мобильную адаптацию как признак качества сайта.</p>
+  </div>
+
+  <!-- 14 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_alt_attributes_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Понимает ли ИИ изображения на сайте</div>
+      </div>
+      <div class="status {{status_alt_attributes_class}}">{{status_alt_attributes}}</div>
+    </div>
+    <div class="factor-tech">Основной фактор проверки: alt-атрибуты изображений</div>
+    <p class="factor-desc">Без alt-атрибутов ИИ не понимает что на картинках и теряет часть смысла страницы.</p>
   </div>
 
   <!-- ЗАКЛЮЧЕНИЕ -->
@@ -478,16 +487,12 @@
       </div>
     </div>
 
-    <p>Рекомендации AI Signal Max основаны на анализе реального поведения ИИ-платформ и отражают лучшие практики работы с контентом и технической оптимизацией сайтов.</p>
+    <p>Благодарим вас за обращение к AI Signal Max. Рекомендации основаны на анализе реального поведения ИИ-платформ и отражают лучшие практики работы с контентом и технической оптимизацией сайтов.</p>
   </div>
 
   <div class="footer">
-    <p>© 2025 AI Signal Max. All rights reserved.</p>
-    <p class="disclaimer">
-      Visibility scores are approximate and based on publicly available data.<br>
-      This report is for informational purposes only and does not constitute legal or technical advice.<br>
-      All actions must comply with U.S. law.
-    </p>
+    <p>© 2025 AI Signal Max. Все права защищены.</p>
+    <p class="disclaimer">Показатели готовности рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической или технической консультацией.</p>
   </div>
 
 </body>
