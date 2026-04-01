@@ -302,7 +302,7 @@ const PRIMARY_PRO_KEYS = [
 const LABEL_MAP: Record<string, string> = {
   title_tag:        "Заголовок",
   h1_present:       "H1",
-  h2_present:       "H2",
+  h2_present:       "Сейчас на сайте",
   meta_description: "Описание",
   contacts:         "Контакт",
   robots_txt:       "Доступ для ИИ",
