@@ -295,7 +295,7 @@ function FactorItem({ factor }: { factor: Factor }) {
 // Ключи, которые показываются явно (primary)
 const PRIMARY_QUICK_KEYS = ["title_tag", "h1_present", "meta_description"];
 const PRIMARY_PRO_KEYS = [
-  "title_tag", "meta_description", "h1_present", "h2_present",
+  "title_tag", "meta_description", "h2_present",
   "contacts", "robots_txt", "sitemap_xml", "sitemap_lastmod",
 ];
 
