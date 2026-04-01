@@ -37,7 +37,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
   const { origin, url } = normalizeUrl(rawUrl);
   const { html, headers, schemeOk, responseTimeMs } = await fetchHTML(url);
 
-  const sitemapResult = await checkSitemap(origin);
+  const sitemapResult = await checkSitemap(origin, html, headers);
 
   const all: Record<CheckKey, CheckItem> = {
     robots_txt: await checkRobotsTxt(origin),
@@ -192,7 +192,23 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
   }
 }
 
-async function checkSitemap(origin: string): Promise<{ pageCount: CheckItem; lastmod: CheckItem }> {
+function formatDate(raw: string): string {
+  try {
+    const d = new Date(raw.trim());
+    if (isNaN(d.getTime())) return raw.trim();
+    return d.toLocaleDateString("ru-RU", {
+      day: "numeric", month: "long", year: "numeric",
+    });
+  } catch {
+    return raw.trim();
+  }
+}
+
+async function checkSitemap(
+  origin: string,
+  html: string | null,
+  headers: Headers
+): Promise<{ pageCount: CheckItem; lastmod: CheckItem }> {
   const paths = ["/sitemap.xml", "/sitemap_index.xml", "/sitemap-index.xml"];
   for (const p of paths) {
     try {
@@ -203,22 +219,8 @@ async function checkSitemap(origin: string): Promise<{ pageCount: CheckItem; las
         const sitemapCount = (text.match(/<sitemap>/gi) || []).length;
         const count = urlCount > 0 ? urlCount : sitemapCount;
         const lastmodRaw = textMatch(text, /<lastmod>([^<]+)<\/lastmod>/i);
-
-        // Форматируем дату
-        let lastmodFormatted = "Не найдено";
-        if (lastmodRaw) {
-          try {
-            const d = new Date(lastmodRaw.trim());
-            lastmodFormatted = d.toLocaleDateString("ru-RU", {
-              day: "numeric", month: "long", year: "numeric",
-            });
-          } catch {
-            lastmodFormatted = lastmodRaw.trim();
-          }
-        }
-
         const countStr = count > 0 ? `${count}` : "Найден";
-
+        const lastmodFormatted = lastmodRaw ? formatDate(lastmodRaw) : "Не найдено";
         return {
           pageCount: item("sitemap_xml", true, `Found ${p}`, countStr),
           lastmod: item("sitemap_lastmod", lastmodRaw ? true : null, `lastmod: ${lastmodRaw}`, lastmodFormatted),
@@ -226,10 +228,35 @@ async function checkSitemap(origin: string): Promise<{ pageCount: CheckItem; las
       }
     } catch {}
   }
+
+  // Sitemap не найден — ищем дату в других местах
+  const lastmodFormatted = getFallbackDate(html, headers);
   return {
     pageCount: item("sitemap_xml", false, "Sitemap not found", "Не найден"),
-    lastmod: item("sitemap_lastmod", null, "Sitemap not found", "Не найдено"),
+    lastmod: item("sitemap_lastmod", lastmodFormatted ? true : null, "fallback date", lastmodFormatted || "Не найдено"),
   };
+}
+
+function getFallbackDate(html: string | null, headers: Headers): string {
+  // 1. Мета-тег article:modified_time
+  const metaModified = textMatch(
+    html,
+    /<meta[^>]+property=["']article:modified_time["'][^>]+content=["']([^"']+)["'][^>]*>/i
+  );
+  if (metaModified) return formatDate(metaModified);
+
+  // 2. Мета-тег last-modified
+  const metaLastMod = textMatch(
+    html,
+    /<meta[^>]+name=["']last-modified["'][^>]+content=["']([^"']+)["'][^>]*>/i
+  );
+  if (metaLastMod) return formatDate(metaLastMod);
+
+  // 3. HTTP заголовок Last-Modified
+  const headerDate = headers.get("last-modified");
+  if (headerDate) return formatDate(headerDate);
+
+  return "";
 }
 
 function checkXRobots(headers: Headers): CheckItem {
