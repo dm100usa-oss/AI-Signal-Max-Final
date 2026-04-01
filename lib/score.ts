@@ -10,12 +10,15 @@ export type CheckKey =
   | "meta_description"
   | "open_graph"
   | "h1_present"
+  | "h2_present"
   | "structured_data"
   | "mobile_friendly"
   | "https"
   | "alt_attributes"
   | "page_speed"
-  | "page_404";
+  | "page_404"
+  | "contacts"
+  | "sitemap_lastmod";
 
 export interface CheckMeta {
   key: CheckKey;
@@ -39,6 +42,9 @@ export const CHECKS: CheckMeta[] = [
   { key: "alt_attributes",   name: "Alt attributes",             weight: 3  },
   { key: "page_speed",       name: "Page speed",                 weight: 5  },
   { key: "page_404",         name: "404 page",                   weight: 1  },
+  { key: "h2_present",      name: "H2",                         weight: 0  },
+  { key: "contacts",        name: "Контакты",                   weight: 0  },
+  { key: "sitemap_lastmod", name: "Дата обновления",            weight: 0  },
 ]; // total = 100
 
 export const PRO_KEYS: CheckKey[] = CHECKS.map((c) => c.key);
