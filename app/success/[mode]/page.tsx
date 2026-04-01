@@ -305,7 +305,7 @@ const LABEL_MAP: Record<string, string> = {
   h2_present:       "Сейчас на сайте",
   meta_description: "Описание",
   site_language:    "Язык",
-  mobile_friendly:  "Мобильная",
+  mobile_friendly:  "Мобильная версия сайта",
   contacts:         "Контакт",
   robots_txt:       "Доступ для ИИ",
   sitemap_xml:      "Страниц",
