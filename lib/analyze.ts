@@ -64,6 +64,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     page_speed: checkPageSpeed(responseTimeMs),
     page_404: await check404(origin),
     contacts: checkContacts(html),
+    site_language: checkLanguage(html),
   };
 
   const score = calcWeightedScore(all);
@@ -349,6 +350,21 @@ function checkContacts(html: string | null): CheckItem {
   return item("contacts", null, "No contacts found", "Не найдено");
 }
 
+const LANG_MAP: Record<string, string> = {
+  ru: "Русский", en: "English", de: "Deutsch", fr: "Français",
+  es: "Español", it: "Italiano", pt: "Português", zh: "中文",
+  ja: "日本語", ko: "한국어", ar: "العربية", tr: "Türkçe",
+  pl: "Polski", nl: "Nederlands", uk: "Українська",
+};
+
+function checkLanguage(html: string | null): CheckItem {
+  const lang = textMatch(html, /<html[^>]+lang=["']([^"']+)["']/i);
+  if (!lang) return item("site_language", null, "No lang attribute", "Не определён");
+  const code = lang.split("-")[0].toLowerCase();
+  const name = LANG_MAP[code] || lang.toUpperCase();
+  return item("site_language", true, `Language: ${lang}`, name);
+}
+
 function checkJSONLD(html: string | null): CheckItem {
   if (!html) return item("structured_data", false, "No JSON-LD structured data", "Не обнаружен");
   const re =
@@ -380,9 +396,9 @@ function checkViewport(html: string | null): CheckItem {
       html,
       /<meta[^>]+name=["']viewport["'][^>]+content=["']([^"']+)["'][^>]*>/i
     ) || "";
-  if (!v) return item("mobile_friendly", false, "Missing viewport meta");
+  if (!v) return item("mobile_friendly", false, "Missing viewport meta", "Нет");
   const ok = /width\s*=\s*device-width/i.test(v);
-  return item("mobile_friendly", ok ? true : null, `viewport: ${v}`);
+  return item("mobile_friendly", ok ? true : null, `viewport: ${v}`, ok ? "Да" : "Частично");
 }
 
 function checkAltAttributes(html: string | null): CheckItem {
