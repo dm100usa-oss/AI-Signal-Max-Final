@@ -1,399 +1,445 @@
-"use client";
+// lib/analyze.ts
+import {
+  QUICK_KEYS,
+  PRO_KEYS,
+  weightOf,
+  nameOf,
+  interpret,
+  CheckKey,
+  Mode,
+} from "./score";
+import { saveData } from "./storage";
 
-import { useEffect, useState } from "react";
-import Donut from "../../../components/Donut";
-
-type Mode = "quick" | "pro";
-
-interface Factor {
-  key: string;
+export interface CheckItem {
+  key: CheckKey;
   name: string;
-  desc: string;
-  status: "Good" | "Moderate" | "Poor";
-}
-
-interface CheckItem {
-  key: string;
-  name?: string;
+  passed: boolean | null;
+  description: string;
+  status?: "Good" | "Moderate" | "Poor";
   value?: string;
 }
 
-export default function SuccessPage({ params }: { params: { mode: Mode } }) {
-  const mode = params.mode as Mode;
-  const [loading, setLoading] = useState(true);
-  const [score, setScore] = useState(0);
-  const [factors, setFactors] = useState<Factor[]>([]);
-  const [items, setItems] = useState<CheckItem[]>([]);
-  const [allItems, setAllItems] = useState<CheckItem[]>([]);
-  const [url, setUrl] = useState("");
-  const [summary, setSummary] = useState("");
-  const [showSummary, setShowSummary] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const currentUrl = new URL(window.location.href);
-        const targetUrl = currentUrl.searchParams.get("url") || "";
-        setUrl(targetUrl);
-
-        const res = await fetch(`/api/result?url=${encodeURIComponent(targetUrl)}&mode=${mode}`);
-        const data = await res.json();
-
-        if (!data || !data.score) throw new Error("No valid data");
-        setScore(data.score);
-        if (data.items) setItems(data.items);
-        if (data.allItems) setAllItems(data.allItems);
-
-        const allFactors = [
-          { key: "robots_txt", name: "Открыт ли сайт для ИИ", desc: "Проверяет, разрешён ли доступ ИИ-платформам к вашему сайту." },
-          { key: "h1_present", name: "Понимает ли ИИ, о чём ваш сайт", desc: "Проверяет наличие главного заголовка H1, объясняющего содержание страницы." },
-          { key: "title_tag", name: "Видит ли ИИ заголовки страниц", desc: "Проверяет наличие и корректность тега Title." },
-          { key: "meta_description", name: "Понимает ли ИИ категорию вашего сайта", desc: "Проверяет описание сайта для правильной тематической классификации." },
-          { key: "sitemap_xml", name: "Понятна ли ИИ структура сайта", desc: "Проверяет наличие карты сайта sitemap.xml, чтобы ИИ знал все страницы." },
-          { key: "https", name: "Считает ли ИИ ваш сайт безопасным", desc: "Проверяет, используется ли защищённое соединение HTTPS." },
-          { key: "page_speed", name: "Достаточна ли скорость сайта для ИИ", desc: "Проверяет скорость ответа сервера — медленный сайт может быть пропущен ИИ-краулером." },
-          { key: "structured_data", name: "Видит ли ИИ разметку страниц", desc: "Проверяет наличие структурированных данных JSON-LD, которые помогают ИИ понимать контент." },
-          { key: "open_graph", name: "Содержит ли ссылка заголовок, описание и изображение", desc: "Проверяет настройки Open Graph, влияющие на то, как сайт выглядит при распространении." },
-          { key: "meta_robots", name: "Не запрещена ли индексация страниц", desc: "Проверяет мета-теги и заголовки сервера на наличие запретов индексации для ИИ." },
-          { key: "page_404", name: "Считает ли ИИ ваш сайт качественным", desc: "Проверяет корректность обработки ошибок — сайт должен правильно сообщать об отсутствующих страницах." },
-          { key: "canonical", name: "Указана ли основная страница сайта", desc: "Проверяет корректность канонических ссылок, чтобы ИИ не путался в дублях." },
-          { key: "mobile_friendly", name: "Удобен ли ваш сайт на мобильных устройствах", desc: "Проверяет наличие мета-тега viewport для корректного отображения на мобильных." },
-          { key: "alt_attributes", name: "Понимает ли ИИ изображения на сайте", desc: "Проверяет наличие alt-атрибутов у изображений." },
-          { key: "score", name: "Будет ли ИИ рекомендовать ваш сайт", desc: "Итоговая оценка готовности сайта к рекомендациям со стороны ИИ-систем." },
-        ];
-
-        const scoreStatus: "Good" | "Moderate" | "Poor" =
-          data.score >= 75 ? "Good" : data.score >= 40 ? "Moderate" : "Poor";
-
-        const mappedFactors = allFactors.map((f) => ({
-          ...f,
-          status: f.key === "score"
-            ? scoreStatus
-            : data.results[f.key] || "Moderate",
-        }));
-
-        const QUICK_FACTOR_KEYS = [
-          "robots_txt", "h1_present", "title_tag", "meta_description",
-          "sitemap_xml", "https", "page_speed", "structured_data", "open_graph", "score",
-        ];
-        const quickFactors = mappedFactors.filter(f => QUICK_FACTOR_KEYS.includes(f.key));
-        setFactors(mode === "quick" ? quickFactors : mappedFactors);
-
-        // --- ТЕКСТЫ ---
-        if (data.score >= 75) {
-          const quickText = `Ваш сайт хорошо подготовлен к рекомендациям со стороны ИИ-систем. <strong>Он уже может попадать в ответы и привлекать клиентов</strong>, благодаря корректной структуре и настройкам.<br/><br/>
-В рамках быстрой проверки мы показываем <strong>ключевые параметры</strong>, которые уже работают корректно и поддерживают вашу готовность.<br/><br/>
-С уважением, команда AI Signal Max.`;
-
-          const proText = `Ваш сайт хорошо подготовлен к рекомендациям со стороны ИИ-систем. <strong>Он уже может попадать в ответы и привлекать клиентов</strong>, благодаря корректной структуре и настройкам.<br/><br/>
-Основные параметры настроены правильно, и ИИ-системы воспринимают сайт как понятный и надёжный источник. <strong>Дальнейшие точечные улучшения помогут усилить позиции и увеличить поток обращений.</strong><br/><br/>
-Мы отправили вам два PDF-файла на email: <strong>подробный отчёт с разъяснениями для владельца и техническое задание для разработчика</strong>. Это позволит закрепить результат и повысить эффективность сайта.<br/><br/>
-С уважением, команда AI Signal Max.`;
-
-          setSummary(mode === "pro" ? proText : quickText);
-        } else if (data.score >= 40) {
-          const quickText = `Ваш сайт частично готов к рекомендациям со стороны ИИ-систем. <strong>Вы близки к хорошему результату</strong> – достаточно доработать детали, чтобы структура стала понятнее для ИИ. Тогда сайт сможет чаще появляться в ответах, и вы получите больше переходов и обращений.<br/><br/>
-В рамках быстрой проверки мы показываем <strong>основные параметры</strong>, которые требуют доработки.<br/><br/>
-С уважением, команда AI Signal Max.`;
-
-          const proText = `Ваш сайт частично готов к рекомендациям со стороны ИИ-систем. <strong>Вы близки к хорошему результату</strong> – достаточно доработать детали, чтобы структура стала понятнее для ИИ. Тогда сайт сможет чаще появляться в ответах, и вы получите больше переходов и обращений.<br/><br/>
-Отдельные параметры пока настроены не полностью, из-за этого сайт не всегда попадает в ответы ИИ. <strong>Их точечная корректировка повысит готовность сайта к рекомендациям и позволит чаще появляться в ответах.</strong><br/><br/>
-Мы отправили вам два PDF-файла на email: <strong>подробный отчёт с разъяснениями для владельца и техническое задание для разработчика</strong>. Это готовый план действий, который можно сразу передать в работу и затем проверить результат повторно.<br/><br/>
-С уважением, команда AI Signal Max.`;
-
-          setSummary(mode === "pro" ? proText : quickText);
-        } else {
-          const quickText = `Ваш сайт пока не готов к рекомендациям со стороны ИИ-систем. <strong>В текущем состоянии он не попадает в ответы</strong>, из-за чего вы теряете потенциальных клиентов и обращения.<br/><br/>
-В рамках быстрой проверки мы показываем <strong>основные параметры</strong>, которые требуют срочного исправления.<br/><br/>
-С уважением, команда AI Signal Max.`;
-
-          const proText = `Ваш сайт пока не готов к рекомендациям со стороны ИИ-систем. <strong>В текущем состоянии он не попадает в ответы</strong>, из-за чего вы теряете потенциальных клиентов и обращения.<br/><br/>
-Критически важные параметры настроены некорректно или отсутствуют. <strong>Без их исправления сайт не сможет рекомендоваться ИИ-системами.</strong><br/><br/>
-Мы отправили вам два PDF-файла на email: <strong>подробный отчёт с разъяснениями для владельца и техническое задание для разработчика</strong>. Это пошаговый план, который позволит исправить ошибки и подготовить сайт к получению трафика из ИИ.<br/><br/>
-С уважением, команда AI Signal Max.`;
-
-          setSummary(mode === "pro" ? proText : quickText);
-        }
-      } catch (err) {
-        console.error("Failed to load analysis:", err);
-      } finally {
-        setLoading(false);
-        setTimeout(() => setShowSummary(true), 2000);
-      }
-    };
-
-    fetchData();
-  }, [mode]);
-
-  const date = new Date().toLocaleDateString("ru-RU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  if (loading) {
-    return (
-      <main className="max-w-3xl mx-auto px-6 py-20 text-center text-gray-600">
-        <p>Загрузка результатов...</p>
-      </main>
-    );
-  }
-
-  return (
-    <main className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-semibold text-center mb-2">
-        {mode === "quick"
-          ? "Результаты быстрой проверки"
-          : "Результаты полного аудита сайта"}
-      </h1>
-
-      {url && (
-        <div className="mb-6 text-center text-sm text-neutral-600">
-          Сайт: {url} &nbsp; | &nbsp; Дата: {date}
-        </div>
-      )}
-
-      <div className="flex justify-center mb-6">
-        <Donut score={score} />
-      </div>
-
-      <div
-        className="max-w-xl mx-auto rounded-2xl p-6 mb-10 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 text-justify transition-all duration-1000 ease-in-out"
-        style={{
-          minHeight: "180px",
-          opacity: showSummary ? 1 : 0,
-        }}
-      >
-        {showSummary && (
-          <>
-            <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
-              {score >= 75
-                ? "Высокая готовность сайта"
-                : score >= 40
-                ? "Средняя готовность сайта"
-                : "Низкая готовность сайта"}
-            </p>
-            <p
-              className="text-base text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: summary }}
-            />
-          </>
-        )}
-      </div>
-
-      <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-4">
-        Материалы проверки
-      </h2>
-
-      <MaterialsBlock
-        url={url}
-        mode={mode}
-        items={items}
-        allItems={allItems}
-      />
-
-      <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-6">
-        Проверенные параметры
-      </h2>
-
-      <div className="space-y-4">
-        {factors.map((f, i) => (
-          <FactorItem key={i} factor={f} />
-        ))}
-      </div>
-
-      <div className="mt-10 flex flex-col items-center space-y-3">
-        <button
-          onClick={() => (window.location.href = "/")}
-          className="w-full max-w-xs px-6 py-3 rounded-2xl text-white font-medium text-base"
-          style={{
-            background:
-              mode === "quick"
-                ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
-                : "linear-gradient(90deg, #059669 0%, #10b981 100%)",
-          }}
-        >
-          Назад на главную
-        </button>
-
-        <button
-          onClick={() => (window.location.href = "/reviews?add=true")}
-          className="w-full max-w-xs px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-colors flex items-center justify-center space-x-2"
-        >
-          <span
-            style={{
-              color: "#facc15",
-              WebkitTextStroke: "0.8px #eab308",
-              fontSize: "20px",
-              lineHeight: "20px",
-            }}
-          >
-            ★
-          </span>
-          <span>Оставить отзыв</span>
-        </button>
-      </div>
-
-      {mode === "pro" && (
-        <p className="text-sm text-gray-600 text-center mt-4">
-          Полный отчёт и чек-лист разработчика отправлены вам на email.
-        </p>
-      )}
-
-      <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
-        <p>© 2025 AI Signal Max. All rights reserved.</p>
-        <p className="opacity-60">
-          Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.
-        </p>
-        <p className="opacity-60">Не являются юридической консультацией.</p>
-      </footer>
-    </main>
-  );
-}
-
-function StatusText({ status }: { status: Factor["status"] }) {
-  const colors = {
-    Good: "text-green-600",
-    Moderate: "text-yellow-600",
-    Poor: "text-red-600",
-  };
-  return (
-    <span className={`text-base font-semibold ${colors[status]}`}>
-      {status === "Good"
-        ? "Хорошо"
-        : status === "Moderate"
-        ? "Средне"
-        : "Плохо"}
-    </span>
-  );
-}
-
-function FactorItem({ factor }: { factor: Factor }) {
-  const borderColors = {
-    Good: "border-green-500",
-    Moderate: "border-yellow-500",
-    Poor: "border-red-500",
-  };
-  return (
-    <div className="p-4 bg-white rounded-xl shadow-sm flex items-center">
-      <div className="flex items-start space-x-4 flex-1">
-        <div
-          className={`w-5 h-5 flex-shrink-0 rounded-full border-2 ${borderColors[factor.status]}`}
-        />
-        <div>
-          <p className="font-semibold">{factor.name}</p>
-          <p className="text-sm text-gray-600">{factor.desc}</p>
-        </div>
-      </div>
-      <div className="w-24 text-right">
-        <StatusText status={factor.status} />
-      </div>
-    </div>
-  );
-}
-
-// Ключи, которые показываются явно (primary)
-const PRIMARY_QUICK_KEYS = ["title_tag", "h1_present", "meta_description"];
-const PRIMARY_PRO_KEYS = [
-  "title_tag", "meta_description", "h2_present",
-  "site_language", "mobile_friendly", "robots_txt",
-];
-
-const LABEL_MAP: Record<string, string> = {
-  title_tag:        "Заголовок",
-  h1_present:       "H1",
-  h2_present:       "Сейчас на сайте",
-  meta_description: "Описание",
-  site_language:    "Язык",
-  mobile_friendly:  "Мобильная версия",
-  contacts:         "Контакт",
-  robots_txt:       "Доступ для ИИ",
-  sitemap_xml:      "Страниц",
-  sitemap_lastmod:  "Обновлён",
-  https:            "Протокол",
-  page_speed:       "Ответ",
-  structured_data:  "JSON-LD",
-  open_graph:       "Open Graph",
-  canonical:        "Canonical",
-  x_robots_tag:     "X-Robots",
-  meta_robots:      "Meta robots",
-  alt_attributes:   "ALT атрибуты",
-  page_404:         "Страница 404",
-};
-
-// Обрамляет текстовые значения в кавычки (без обрезки)
-function quoted(value: string): string {
-  if (!value || value === "Не найден" || value === "Не найдено" || value === "Не обнаружен") {
-    return value;
-  }
-  return `«${value}»`;
-}
-
-// Значения, не требующие кавычек
-const RAW_VALUE_KEYS = new Set([
-  "https", "page_speed", "robots_txt", "sitemap_xml", "sitemap_lastmod",
-  "structured_data", "open_graph", "canonical", "contacts",
-  "site_language", "mobile_friendly",
-  "x_robots_tag", "meta_robots", "alt_attributes", "page_404",
-]);
-
-function MaterialRow({ label, value, withQuotes }: { label: string; value: string; withQuotes: boolean }) {
-  const display = withQuotes ? quoted(value) : value;
-  return (
-    <div className="flex items-baseline gap-0 min-w-0">
-      <span className="text-gray-400 shrink-0" style={{ width: "8rem" }}>{label}:</span>
-      <span className="text-gray-800 min-w-0 break-words">{display}</span>
-    </div>
-  );
-}
-
-function MaterialsBlock({
-  url,
-  mode,
-  items,
-  allItems,
-}: {
+export interface AnalyzeResult {
   url: string;
   mode: Mode;
   items: CheckItem[];
   allItems: CheckItem[];
-}) {
-  const primaryKeys = mode === "pro" ? PRIMARY_PRO_KEYS : PRIMARY_QUICK_KEYS;
+  score: number;
+  interpretation: ReturnType<typeof interpret>;
+  results: Record<string, "Good" | "Moderate" | "Poor">;
+  factors: Record<string, { status: "Good" | "Moderate" | "Poor" }>;
+}
 
-  // Объединяем items + allItems в один lookup (allItems приоритетнее)
-  const lookup = new Map<string, string>();
-  for (const item of [...items, ...allItems]) {
-    if (item.value) lookup.set(item.key, item.value);
+const DEFAULT_UA =
+  "Mozilla/5.0 (compatible; AIVCheckBot/1.0; +https://aivcheck.com)";
+
+export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult> {
+  const { origin, url } = normalizeUrl(rawUrl);
+  const { html, headers, schemeOk, responseTimeMs } = await fetchHTML(url);
+
+  const sitemapResult = await checkSitemap(origin, html, headers);
+
+  const all: Record<CheckKey, CheckItem> = {
+    robots_txt: await checkRobotsTxt(origin),
+    sitemap_xml: sitemapResult.pageCount,
+    sitemap_lastmod: sitemapResult.lastmod,
+    x_robots_tag: checkXRobots(headers),
+    meta_robots: checkMetaRobots(html),
+    canonical: checkCanonical(html, origin),
+    title_tag: checkTitle(html),
+    meta_description: checkMetaDescription(html),
+    open_graph: checkOpenGraph(html),
+    h1_present: checkH1(html),
+    h2_present: checkH2(html),
+    structured_data: checkJSONLD(html),
+    mobile_friendly: checkViewport(html),
+    https: {
+      key: "https",
+      name: nameOf("https"),
+      passed: schemeOk,
+      description: schemeOk ? "HTTPS detected" : "Page is not served via HTTPS",
+      value: schemeOk ? "HTTPS" : "HTTP",
+    },
+    alt_attributes: checkAltAttributes(html),
+    page_speed: checkPageSpeed(responseTimeMs),
+    page_404: await check404(origin),
+    contacts: checkContacts(html),
+    site_language: checkLanguage(html),
+  };
+
+  const score = calcWeightedScore(all);
+  const keysToShow = mode === "quick" ? QUICK_KEYS : PRO_KEYS;
+  const items = keysToShow.map((k) => all[k]);
+  const allItems = Object.values(all);
+
+  const results: Record<string, "Good" | "Moderate" | "Poor"> = {};
+  const factors: Record<string, { status: "Good" | "Moderate" | "Poor" }> = {};
+
+  for (const [key, item] of Object.entries(all)) {
+    const status =
+      item.passed === true ? "Good" : item.passed === false ? "Poor" : "Moderate";
+    results[key] = status;
+    factors[key] = { status };
   }
 
-  // Дополнительные строки — те что не в primary и есть в allItems с value
-  const extraRows = allItems.filter(
-    (item) => !primaryKeys.includes(item.key) && item.value && LABEL_MAP[item.key]
+  const resultData = {
+    url,
+    mode,
+    items,
+    allItems,
+    score,
+    interpretation: interpret(score),
+    results,
+    factors,
+  };
+
+  const sessionKey = `${mode}:${url}`;
+  await saveData(sessionKey, resultData);
+
+  return resultData;
+}
+
+function calcWeightedScore(all: Record<CheckKey, CheckItem>): number {
+  const total = PRO_KEYS.reduce((a, k) => a + weightOf(k), 0);
+  const pass = PRO_KEYS.reduce(
+    (a, k) => a + (all[k].passed === true ? weightOf(k) : 0),
+    0
   );
+  return Math.round((pass / total) * 100);
+}
 
-  let hostname = "";
-  try { hostname = new URL(url).hostname; } catch {}
+function normalizeUrl(input: string): { origin: string; url: string } {
+  let u = input.trim();
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  const urlObj = new URL(u);
+  return { origin: urlObj.origin, url: urlObj.toString() };
+}
 
-  return (
-    <div className="max-w-xl mx-auto rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 mb-10 text-xs sm:text-sm text-gray-700 leading-relaxed">
-      {/* Сайт */}
-      <MaterialRow label="Сайт" value={hostname} withQuotes={false} />
+async function fetchWithTimeout(
+  resource: string,
+  opts: RequestInit & { timeoutMs?: number } = {}
+) {
+  const { timeoutMs = 12000, ...rest } = opts;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(resource, {
+      ...rest,
+      redirect: "follow",
+      headers: { "user-agent": DEFAULT_UA, ...(rest.headers || {}) },
+      signal: controller.signal,
+      cache: "no-store",
+    });
+    return res;
+  } finally {
+    clearTimeout(id);
+  }
+}
 
-      {/* Primary строки */}
-      {primaryKeys.map((key) => {
-        const value = lookup.get(key);
-        if (!value) return null;
-        const label = LABEL_MAP[key] || key;
-        const withQuotes = !RAW_VALUE_KEYS.has(key);
-        return (
-          <div className="mt-1" key={key}>
-            <MaterialRow label={label} value={value} withQuotes={withQuotes} />
-          </div>
-        );
-      })}
+async function fetchHTML(
+  url: string
+): Promise<{ html: string | null; headers: Headers; schemeOk: boolean; responseTimeMs: number }> {
+  const start = Date.now();
+  const res = await fetchWithTimeout(url);
+  const responseTimeMs = Date.now() - start;
+  const schemeOk = url.startsWith("https://") && res.ok;
+  const html = res.ok ? await res.text() : null;
+  return { html, headers: res.headers, schemeOk, responseTimeMs };
+}
 
-      {/* Подсказка */}
-      <div className="mt-2 text-gray-400 text-xs">и другие данные...</div>
-    </div>
+function item(key: CheckKey, passed: boolean | null, description: string, value?: string): CheckItem {
+  return { key, name: nameOf(key), passed, description, value };
+}
+
+function textMatch(html: string | null, re: RegExp) {
+  if (!html) return null;
+  const m = html.match(re);
+  return m ? m[1] || m[0] : null;
+}
+
+function stripTags(s: string) {
+  return s.replace(/<[^>]*>/g, "").trim();
+}
+
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function checkRobotsTxt(origin: string): Promise<CheckItem> {
+  const url = origin + "/robots.txt";
+  try {
+    const res = await fetchWithTimeout(url, { method: "GET" });
+    if (!res.ok) return item("robots_txt", false, "robots.txt not found", "Закрыт");
+    const text = await res.text();
+    const blocksAll =
+      /Disallow:\s*\/\s*$/im.test(text) ||
+      /User-agent:\s*\*\s*[\r\n]+Disallow:\s*\/\s*$/im.test(text);
+    return item(
+      "robots_txt",
+      blocksAll ? false : true,
+      blocksAll ? "robots.txt blocks all" : "robots.txt valid",
+      blocksAll ? "Закрыт" : "Открыт"
+    );
+  } catch {
+    return item("robots_txt", null, "robots.txt not accessible", "Закрыт");
+  }
+}
+
+function formatDate(raw: string): string {
+  try {
+    const d = new Date(raw.trim());
+    if (isNaN(d.getTime())) return raw.trim();
+    return d.toLocaleDateString("ru-RU", {
+      day: "numeric", month: "long", year: "numeric",
+    });
+  } catch {
+    return raw.trim();
+  }
+}
+
+async function checkSitemap(
+  origin: string,
+  html: string | null,
+  headers: Headers
+): Promise<{ pageCount: CheckItem; lastmod: CheckItem }> {
+  const paths = ["/sitemap.xml", "/sitemap_index.xml", "/sitemap-index.xml"];
+  for (const p of paths) {
+    try {
+      const res = await fetchWithTimeout(origin + p, { method: "GET" });
+      if (res.ok) {
+        const text = await res.text();
+        const urlCount = (text.match(/<url>/gi) || []).length;
+        const sitemapCount = (text.match(/<sitemap>/gi) || []).length;
+        const count = urlCount > 0 ? urlCount : sitemapCount;
+        const lastmodRaw = textMatch(text, /<lastmod>([^<]+)<\/lastmod>/i);
+        const countStr = count > 0 ? `${count}` : "Найден";
+        const lastmodFormatted = lastmodRaw ? formatDate(lastmodRaw) : "Не найдено";
+        return {
+          pageCount: item("sitemap_xml", true, `Found ${p}`, countStr),
+          lastmod: item("sitemap_lastmod", lastmodRaw ? true : null, `lastmod: ${lastmodRaw}`, lastmodFormatted),
+        };
+      }
+    } catch {}
+  }
+
+  // Sitemap не найден — ищем дату в других местах
+  const lastmodFormatted = getFallbackDate(html, headers);
+  return {
+    pageCount: item("sitemap_xml", false, "Sitemap not found", "Не найден"),
+    lastmod: item("sitemap_lastmod", lastmodFormatted ? true : null, "fallback date", lastmodFormatted || "Не найдено"),
+  };
+}
+
+function getFallbackDate(html: string | null, headers: Headers): string {
+  // 1. Мета-тег article:modified_time
+  const metaModified = textMatch(
+    html,
+    /<meta[^>]+property=["']article:modified_time["'][^>]+content=["']([^"']+)["'][^>]*>/i
   );
+  if (metaModified) return formatDate(metaModified);
+
+  // 2. Мета-тег last-modified
+  const metaLastMod = textMatch(
+    html,
+    /<meta[^>]+name=["']last-modified["'][^>]+content=["']([^"']+)["'][^>]*>/i
+  );
+  if (metaLastMod) return formatDate(metaLastMod);
+
+  // 3. HTTP заголовок Last-Modified
+  const headerDate = headers.get("last-modified");
+  if (headerDate) return formatDate(headerDate);
+
+  return "";
+}
+
+function checkXRobots(headers: Headers): CheckItem {
+  const v = headers.get("x-robots-tag") || "";
+  if (!v) return item("x_robots_tag", null, "No X-Robots-Tag header");
+  const blocked = /\bnoindex\b|\bnone\b/i.test(v);
+  return item("x_robots_tag", blocked ? false : true, `X-Robots-Tag: ${v}`);
+}
+
+function checkMetaRobots(html: string | null): CheckItem {
+  const content =
+    textMatch(
+      html,
+      /<meta[^>]+name=["']robots["'][^>]+content=["']([^"']*)["'][^>]*>/i
+    ) || "";
+  if (!content) return item("meta_robots", null, "No meta robots tag");
+  const blocked = /\bnoindex\b|\bnone\b/i.test(content);
+  return item("meta_robots", blocked ? false : true, `meta robots: ${content}`);
+}
+
+function checkCanonical(html: string | null, origin: string): CheckItem {
+  const href =
+    textMatch(
+      html,
+      /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i
+    ) || "";
+  if (!href) return item("canonical", null, "No canonical link");
+  const abs = /^https?:\/\//i.test(href);
+  const sameOrigin = abs ? href.startsWith(origin) : true;
+  return item("canonical", sameOrigin ? true : false, `canonical: ${href}`);
+}
+
+function checkTitle(html: string | null): CheckItem {
+  const t = stripTags(
+    textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || ""
+  );
+  return item("title_tag", t.length ? true : false, t.length ? `Title: ${t}` : "Missing <title>", t || "Не найден");
+}
+
+function checkMetaDescription(html: string | null): CheckItem {
+  const d =
+    textMatch(
+      html,
+      /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["'][^>]*>/i
+    ) || "";
+  return item(
+    "meta_description",
+    d.trim().length ? true : false,
+    d ? `Meta description: ${d}` : "Missing meta description",
+    d || "Не найдено"
+  );
+}
+
+function checkOpenGraph(html: string | null): CheckItem {
+  const t =
+    textMatch(
+      html,
+      /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["'][^>]*>/i
+    ) || "";
+  const d =
+    textMatch(
+      html,
+      /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["'][^>]*>/i
+    ) || "";
+  if (t && d) return item("open_graph", true, "OG tags found", t);
+  if (!t && !d) return item("open_graph", false, "OG tags missing", "Не найдено");
+  return item("open_graph", null, "OG tags partially found", t || "Частично");
+}
+
+function checkH1(html: string | null): CheckItem {
+  const h1 = stripTags(
+    textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || ""
+  );
+  return item("h1_present", h1.length ? true : false, h1 ? `H1: ${h1}` : "Missing H1", h1 || "Не найден");
+}
+
+function checkH2(html: string | null): CheckItem {
+  const h2 = decodeEntities(stripTags(
+    textMatch(html, /<h2[^>]*>([\s\S]*?)<\/h2>/i) || ""
+  ));
+  return item("h2_present", h2.length ? true : null, h2 ? `H2: ${h2}` : "Missing H2", h2 || "Не найден");
+}
+
+function checkContacts(html: string | null): CheckItem {
+  if (!html) return item("contacts", null, "No contacts found", "Не найдено");
+  const phone = textMatch(html, /href=["']tel:([^"']+)["']/i);
+  if (phone) return item("contacts", true, `Phone: ${phone}`, phone.trim());
+  const email = textMatch(html, /href=["']mailto:([^"']+)["']/i);
+  if (email) return item("contacts", true, `Email: ${email}`, email.trim());
+  return item("contacts", null, "No contacts found", "Не найдено");
+}
+
+const LANG_MAP: Record<string, string> = {
+  ru: "Русский", en: "English", de: "Deutsch", fr: "Français",
+  es: "Español", it: "Italiano", pt: "Português", zh: "中文",
+  ja: "日本語", ko: "한국어", ar: "العربية", tr: "Türkçe",
+  pl: "Polski", nl: "Nederlands", uk: "Українська",
+};
+
+function checkLanguage(html: string | null): CheckItem {
+  const lang = textMatch(html, /<html[^>]+lang=["']([^"']+)["']/i);
+  if (!lang) return item("site_language", null, "No lang attribute", "Не определён");
+  const code = lang.split("-")[0].toLowerCase();
+  const name = LANG_MAP[code] || lang.toUpperCase();
+  return item("site_language", true, `Language: ${lang}`, name);
+}
+
+function checkJSONLD(html: string | null): CheckItem {
+  if (!html) return item("structured_data", false, "No JSON-LD structured data", "Не обнаружен");
+  const re =
+    /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let ok = false;
+  let schemaType = "";
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html)) !== null) {
+    try {
+      const json = JSON.parse(m[1]);
+      if (json) {
+        ok = true;
+        schemaType = json["@type"] || "";
+        break;
+      }
+    } catch {}
+  }
+  return item(
+    "structured_data",
+    ok ? true : false,
+    ok ? "Valid JSON-LD present" : "No JSON-LD structured data",
+    ok ? (schemaType || "Найден") : "Не обнаружен"
+  );
+}
+
+function checkViewport(html: string | null): CheckItem {
+  const v =
+    textMatch(
+      html,
+      /<meta[^>]+name=["']viewport["'][^>]+content=["']([^"']+)["'][^>]*>/i
+    ) || "";
+  if (!v) return item("mobile_friendly", false, "Missing viewport meta", "Нет");
+  const ok = /width\s*=\s*device-width/i.test(v);
+  return item("mobile_friendly", ok ? true : null, `viewport: ${v}`, ok ? "Да" : "Нет");
+}
+
+function checkAltAttributes(html: string | null): CheckItem {
+  if (!html) return item("alt_attributes", null, "No images detected");
+  const imgTags = html.match(/<img\b[^>]*>/gi) || [];
+  if (!imgTags.length) return item("alt_attributes", null, "No images on page");
+  let withAlt = 0;
+  for (const tag of imgTags) {
+    const alt = (tag.match(/alt\s*=\s*["']([^"']*)["']/i) || [, ""])[1].trim();
+    if (alt.length > 0) withAlt++;
+  }
+  const ratio = withAlt / imgTags.length;
+  if (ratio >= 0.8)
+    return item("alt_attributes", true, `Images with alt: ${withAlt}/${imgTags.length}`);
+  if (ratio >= 0.3)
+    return item("alt_attributes", null, `Partial alts: ${withAlt}/${imgTags.length}`);
+  return item("alt_attributes", false, `Poor alts: ${withAlt}/${imgTags.length}`);
+}
+
+function checkPageSpeed(responseTimeMs: number): CheckItem {
+  const valueStr = `${responseTimeMs} мс`;
+  if (responseTimeMs <= 1500)
+    return item("page_speed", true, `Response time: ${responseTimeMs}ms — fast`, valueStr);
+  if (responseTimeMs <= 3000)
+    return item("page_speed", null, `Response time: ${responseTimeMs}ms — moderate`, valueStr);
+  return item("page_speed", false, `Response time: ${responseTimeMs}ms — slow`, valueStr);
+}
+
+async function check404(origin: string): Promise<CheckItem> {
+  const url = `${origin}/__aivcheck_not_found_${Date.now().toString(36)}.html`;
+  try {
+    const res = await fetchWithTimeout(url, { method: "GET" });
+    const text = await res.text();
+    const hint = /404/i.test(text) || /not found/i.test(text);
+    const ok = res.status === 404 || hint;
+    return item(
+      "page_404",
+      ok ? true : false,
+      ok ? "Proper 404 response" : `Unexpected status ${res.status}`
+    );
+  } catch {
+    return item("page_404", null, "404 check inconclusive");
+  }
 }
