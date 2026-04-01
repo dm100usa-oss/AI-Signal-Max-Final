@@ -296,7 +296,7 @@ function FactorItem({ factor }: { factor: Factor }) {
 const PRIMARY_QUICK_KEYS = ["title_tag", "h1_present", "meta_description"];
 const PRIMARY_PRO_KEYS = [
   "title_tag", "meta_description", "h2_present",
-  "contacts", "robots_txt", "sitemap_xml", "sitemap_lastmod",
+  "site_language", "mobile_friendly", "robots_txt",
 ];
 
 const LABEL_MAP: Record<string, string> = {
@@ -304,6 +304,8 @@ const LABEL_MAP: Record<string, string> = {
   h1_present:       "H1",
   h2_present:       "Сейчас на сайте",
   meta_description: "Описание",
+  site_language:    "Язык",
+  mobile_friendly:  "Мобильная версия",
   contacts:         "Контакт",
   robots_txt:       "Доступ для ИИ",
   sitemap_xml:      "Страниц",
@@ -315,7 +317,6 @@ const LABEL_MAP: Record<string, string> = {
   canonical:        "Canonical",
   x_robots_tag:     "X-Robots",
   meta_robots:      "Meta robots",
-  mobile_friendly:  "Мобильный",
   alt_attributes:   "ALT атрибуты",
   page_404:         "Страница 404",
 };
@@ -332,7 +333,8 @@ function quoted(value: string): string {
 const RAW_VALUE_KEYS = new Set([
   "https", "page_speed", "robots_txt", "sitemap_xml", "sitemap_lastmod",
   "structured_data", "open_graph", "canonical", "contacts",
-  "x_robots_tag", "meta_robots", "mobile_friendly", "alt_attributes", "page_404",
+  "site_language", "mobile_friendly",
+  "x_robots_tag", "meta_robots", "alt_attributes", "page_404",
 ]);
 
 function MaterialRow({ label, value, withQuotes }: { label: string; value: string; withQuotes: boolean }) {
