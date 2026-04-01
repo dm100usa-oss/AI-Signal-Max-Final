@@ -177,7 +177,7 @@ export default function FullPreview() {
         }`}
       >
         <span className="flex items-center justify-center">
-          Мы начали полный аудит
+          Мы начали детальный аудит
           <span className="inline-flex w-[1.7ch] justify-start ml-1">
             {fadeHeader && <Dots colorClass="text-green-400/70" />}
           </span>
@@ -275,7 +275,7 @@ export default function FullPreview() {
                 style={{ width: `${(timeLeft / totalTime) * 100}%` }}
               />
               <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-                {`Полный аудит завершится через ${timeLeft} сек`}
+                {`Детальная проверка завершится через ${timeLeft} сек`}
               </div>
             </>
           )}
