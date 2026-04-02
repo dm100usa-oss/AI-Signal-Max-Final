@@ -24,12 +24,8 @@ function Dots() {
           position: relative;
           top: 2px;
         }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
+        .dot2 { animation-delay: 200ms; }
+        .dot3 { animation-delay: 400ms; }
         @keyframes aiv-dots {
           0% { opacity: 0.2; }
           30% { opacity: 1; }
@@ -46,8 +42,8 @@ function ReviewsPage() {
   const params = useSearchParams();
   const isAddMode = params.get("add") === "true";
 
-  const [rating, setRating] = useState<number>(4.9);
-  const [reviewsCount, setReviewsCount] = useState<number>(128);
+  const [rating, setRating] = useState<number | null>(null);
+  const [reviewsCount, setReviewsCount] = useState<number | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
 
   const [name, setName] = useState("");
@@ -91,11 +87,7 @@ function ReviewsPage() {
       <span
         key={i}
         className={`inline-block ${i < full ? "text-yellow-400" : "text-transparent"}`}
-        style={{
-          fontSize: "18px",
-          WebkitTextStroke: "0.8px #eab308",
-          marginRight: "2px",
-        }}
+        style={{ fontSize: "18px", WebkitTextStroke: "0.8px #eab308", marginRight: "2px" }}
       >
         ★
       </span>
@@ -108,7 +100,6 @@ function ReviewsPage() {
     e.preventDefault();
     setStatus("loading");
     await new Promise((resolve) => setTimeout(resolve, 3000));
-
     try {
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
@@ -143,7 +134,10 @@ function ReviewsPage() {
           ★★★★★
         </span>{" "}
         <span className="text-gray-700 ml-[6px]">
-          {rating.toFixed(1)} <span className="text-neutral-500">({reviewsCount})</span>
+          {rating !== null ? rating.toFixed(1) : ""}{" "}
+          <span className="text-neutral-500">
+            {reviewsCount !== null ? `(${reviewsCount})` : ""}
+          </span>
         </span>
       </p>
 
@@ -205,10 +199,7 @@ function ReviewsPage() {
             className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
           >
             {status === "loading" ? (
-              <span className="inline-flex items-center">
-                Отправка
-                <Dots />
-              </span>
+              <span className="inline-flex items-center">Отправка<Dots /></span>
             ) : (
               "Отправить"
             )}
