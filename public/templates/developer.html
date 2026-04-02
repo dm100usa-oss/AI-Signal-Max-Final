@@ -50,6 +50,7 @@
       margin: 14px 0; padding: 16px 20px;
       border-radius: 10px; border: 1px solid rgb(229,231,235);
       background: rgb(249,250,251);
+      page-break-inside: avoid;
     }
     .priority-block-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .priority-dot {
@@ -66,12 +67,12 @@
     .priority-urgent { border-color: rgb(239,68,68); background: rgba(239,68,68,0.04); }
     .priority-improve { border-color: rgb(245,158,11); background: rgba(245,158,11,0.04); }
     .priority-ok { border-color: rgb(16,185,129); background: rgba(16,185,129,0.04); }
-    .priority-block ul { margin: 4px 0 0 20px; }
-    .priority-block p { margin: 0 0 6px 0; font-size: 11pt; color: rgb(55,65,81); }
+    .priority-block p { margin: 0; font-size: 11pt; color: rgb(55,65,81); }
 
     .factor {
       margin-top: 14px; padding: 14px 18px;
       border: 1px solid rgb(229,231,235); border-radius: 10px; background: #fff;
+      page-break-inside: avoid;
     }
     .factor-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
     .factor-lead { display: flex; align-items: center; gap: 8px; color: rgb(15,23,42); }
@@ -80,7 +81,10 @@
     .factor-lead.poor .dot { border-color: rgb(239,68,68); }
     .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; }
     .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
-    .factor-tech { font-size: 10pt; color: rgb(107,114,128); margin: 2px 0 6px 22px; }
+    .factor-tech { font-size: 11pt; color: rgb(55,65,81); margin: 2px 0 4px 22px; }
+    .factor-verdict-good { font-size: 12pt; font-weight: 700; color: rgb(16,185,129); margin: 0 0 6px 22px; }
+    .factor-verdict-moderate { font-size: 12pt; font-weight: 700; color: rgb(245,158,11); margin: 0 0 6px 22px; }
+    .factor-verdict-poor { font-size: 12pt; font-weight: 700; color: rgb(239,68,68); margin: 0 0 6px 22px; }
     .status { font-weight: 700; font-size: 11pt; white-space: nowrap; }
     .status.good { color: rgb(16,185,129); }
     .status.moderate { color: rgb(245,158,11); }
@@ -111,27 +115,26 @@
     <div class="meta">Сайт: {{website}} &nbsp;|&nbsp; Дата: {{date}} &nbsp;|&nbsp; Оценка готовности: {{score}}%</div>
   </div>
 
-  <h2>Введение</h2>
-  <p>Этот документ передаётся разработчику по результатам технической проверки сайта системой AI Signal Max. Он содержит конкретные задачи для каждого параметра, влияющего на видимость сайта в ответах ИИ-ассистентов — ChatGPT, Gemini, Claude, Copilot и других.</p>
-  <p>Речь идёт о направлении GEO (Generative Engine Optimization) — в отличие от классического SEO, цель не позиции в поисковой выдаче, а корректное восприятие и появление сайта в ответах ИИ-платформ. Это требует правильной технической структуры, доступности контента для ИИ-краулеров и корректных метаданных. Каждая задача ниже направлена именно на это.</p>
+  <p style="margin-top:28px;">Этот документ передаётся разработчику по результатам технической проверки сайта системой AI Signal Max. Он содержит конкретные задачи для каждого параметра, влияющего на появление сайта в ответах ИИ-ассистентов — ChatGPT, Gemini, Claude, Copilot и других.</p>
+  <p>Речь идёт о направлении GEO (Generative Engine Optimization) — в отличие от классического SEO, цель не позиции в поисковой выдаче, а появление сайта в ответах ИИ-платформ. Это требует правильной технической структуры, доступности контента для ИИ-краулеров и корректных метаданных. Каждая задача ниже направлена именно на это.</p>
 
   <h2>О документе</h2>
   <p>Документ сформирован автоматически на основании анализа открытых технических параметров сайта <strong>{{website}}</strong>, проведённого по запросу его владельца. Анализ выполняется без вмешательства во внутренние системы сайта — проверяются только публично доступные данные: заголовки HTTP-ответов, метатеги, файлы robots.txt и sitemap.xml, наличие SSL-сертификата, скорость ответа сервера и другие внешние параметры.</p>
-  <p>Документ предназначен для разработчика или технического специалиста, ответственного за сопровождение сайта. Рекомендуется последовательно выполнить задачи начиная с блока "Исправить срочно", затем перейти к блоку "Улучшить". После выполнения задач владелец сайта может провести повторную проверку на <a href="https://aivcheck.com">aivcheck.com</a>.</p>
+  <p>Документ предназначен для разработчика или технического специалиста, ответственного за сопровождение сайта. Рекомендуется последовательно выполнить задачи начиная с блока "Исправить срочно", затем перейти к блоку "Улучшить". После выполнения задач владелец сайта может провести повторную проверку на <a href="https://aisignalmax.com">aisignalmax.com</a>.</p>
 
   <h2>Методика AI Signal Max (aiv.01)</h2>
   <div class="highlight-box">
-    <p>Оценка основана на анализе 14 технических параметров, каждый из которых влияет на то, как ИИ-платформы воспринимают, интерпретируют и цитируют сайт. Итоговый балл рассчитывается как взвешенная сумма параметров. Цветовое обозначение: <strong style="color:rgb(16,185,129)">Хорошо</strong> — параметр настроен корректно, <strong style="color:rgb(245,158,11)">Средне</strong> — требует доработки, <strong style="color:rgb(239,68,68)">Плохо</strong> — критическая проблема, влияющая на видимость.</p>
+    <p>Оценка основана на анализе 15 технических параметров, каждый из которых влияет на шансы сайта появляться в ответах ИИ-платформ. Итоговый балл рассчитывается как взвешенная сумма параметров. Цветовое обозначение: <strong style="color:rgb(16,185,129)">Хорошо</strong> — параметр настроен корректно, <strong style="color:rgb(245,158,11)">Средне</strong> — требует доработки, <strong style="color:rgb(239,68,68)">Плохо</strong> — критическая проблема, снижающая шансы на появление в ответах.</p>
   </div>
 
   <h2>Базовые технические требования</h2>
-  <p>Для обеспечения корректного восприятия сайта ИИ-платформами необходимо соблюдать следующие базовые принципы:</p>
+  <p>Для повышения шансов сайта на появление в ответах ИИ-платформ необходимо соблюдать следующие базовые принципы:</p>
   <ul>
     <li><strong>Безопасность:</strong> HTTPS на всех страницах, действующий SSL-сертификат, автоматический редирект с HTTP, включённый HSTS.</li>
     <li><strong>Доступность для краулеров:</strong> корректный robots.txt с явным разрешением для ИИ-ботов (GPTBot, ClaudeBot, Google-Extended), актуальный sitemap.xml.</li>
     <li><strong>Производительность:</strong> время ответа сервера до 1.5 секунд, кеширование, сжатие Gzip/Brotli, оптимизация изображений.</li>
     <li><strong>Метаданные:</strong> уникальные title и meta description на каждой странице, корректные canonical-ссылки, отсутствие конфликтующих директив индексации.</li>
-    <li><strong>Структурированные данные:</strong> JSON-LD разметка Schema.org для точной идентификации типа бизнеса и контента ИИ-платформами.</li>
+    <li><strong>Структурированные данные:</strong> JSON-LD разметка Schema.org для точной идентификации типа бизнеса и контента.</li>
     <li><strong>Мобильная адаптивность:</strong> наличие viewport meta-тега, корректное отображение на мобильных устройствах.</li>
     <li><strong>Качество контента:</strong> alt-атрибуты у всех изображений, корректная обработка ошибок 404, Open Graph теги для корректного отображения ссылок.</li>
   </ul>
@@ -143,8 +146,7 @@
       <span class="priority-dot"></span>
       <h3>Исправить срочно</h3>
     </div>
-    <p>Параметры со статусом <strong>Плохо</strong> — критически влияют на видимость сайта в ИИ. Выполнить в первую очередь.</p>
-    <ul>{{priority_urgent_list}}</ul>
+    <p>Параметры со статусом <strong>Плохо</strong> критически влияют на появление сайта в ИИ-рекомендациях и должны быть выполнены в первую очередь.</p>
   </div>
 
   <div class="priority-block priority-improve">
@@ -152,8 +154,7 @@
       <span class="priority-dot"></span>
       <h3>Улучшить</h3>
     </div>
-    <p>Параметры со статусом <strong>Средне</strong> — частично работают, но требуют доработки.</p>
-    <ul>{{priority_improve_list}}</ul>
+    <p>Параметры со статусом <strong>Средне</strong> частично работают, их доработка повысит шансы сайта на появление в ответах ИИ.</p>
   </div>
 
   <div class="priority-block priority-ok">
@@ -162,7 +163,6 @@
       <h3>Настроено корректно</h3>
     </div>
     <p>Параметры со статусом <strong>Хорошо</strong> — изменений не требуют.</p>
-    <ul>{{priority_ok_list}}</ul>
   </div>
 
   <hr class="divider" />
@@ -175,11 +175,11 @@
       <div class="status {{status_robots_txt_class}}">{{status_robots_txt}}</div>
     </div>
     <div class="factor-tech">Параметр: robots.txt</div>
-    <p><span class="task-label">Назначение:</span> управляет доступом ИИ-ботов к содержимому сайта. Ошибки в файле могут полностью скрыть сайт от ИИ-платформ.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> без явного разрешения для GPTBot, ClaudeBot и Google-Extended ИИ-платформы не сканируют сайт и не включают его содержимое в свои ответы.</p>
-    {{task_poor_robots_txt}}<p><span class="task-label">Задача (Плохо):</span> проверить файл robots.txt на наличие директивы Disallow: / — она блокирует всех ботов. Добавить явное разрешение для GPTBot, ClaudeBot, Google-Extended. Убедиться что файл доступен по адресу /robots.txt.</p>{{/task_poor_robots_txt}}
-    {{task_moderate_robots_txt}}<p><span class="task-label">Задача (Средне):</span> проверить корректность директив — убедиться что нужные разделы открыты, служебные закрыты. Указать путь к sitemap.xml внутри файла.</p>{{/task_moderate_robots_txt}}
-    {{task_tool_robots_txt}}<p><span class="task-label">Инструмент проверки:</span> Google Search Console — Robots Testing Tool.</p>{{/task_tool_robots_txt}}
+    {{verdict_robots_txt}}
+    <p><span class="task-label">Назначение:</span> управляет доступом ИИ-ботов к содержимому сайта. Ошибки в файле могут значительно снизить шансы на появление сайта в ответах ИИ-платформ.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> без явного разрешения для GPTBot, ClaudeBot и Google-Extended шансы на сканирование сайта и включение его содержимого в ответы ИИ существенно снижаются.</p>
+    {{task_robots_txt}}
+    {{tool_robots_txt}}
   </div>
 
   <div class="factor">
@@ -188,11 +188,11 @@
       <div class="status {{status_meta_description_class}}">{{status_meta_description}}</div>
     </div>
     <div class="factor-tech">Параметр: meta description</div>
-    <p><span class="task-label">Назначение:</span> краткое описание страницы которое ИИ использует чтобы понять её тему и содержание.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие или дублирование meta description снижает точность тематической идентификации сайта — ИИ не может корректно определить о чём сайт и в каких ответах его упоминать.</p>
-    {{task_poor_meta_description}}<p><span class="task-label">Задача (Плохо):</span> добавить тег &lt;meta name="description"&gt; на все ключевые страницы. Текст 120–160 символов, естественный, отражает суть страницы.</p>{{/task_poor_meta_description}}
-    {{task_moderate_meta_description}}<p><span class="task-label">Задача (Средне):</span> проверить уникальность описаний на всех страницах. Устранить дубликаты и пустые значения.</p>{{/task_moderate_meta_description}}
-    {{task_tool_meta_description}}<p><span class="task-label">Инструмент проверки:</span> Google Search Console — Coverage.</p>{{/task_tool_meta_description}}
+    {{verdict_meta_description}}
+    <p><span class="task-label">Назначение:</span> краткое описание страницы, которое помогает ИИ определить её тему и содержание.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие или дублирование meta description снижает точность тематической идентификации сайта, что уменьшает шансы на появление в релевантных ответах ИИ.</p>
+    {{task_meta_description}}
+    {{tool_meta_description}}
   </div>
 
   <div class="factor">
@@ -201,11 +201,24 @@
       <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
     </div>
     <div class="factor-tech">Параметр: title tag</div>
-    <p><span class="task-label">Назначение:</span> главный заголовок страницы — основной сигнал для ИИ о теме страницы.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> отсутствующий или неинформативный title лишает ИИ-платформу главного ориентира по теме страницы — сайт становится менее предсказуемым источником и реже попадает в тематические ответы.</p>
-    {{task_poor_title_tag}}<p><span class="task-label">Задача (Плохо):</span> добавить уникальный тег &lt;title&gt; на каждую страницу. Длина 50–60 символов. Не дублировать между страницами.</p>{{/task_poor_title_tag}}
-    {{task_moderate_title_tag}}<p><span class="task-label">Задача (Средне):</span> проверить уникальность и информативность заголовков. Привести в соответствие с содержанием страницы.</p>{{/task_moderate_title_tag}}
-    {{task_tool_title_tag}}<p><span class="task-label">Инструмент проверки:</span> Screaming Frog SEO Spider.</p>{{/task_tool_title_tag}}
+    {{verdict_title_tag}}
+    <p><span class="task-label">Назначение:</span> главный заголовок страницы — основной сигнал для ИИ о её теме.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> отсутствующий или неинформативный title снижает предсказуемость сайта как источника, что уменьшает шансы на попадание в тематические ответы ИИ.</p>
+    {{task_title_tag}}
+    {{tool_title_tag}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_h1_present_class}}"><span class="dot"></span><div class="factor-name">Есть ли на странице главный заголовок</div></div>
+      <div class="status {{status_h1_present_class}}">{{status_h1_present}}</div>
+    </div>
+    <div class="factor-tech">Параметр: H1</div>
+    {{verdict_h1_present}}
+    <p><span class="task-label">Назначение:</span> тег H1 задаёт главную тему страницы и помогает ИИ определить её контекст.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие H1 или его дублирование с title снижает чёткость тематического сигнала страницы, что может уменьшить шансы на появление в ответах ИИ.</p>
+    {{task_h1_present}}
+    {{tool_h1_present}}
   </div>
 
   <div class="factor">
@@ -214,11 +227,11 @@
       <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
     </div>
     <div class="factor-tech">Параметр: подзаголовки H2</div>
+    {{verdict_h2_present}}
     <p><span class="task-label">Назначение:</span> подзаголовки H2 помогают ИИ понять структуру страницы и определить тематическую категорию сайта.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> без подзаголовков H2 ИИ воспринимает страницу как неструктурированный текст — это затрудняет определение тематики и снижает вероятность цитирования в ответах.</p>
-    {{task_poor_h2_present}}<p><span class="task-label">Задача (Плохо):</span> добавить подзаголовки H2 на ключевые страницы. Они должны отражать разделы контента и отвечать на конкретные вопросы пользователя.</p>{{/task_poor_h2_present}}
-    {{task_moderate_h2_present}}<p><span class="task-label">Задача (Средне):</span> проверить логику структуры H2 — убедиться что они не дублируют H1 и отражают реальные разделы страницы.</p>{{/task_moderate_h2_present}}
-    {{task_tool_h2_present}}<p><span class="task-label">Инструмент проверки:</span> просмотр исходного кода страницы.</p>{{/task_tool_h2_present}}
+    <p><span class="impact-label">Влияние на ИИ:</span> без подзаголовков H2 ИИ воспринимает страницу как неструктурированный текст, что затрудняет определение тематики и снижает шансы на цитирование в ответах.</p>
+    {{task_h2_present}}
+    {{tool_h2_present}}
   </div>
 
   <div class="factor">
@@ -227,11 +240,11 @@
       <div class="status {{status_sitemap_xml_class}}">{{status_sitemap_xml}}</div>
     </div>
     <div class="factor-tech">Параметр: sitemap.xml</div>
+    {{verdict_sitemap_xml}}
     <p><span class="task-label">Назначение:</span> карта сайта показывает ИИ-платформам все страницы и их связи.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> без sitemap.xml ИИ-краулер обнаруживает только страницы доступные по внешним ссылкам — остальной контент остаётся невидимым и не попадает в ответы.</p>
-    {{task_poor_sitemap_xml}}<p><span class="task-label">Задача (Плохо):</span> создать файл sitemap.xml в корне сайта. Включить все публичные страницы. Указать путь в robots.txt. Отправить в Google Search Console.</p>{{/task_poor_sitemap_xml}}
-    {{task_moderate_sitemap_xml}}<p><span class="task-label">Задача (Средне):</span> убедиться что sitemap обновляется автоматически при добавлении страниц. Проверить валидность XML-формата.</p>{{/task_moderate_sitemap_xml}}
-    {{task_tool_sitemap_xml}}<p><span class="task-label">Инструмент проверки:</span> Google Search Console — Sitemaps.</p>{{/task_tool_sitemap_xml}}
+    <p><span class="impact-label">Влияние на ИИ:</span> без sitemap.xml ИИ-краулер может обнаружить только страницы, доступные по внешним ссылкам — остальной контент рискует остаться невидимым и не попасть в ответы.</p>
+    {{task_sitemap_xml}}
+    {{tool_sitemap_xml}}
   </div>
 
   <div class="factor">
@@ -240,11 +253,11 @@
       <div class="status {{status_https_class}}">{{status_https}}</div>
     </div>
     <div class="factor-tech">Параметр: HTTPS / SSL</div>
-    <p><span class="task-label">Назначение:</span> защищённое соединение — базовый сигнал доверия для ИИ-платформ.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> сайт без HTTPS воспринимается ИИ-платформами как ненадёжный источник — это снижает вероятность его цитирования в ответах пользователям.</p>
-    {{task_poor_https}}<p><span class="task-label">Задача (Плохо):</span> установить SSL-сертификат. Настроить автоматический редирект с HTTP на HTTPS. Устранить mixed content (смешанные HTTP/HTTPS ресурсы на страницах).</p>{{/task_poor_https}}
-    {{task_moderate_https}}<p><span class="task-label">Задача (Средне):</span> проверить срок действия сертификата. Включить HSTS. Устранить предупреждения о смешанном контенте.</p>{{/task_moderate_https}}
-    {{task_tool_https}}<p><span class="task-label">Инструмент проверки:</span> SSL Labs — ssllabs.com/ssltest.</p>{{/task_tool_https}}
+    {{verdict_https}}
+    <p><span class="task-label">Назначение:</span> защищённое соединение — базовый сигнал надёжности для ИИ-платформ.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> сайт без HTTPS может восприниматься как менее надёжный источник, что снижает вероятность его появления в ответах ИИ-ассистентов.</p>
+    {{task_https}}
+    {{tool_https}}
   </div>
 
   <div class="factor">
@@ -253,11 +266,11 @@
       <div class="status {{status_page_speed_class}}">{{status_page_speed}}</div>
     </div>
     <div class="factor-tech">Параметр: скорость ответа сервера</div>
+    {{verdict_page_speed}}
     <p><span class="task-label">Назначение:</span> медленный сайт ИИ-краулер может пропустить при сканировании.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> при времени ответа сервера свыше 2–3 секунд ИИ-краулеры сокращают глубину сканирования или полностью пропускают сайт — часть страниц не попадает в индекс платформ.</p>
-    {{task_poor_page_speed}}<p><span class="task-label">Задача (Плохо):</span> добиться времени ответа сервера до 1.5 сек. Подключить CDN, настроить кэширование на стороне сервера, оптимизировать изображения (WebP, сжатие), включить Gzip/Brotli сжатие.</p>{{/task_poor_page_speed}}
-    {{task_moderate_page_speed}}<p><span class="task-label">Задача (Средне):</span> провести аудит через Google Lighthouse. Устранить блокирующие загрузку ресурсы (render-blocking JS/CSS).</p>{{/task_moderate_page_speed}}
-    {{task_tool_page_speed}}<p><span class="task-label">Инструмент проверки:</span> Google PageSpeed Insights.</p>{{/task_tool_page_speed}}
+    <p><span class="impact-label">Влияние на ИИ:</span> при высоком времени ответа сервера ИИ-краулеры могут сократить глубину сканирования — часть страниц рискует не попасть в индекс платформ.</p>
+    {{task_page_speed}}
+    {{tool_page_speed}}
   </div>
 
   <div class="factor">
@@ -266,11 +279,11 @@
       <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
     </div>
     <div class="factor-tech">Параметр: structured data (JSON-LD)</div>
+    {{verdict_structured_data}}
     <p><span class="task-label">Назначение:</span> структурированные данные точно объясняют ИИ что на странице — компания, услуга, товар или статья.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> без JSON-LD разметки ИИ-платформы не могут точно определить тип бизнеса и его услуги — сайт выпадает из тематических рекомендаций и теряет приоритет перед конкурентами с правильной разметкой.</p>
-    {{task_poor_structured_data}}<p><span class="task-label">Задача (Плохо):</span> добавить JSON-LD разметку Schema.org на ключевые страницы. Для бизнеса — LocalBusiness или Organization. Для услуг — Service. Для статей — Article.</p>{{/task_poor_structured_data}}
-    {{task_moderate_structured_data}}<p><span class="task-label">Задача (Средне):</span> проверить корректность существующей разметки через Rich Results Test. Устранить ошибки и предупреждения.</p>{{/task_moderate_structured_data}}
-    {{task_tool_structured_data}}<p><span class="task-label">Инструмент проверки:</span> Google Rich Results Test — search.google.com/test/rich-results.</p>{{/task_tool_structured_data}}
+    <p><span class="impact-label">Влияние на ИИ:</span> без JSON-LD разметки ИИ-платформам сложнее определить тип бизнеса и его услуги, что снижает шансы на попадание в тематические рекомендации.</p>
+    {{task_structured_data}}
+    {{tool_structured_data}}
   </div>
 
   <div class="factor">
@@ -279,11 +292,11 @@
       <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
     </div>
     <div class="factor-tech">Параметр: Open Graph</div>
-    <p><span class="task-label">Назначение:</span> OG-теги определяют как выглядит ссылка на сайт при распространении и анализе ИИ-платформами.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие OG-тегов снижает информативность ссылки при анализе ИИ-платформами — сайт хуже идентифицируется при распространении в соцсетях и мессенджерах, что уменьшает его авторитетность как источника.</p>
-    {{task_poor_open_graph}}<p><span class="task-label">Задача (Плохо):</span> добавить на все страницы теги og:title, og:description, og:image, og:url, og:type. Изображение минимум 1200x630px.</p>{{/task_poor_open_graph}}
-    {{task_moderate_open_graph}}<p><span class="task-label">Задача (Средне):</span> проверить наличие всех обязательных OG-тегов. Убедиться что изображения загружаются корректно.</p>{{/task_moderate_open_graph}}
-    {{task_tool_open_graph}}<p><span class="task-label">Инструмент проверки:</span> Facebook Sharing Debugger — developers.facebook.com/tools/debug.</p>{{/task_tool_open_graph}}
+    {{verdict_open_graph}}
+    <p><span class="task-label">Назначение:</span> OG-теги определяют как выглядит ссылка на сайт при распространении и анализе.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие OG-тегов снижает информативность ссылки при анализе, что уменьшает авторитетность сайта как источника для ИИ-платформ.</p>
+    {{task_open_graph}}
+    {{tool_open_graph}}
   </div>
 
   <div class="factor">
@@ -292,11 +305,11 @@
       <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
     </div>
     <div class="factor-tech">Параметр: meta robots</div>
+    {{verdict_meta_robots}}
     <p><span class="task-label">Назначение:</span> управляет индексацией на уровне отдельной страницы.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> директива noindex на публичных страницах напрямую запрещает ИИ-платформам включать их содержимое в ответы — даже качественный контент остаётся невидимым.</p>
-    {{task_poor_meta_robots}}<p><span class="task-label">Задача (Плохо):</span> проверить наличие тега &lt;meta name="robots" content="noindex"&gt; на публичных страницах — удалить его. Убедиться что не конфликтует с robots.txt и X-Robots-Tag.</p>{{/task_poor_meta_robots}}
-    {{task_moderate_meta_robots}}<p><span class="task-label">Задача (Средне):</span> провести аудит всех страниц на предмет корректности директив. Служебные страницы — noindex, публичные — index, follow.</p>{{/task_moderate_meta_robots}}
-    {{task_tool_meta_robots}}<p><span class="task-label">Инструмент проверки:</span> Screaming Frog SEO Spider.</p>{{/task_tool_meta_robots}}
+    {{task_meta_robots}}
+    {{tool_meta_robots}}
   </div>
 
   <div class="factor">
@@ -305,11 +318,11 @@
       <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
     </div>
     <div class="factor-tech">Параметр: обработка страницы 404</div>
-    <p><span class="task-label">Назначение:</span> корректная обработка несуществующих страниц — признак качественного сайта для ИИ.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> некорректный ответ на несуществующие URL (soft 404 или отсутствие страницы ошибки) сигнализирует ИИ-платформам о низком качестве технической поддержки сайта, что снижает его авторитетность как источника.</p>
-    {{task_poor_page_404}}<p><span class="task-label">Задача (Плохо):</span> настроить сервер на возврат кода 404 для несуществующих страниц. Создать кастомную страницу 404 с навигацией на главную и основные разделы.</p>{{/task_poor_page_404}}
-    {{task_moderate_page_404}}<p><span class="task-label">Задача (Средне):</span> проверить что страница 404 возвращает именно код 404, а не 200 (soft 404). Улучшить дизайн страницы ошибки.</p>{{/task_moderate_page_404}}
-    {{task_tool_page_404}}<p><span class="task-label">Инструмент проверки:</span> curl -I {{website}}/nonexistent-page — проверить код ответа.</p>{{/task_tool_page_404}}
+    {{verdict_page_404}}
+    <p><span class="task-label">Назначение:</span> корректная обработка несуществующих страниц — признак качественного сайта.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> некорректная обработка несуществующих URL может сигнализировать о низком техническом качестве сайта, что снижает его авторитетность как источника для ИИ.</p>
+    {{task_page_404}}
+    {{tool_page_404}}
   </div>
 
   <div class="factor">
@@ -318,11 +331,11 @@
       <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
     </div>
     <div class="factor-tech">Параметр: canonical</div>
-    <p><span class="task-label">Назначение:</span> указывает ИИ какая версия страницы является основной — устраняет путаницу с дублями.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> без canonical-тегов ИИ-платформы могут индексировать дублирующиеся версии страниц, распределяя авторитетность и снижая релевантность основного контента в ответах.</p>
-    {{task_poor_canonical}}<p><span class="task-label">Задача (Плохо):</span> добавить тег &lt;link rel="canonical"&gt; на все страницы с абсолютным HTTPS-URL. Устранить циклические или конфликтующие canonical.</p>{{/task_poor_canonical}}
-    {{task_moderate_canonical}}<p><span class="task-label">Задача (Средне):</span> проверить что canonical указывает на правильную версию страницы. Убедиться в отсутствии цепочек редиректов.</p>{{/task_moderate_canonical}}
-    {{task_tool_canonical}}<p><span class="task-label">Инструмент проверки:</span> Screaming Frog SEO Spider.</p>{{/task_tool_canonical}}
+    {{verdict_canonical}}
+    <p><span class="task-label">Назначение:</span> указывает ИИ какая версия страницы является основной, устраняет путаницу с дублями.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> без canonical-тегов ИИ-платформы могут индексировать дублирующиеся версии страниц, что снижает релевантность основного контента в ответах.</p>
+    {{task_canonical}}
+    {{tool_canonical}}
   </div>
 
   <div class="factor">
@@ -331,11 +344,11 @@
       <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
     </div>
     <div class="factor-tech">Параметр: mobile viewport</div>
-    <p><span class="task-label">Назначение:</span> мобильная адаптация — признак качества сайта для ИИ-платформ.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие мобильной адаптации сигнализирует ИИ-платформам об устаревшей технической базе сайта — это снижает его приоритет как авторитетного источника при формировании ответов.</p>
-    {{task_poor_mobile_friendly}}<p><span class="task-label">Задача (Плохо):</span> добавить мета-тег &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;. Проверить отображение на мобильных устройствах — устранить горизонтальную прокрутку и мелкие элементы.</p>{{/task_poor_mobile_friendly}}
-    {{task_moderate_mobile_friendly}}<p><span class="task-label">Задача (Средне):</span> провести тестирование через Google Mobile-Friendly Test. Устранить все выявленные замечания.</p>{{/task_moderate_mobile_friendly}}
-    {{task_tool_mobile_friendly}}<p><span class="task-label">Инструмент проверки:</span> Google Mobile-Friendly Test — search.google.com/test/mobile-friendly.</p>{{/task_tool_mobile_friendly}}
+    {{verdict_mobile_friendly}}
+    <p><span class="task-label">Назначение:</span> мобильная адаптация — признак качества сайта.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие мобильной адаптации может сигнализировать об устаревшей технической базе сайта, снижая его приоритет как источника при формировании ответов ИИ.</p>
+    {{task_mobile_friendly}}
+    {{tool_mobile_friendly}}
   </div>
 
   <div class="factor">
@@ -344,17 +357,17 @@
       <div class="status {{status_alt_attributes_class}}">{{status_alt_attributes}}</div>
     </div>
     <div class="factor-tech">Параметр: alt-атрибуты изображений</div>
-    <p><span class="task-label">Назначение:</span> без alt-атрибутов ИИ не понимает что на картинках и теряет часть смысла страницы.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> изображения без alt-атрибутов — невидимый для ИИ контент. Если значительная часть смысла страницы передана через изображения, ИИ получает неполную картину и может некорректно интерпретировать тематику.</p>
-    {{task_poor_alt_attributes}}<p><span class="task-label">Задача (Плохо):</span> добавить атрибут alt ко всем изображениям на сайте. Текст должен описывать содержание изображения — не использовать ключевые слова как спам.</p>{{/task_poor_alt_attributes}}
-    {{task_moderate_alt_attributes}}<p><span class="task-label">Задача (Средне):</span> проверить все изображения — заполнить пустые alt. Декоративные изображения — alt="".</p>{{/task_moderate_alt_attributes}}
-    {{task_tool_alt_attributes}}<p><span class="task-label">Инструмент проверки:</span> Screaming Frog SEO Spider — вкладка Images.</p>{{/task_tool_alt_attributes}}
+    {{verdict_alt_attributes}}
+    <p><span class="task-label">Назначение:</span> без alt-атрибутов ИИ не может интерпретировать изображения и теряет часть смысла страницы.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> изображения без alt-атрибутов — невидимый для ИИ контент. Это может привести к неполной интерпретации тематики страницы и снизить шансы на появление в ответах.</p>
+    {{task_alt_attributes}}
+    {{tool_alt_attributes}}
   </div>
 
   <hr class="divider" />
 
   <h2>Итоговый чеклист</h2>
-  <p>Таблица содержит только параметры требующие исправления. Отметьте каждый пункт после завершения.</p>
+  <p>Таблица содержит только параметры, требующие исправления. Отметьте каждый пункт после завершения.</p>
 
   <table class="checklist-table">
     <thead>
