@@ -31,16 +31,31 @@
     .subtitle { font-size: 16pt; text-align: center; margin: 6px 0 0; font-weight: 400; color: rgb(55,65,81); }
     .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
 
-    h2 { font-size: 14pt; margin-top: 32px; margin-bottom: 8px; font-weight: 700; color: rgb(15,23,42); }
+    h2 { font-size: 14pt; margin-top: 0; margin-bottom: 8px; font-weight: 700; color: rgb(15,23,42); page-break-after: avoid; break-after: avoid; }
     p { margin: 10px 0; color: rgb(15,23,42); }
     ul { margin: 10px 0 10px 24px; line-height: 1.8; }
 
+    .no-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
+    }
+    .section-block {
+      margin-top: 32px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
+    }
+
     .highlight-box {
-      background: rgba(30,64,175,0.05);
-      border-left: 4px solid rgb(30,64,175);
+      background: rgba(37,99,235,0.05);
+      border-left: 4px solid #2563eb;
       border-radius: 0 8px 8px 0;
       padding: 14px 18px;
       margin: 18px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .highlight-box p { margin: 0; }
 
@@ -48,9 +63,11 @@
 
     .priority-block {
       margin: 14px 0; padding: 16px 20px;
-      border-radius: 10px; border: 1px solid rgb(229,231,235);
+      border-radius: 10px; border: 1px solid rgb(209,213,219);
       background: rgb(249,250,251);
       page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .priority-block-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .priority-dot {
@@ -58,52 +75,54 @@
       background: #fff; display: inline-block; box-sizing: border-box; flex-shrink: 0;
     }
     .priority-block-head h3 { margin: 0; font-size: 12.5pt; font-weight: 700; }
-    .priority-urgent .priority-dot { color: rgb(239,68,68); }
-    .priority-urgent h3 { color: rgb(239,68,68); }
-    .priority-improve .priority-dot { color: rgb(245,158,11); }
-    .priority-improve h3 { color: rgb(245,158,11); }
-    .priority-ok .priority-dot { color: rgb(16,185,129); }
-    .priority-ok h3 { color: rgb(16,185,129); }
-    .priority-urgent { border-color: rgb(239,68,68); background: rgba(239,68,68,0.04); }
-    .priority-improve { border-color: rgb(245,158,11); background: rgba(245,158,11,0.04); }
-    .priority-ok { border-color: rgb(16,185,129); background: rgba(16,185,129,0.04); }
+    .priority-urgent .priority-dot { color: #dc2626; }
+    .priority-urgent h3 { color: #dc2626; }
+    .priority-improve .priority-dot { color: #ca8a04; }
+    .priority-improve h3 { color: #ca8a04; }
+    .priority-ok .priority-dot { color: #16a34a; }
+    .priority-ok h3 { color: #16a34a; }
+    .priority-urgent { border-color: #dc2626; background: rgba(220,38,38,0.04); }
+    .priority-improve { border-color: #ca8a04; background: rgba(202,138,4,0.04); }
+    .priority-ok { border-color: #16a34a; background: rgba(22,163,74,0.04); }
     .priority-block p { margin: 0; font-size: 11pt; color: rgb(55,65,81); }
 
     .factor {
       margin-top: 14px; padding: 14px 18px;
-      border: 1px solid rgb(229,231,235); border-radius: 10px; background: #fff;
+      border: 1px solid rgb(209,213,219); border-radius: 10px; background: #fff;
       page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .factor-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
     .factor-lead { display: flex; align-items: center; gap: 8px; color: rgb(15,23,42); }
-    .factor-lead.good .dot { border-color: rgb(16,185,129); }
-    .factor-lead.moderate .dot { border-color: rgb(245,158,11); }
-    .factor-lead.poor .dot { border-color: rgb(239,68,68); }
+    .factor-lead.good .dot { border-color: #16a34a; }
+    .factor-lead.moderate .dot { border-color: #ca8a04; }
+    .factor-lead.poor .dot { border-color: #dc2626; }
     .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; }
     .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
     .factor-tech { font-size: 11pt; color: rgb(55,65,81); margin: 2px 0 4px 22px; }
-    .factor-verdict-good { font-size: 12pt; font-weight: 700; color: rgb(16,185,129); margin: 0 0 6px 22px; }
-    .factor-verdict-moderate { font-size: 12pt; font-weight: 700; color: rgb(245,158,11); margin: 0 0 6px 22px; }
-    .factor-verdict-poor { font-size: 12pt; font-weight: 700; color: rgb(239,68,68); margin: 0 0 6px 22px; }
+    .factor-verdict-good { font-size: 12pt; font-weight: 700; color: #16a34a; margin: 0 0 6px 22px; }
+    .factor-verdict-moderate { font-size: 12pt; font-weight: 700; color: #ca8a04; margin: 0 0 6px 22px; }
+    .factor-verdict-poor { font-size: 12pt; font-weight: 700; color: #dc2626; margin: 0 0 6px 22px; }
     .status { font-weight: 700; font-size: 11pt; white-space: nowrap; }
-    .status.good { color: rgb(16,185,129); }
-    .status.moderate { color: rgb(245,158,11); }
-    .status.poor { color: rgb(239,68,68); }
+    .status.good { color: #16a34a; }
+    .status.moderate { color: #ca8a04; }
+    .status.poor { color: #dc2626; }
     .task-label { font-weight: 700; color: rgb(15,23,42); }
-    .impact-label { font-weight: 700; color: rgb(30,64,175); }
+    .impact-label { font-weight: 700; color: #2563eb; }
 
     .checklist-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 11pt; }
-    .checklist-table th { background: rgb(30,64,175); color: #fff; padding: 10px 12px; text-align: left; font-weight: 700; }
+    .checklist-table th { background: #2563eb; color: #fff; padding: 10px 12px; text-align: left; font-weight: 700; }
     .checklist-table td { padding: 9px 12px; border-bottom: 1px solid rgb(229,231,235); vertical-align: top; }
     .checklist-table tr:nth-child(even) td { background: rgb(249,250,251); }
     .checklist-table .cb { text-align: center; width: 30px; font-size: 14pt; }
     .checklist-table .pri { text-align: center; width: 80px; font-size: 10pt; font-weight: 700; }
-    .pri-urgent { color: rgb(239,68,68); }
-    .pri-improve { color: rgb(245,158,11); }
+    .pri-urgent { color: #dc2626; }
+    .pri-improve { color: #ca8a04; }
 
     .footer { margin-top: 40px; text-align: center; font-size: 10pt; color: rgb(107,114,128); }
     .footer .disclaimer { opacity: 0.7; font-size: 10pt; margin-top: 4px; }
-    a { color: rgb(37,99,235); text-decoration: none; }
+    a { color: #2563eb; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -115,59 +134,69 @@
     <div class="meta">Сайт: {{website}} &nbsp;|&nbsp; Дата: {{date}} &nbsp;|&nbsp; Оценка готовности: {{score}}%</div>
   </div>
 
-  <p style="margin-top:28px;">Этот документ передаётся разработчику по результатам технической проверки сайта системой AI Signal Max. Он содержит конкретные задачи для каждого параметра, влияющего на появление сайта в ответах ИИ-ассистентов — ChatGPT, Gemini, Claude, Copilot и других.</p>
-  <p>Речь идёт о направлении GEO (Generative Engine Optimization) — в отличие от классического SEO, цель не позиции в поисковой выдаче, а появление сайта в ответах ИИ-платформ. Это требует правильной технической структуры, доступности контента для ИИ-краулеров и корректных метаданных. Каждая задача ниже направлена именно на это.</p>
+  <p style="margin-top:28px;">Этот документ передаётся разработчику по результатам технической проверки сайта системой AI Signal Max. Он содержит конкретные задачи для каждого параметра, влияющего на появление сайта в ответах ИИ-ассистентов - ChatGPT, Gemini, Claude, Copilot и других.</p>
+  <p>Речь идёт о направлении GEO (Generative Engine Optimization) - в отличие от классического SEO, цель не позиции в поисковой выдаче, а появление сайта в ответах ИИ-платформ. Это требует правильной технической структуры, доступности контента для ИИ-краулеров и корректных метаданных. Каждая задача ниже направлена именно на это.</p>
 
-  <h2>О документе</h2>
-  <p>Документ сформирован автоматически на основании анализа открытых технических параметров сайта <strong>{{website}}</strong>, проведённого по запросу его владельца. Анализ выполняется без вмешательства во внутренние системы сайта — проверяются только публично доступные данные: заголовки HTTP-ответов, метатеги, файлы robots.txt и sitemap.xml, наличие SSL-сертификата, скорость ответа сервера и другие внешние параметры.</p>
-  <p>Документ предназначен для разработчика или технического специалиста, ответственного за сопровождение сайта. Рекомендуется последовательно выполнить задачи начиная с блока "Исправить срочно", затем перейти к блоку "Улучшить". После выполнения задач владелец сайта может провести повторную проверку на <a href="https://aisignalmax.com">aisignalmax.com</a>.</p>
-
-  <h2>Методика AI Signal Max (aiv.01)</h2>
-  <div class="highlight-box">
-    <p>Оценка основана на анализе 15 технических параметров, каждый из которых влияет на шансы сайта появляться в ответах ИИ-платформ. Итоговый балл рассчитывается как взвешенная сумма параметров. Цветовое обозначение: <strong style="color:rgb(16,185,129)">Хорошо</strong> — параметр настроен корректно, <strong style="color:rgb(245,158,11)">Средне</strong> — требует доработки, <strong style="color:rgb(239,68,68)">Плохо</strong> — критическая проблема, снижающая шансы на появление в ответах.</p>
+  <div class="section-block">
+    <h2>О документе</h2>
+    <p>Документ сформирован автоматически на основании анализа открытых технических параметров сайта <strong>{{website}}</strong>, проведённого по запросу его владельца. Анализ выполняется без вмешательства во внутренние системы сайта - проверяются только публично доступные данные: заголовки HTTP-ответов, метатеги, файлы robots.txt и sitemap.xml, наличие SSL-сертификата, скорость ответа сервера и другие внешние параметры.</p>
+    <p>Документ предназначен для разработчика или технического специалиста, ответственного за сопровождение сайта. Рекомендуется последовательно выполнить задачи начиная с блока "Исправить срочно", затем перейти к блоку "Улучшить". После выполнения задач владелец сайта может провести повторную проверку на <a href="https://aisignalmax.com">aisignalmax.com</a>.</p>
   </div>
 
-  <h2>Базовые технические требования</h2>
-  <p>Для повышения шансов сайта на появление в ответах ИИ-платформ необходимо соблюдать следующие базовые принципы:</p>
-  <ul>
-    <li><strong>Безопасность:</strong> HTTPS на всех страницах, действующий SSL-сертификат, автоматический редирект с HTTP, включённый HSTS.</li>
-    <li><strong>Доступность для краулеров:</strong> корректный robots.txt с явным разрешением для ИИ-ботов (GPTBot, ClaudeBot, Google-Extended), актуальный sitemap.xml.</li>
-    <li><strong>Производительность:</strong> время ответа сервера до 1.5 секунд, кеширование, сжатие Gzip/Brotli, оптимизация изображений.</li>
-    <li><strong>Метаданные:</strong> уникальные title и meta description на каждой странице, корректные canonical-ссылки, отсутствие конфликтующих директив индексации.</li>
-    <li><strong>Структурированные данные:</strong> JSON-LD разметка Schema.org для точной идентификации типа бизнеса и контента.</li>
-    <li><strong>Мобильная адаптивность:</strong> наличие viewport meta-тега, корректное отображение на мобильных устройствах.</li>
-    <li><strong>Качество контента:</strong> alt-атрибуты у всех изображений, корректная обработка ошибок 404, Open Graph теги для корректного отображения ссылок.</li>
-  </ul>
-
-  <h2>Приоритеты выполнения</h2>
-
-  <div class="priority-block priority-urgent">
-    <div class="priority-block-head">
-      <span class="priority-dot"></span>
-      <h3>Исправить срочно</h3>
+  <div class="section-block">
+    <h2>Методика AI Signal Max (aiv.01)</h2>
+    <div class="highlight-box">
+      <p>Оценка основана на анализе 15 технических параметров, каждый из которых влияет на шансы сайта появляться в ответах ИИ-платформ. Итоговый балл рассчитывается как взвешенная сумма параметров. Цветовое обозначение: <strong style="color:#16a34a">Хорошо</strong> - параметр настроен корректно, <strong style="color:#ca8a04">Средне</strong> - требует доработки, <strong style="color:#dc2626">Плохо</strong> - критическая проблема, снижающая шансы на появление в ответах.</p>
     </div>
-    <p>Параметры со статусом <strong>Плохо</strong> критически влияют на появление сайта в ИИ-рекомендациях и должны быть выполнены в первую очередь.</p>
   </div>
 
-  <div class="priority-block priority-improve">
-    <div class="priority-block-head">
-      <span class="priority-dot"></span>
-      <h3>Улучшить</h3>
-    </div>
-    <p>Параметры со статусом <strong>Средне</strong> частично работают, их доработка повысит шансы сайта на появление в ответах ИИ.</p>
+  <div class="section-block">
+    <h2>Базовые технические требования</h2>
+    <p>Для повышения шансов сайта на появление в ответах ИИ-платформ необходимо соблюдать следующие базовые принципы:</p>
+    <ul>
+      <li><strong>Безопасность:</strong> HTTPS на всех страницах, действующий SSL-сертификат, автоматический редирект с HTTP, включённый HSTS.</li>
+      <li><strong>Доступность для краулеров:</strong> корректный robots.txt с явным разрешением для ИИ-ботов (GPTBot, ClaudeBot, Google-Extended), актуальный sitemap.xml.</li>
+      <li><strong>Производительность:</strong> время ответа сервера до 1.5 секунд, кеширование, сжатие Gzip/Brotli, оптимизация изображений.</li>
+      <li><strong>Метаданные:</strong> уникальные title и meta description на каждой странице, корректные canonical-ссылки, отсутствие конфликтующих директив индексации.</li>
+      <li><strong>Структурированные данные:</strong> JSON-LD разметка Schema.org для точной идентификации типа бизнеса и контента.</li>
+      <li><strong>Мобильная адаптивность:</strong> наличие viewport meta-тега, корректное отображение на мобильных устройствах.</li>
+      <li><strong>Качество контента:</strong> alt-атрибуты у всех изображений, корректная обработка ошибок 404, Open Graph теги для корректного отображения ссылок.</li>
+      <li><strong>Доступность контента без JS:</strong> важный контент должен быть доступен в исходном коде страницы без рендеринга JavaScript - ИИ-краулеры часто читают страницу без выполнения скриптов.</li>
+    </ul>
   </div>
 
-  <div class="priority-block priority-ok">
-    <div class="priority-block-head">
-      <span class="priority-dot"></span>
-      <h3>Настроено корректно</h3>
+  <div class="section-block">
+    <h2>Приоритеты выполнения</h2>
+    <div class="priority-block priority-urgent">
+      <div class="priority-block-head">
+        <span class="priority-dot"></span>
+        <h3>Исправить срочно</h3>
+      </div>
+      <p>Параметры со статусом <strong>Плохо</strong> критически влияют на появление сайта в ИИ-рекомендациях и должны быть выполнены в первую очередь.</p>
     </div>
-    <p>Параметры со статусом <strong>Хорошо</strong> — изменений не требуют.</p>
+
+    <div class="priority-block priority-improve">
+      <div class="priority-block-head">
+        <span class="priority-dot"></span>
+        <h3>Улучшить</h3>
+      </div>
+      <p>Параметры со статусом <strong>Средне</strong> частично работают, их доработка повысит шансы сайта на появление в ответах ИИ.</p>
+    </div>
+
+    <div class="priority-block priority-ok">
+      <div class="priority-block-head">
+        <span class="priority-dot"></span>
+        <h3>Настроено корректно</h3>
+      </div>
+      <p>Параметры со статусом <strong>Хорошо</strong> - изменений не требуют.</p>
+    </div>
   </div>
 
   <hr class="divider" />
 
-  <h2>Детальные задачи по каждому параметру</h2>
+  <div class="no-break">
+    <h2>Детальные задачи по каждому параметру</h2>
+  </div>
 
   <div class="factor">
     <div class="factor-head">
@@ -202,7 +231,7 @@
     </div>
     <div class="factor-tech">Параметр: title tag</div>
     {{verdict_title_tag}}
-    <p><span class="task-label">Назначение:</span> главный заголовок страницы — основной сигнал для ИИ о её теме.</p>
+    <p><span class="task-label">Назначение:</span> главный заголовок страницы - основной сигнал для ИИ о её теме.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> отсутствующий или неинформативный title снижает предсказуемость сайта как источника, что уменьшает шансы на попадание в тематические ответы ИИ.</p>
     {{task_title_tag}}
     {{tool_title_tag}}
@@ -242,7 +271,7 @@
     <div class="factor-tech">Параметр: sitemap.xml</div>
     {{verdict_sitemap_xml}}
     <p><span class="task-label">Назначение:</span> карта сайта показывает ИИ-платформам все страницы и их связи.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> без sitemap.xml ИИ-краулер может обнаружить только страницы, доступные по внешним ссылкам — остальной контент рискует остаться невидимым и не попасть в ответы.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> без sitemap.xml ИИ-краулер может обнаружить только страницы, доступные по внешним ссылкам - остальной контент рискует остаться невидимым и не попасть в ответы.</p>
     {{task_sitemap_xml}}
     {{tool_sitemap_xml}}
   </div>
@@ -254,7 +283,7 @@
     </div>
     <div class="factor-tech">Параметр: HTTPS / SSL</div>
     {{verdict_https}}
-    <p><span class="task-label">Назначение:</span> защищённое соединение — базовый сигнал надёжности для ИИ-платформ.</p>
+    <p><span class="task-label">Назначение:</span> защищённое соединение - базовый сигнал надёжности для ИИ-платформ.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> сайт без HTTPS может восприниматься как менее надёжный источник, что снижает вероятность его появления в ответах ИИ-ассистентов.</p>
     {{task_https}}
     {{tool_https}}
@@ -268,7 +297,7 @@
     <div class="factor-tech">Параметр: скорость ответа сервера</div>
     {{verdict_page_speed}}
     <p><span class="task-label">Назначение:</span> медленный сайт ИИ-краулер может пропустить при сканировании.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> при высоком времени ответа сервера ИИ-краулеры могут сократить глубину сканирования — часть страниц рискует не попасть в индекс платформ.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> при высоком времени ответа сервера ИИ-краулеры могут сократить глубину сканирования - часть страниц рискует не попасть в индекс платформ.</p>
     {{task_page_speed}}
     {{tool_page_speed}}
   </div>
@@ -280,7 +309,7 @@
     </div>
     <div class="factor-tech">Параметр: structured data (JSON-LD)</div>
     {{verdict_structured_data}}
-    <p><span class="task-label">Назначение:</span> структурированные данные точно объясняют ИИ что на странице — компания, услуга, товар или статья.</p>
+    <p><span class="task-label">Назначение:</span> структурированные данные точно объясняют ИИ что на странице - компания, услуга, товар или статья.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> без JSON-LD разметки ИИ-платформам сложнее определить тип бизнеса и его услуги, что снижает шансы на попадание в тематические рекомендации.</p>
     {{task_structured_data}}
     {{tool_structured_data}}
@@ -307,7 +336,7 @@
     <div class="factor-tech">Параметр: meta robots</div>
     {{verdict_meta_robots}}
     <p><span class="task-label">Назначение:</span> управляет индексацией на уровне отдельной страницы.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> директива noindex на публичных страницах напрямую запрещает ИИ-платформам включать их содержимое в ответы — даже качественный контент остаётся невидимым.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> директива noindex на публичных страницах напрямую запрещает ИИ-платформам включать их содержимое в ответы - даже качественный контент остаётся невидимым.</p>
     {{task_meta_robots}}
     {{tool_meta_robots}}
   </div>
@@ -319,7 +348,7 @@
     </div>
     <div class="factor-tech">Параметр: обработка страницы 404</div>
     {{verdict_page_404}}
-    <p><span class="task-label">Назначение:</span> корректная обработка несуществующих страниц — признак качественного сайта.</p>
+    <p><span class="task-label">Назначение:</span> корректная обработка несуществующих страниц - признак качественного сайта.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> некорректная обработка несуществующих URL может сигнализировать о низком техническом качестве сайта, что снижает его авторитетность как источника для ИИ.</p>
     {{task_page_404}}
     {{tool_page_404}}
@@ -345,7 +374,7 @@
     </div>
     <div class="factor-tech">Параметр: mobile viewport</div>
     {{verdict_mobile_friendly}}
-    <p><span class="task-label">Назначение:</span> мобильная адаптация — признак качества сайта.</p>
+    <p><span class="task-label">Назначение:</span> мобильная адаптация - признак качества сайта.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> отсутствие мобильной адаптации может сигнализировать об устаревшей технической базе сайта, снижая его приоритет как источника при формировании ответов ИИ.</p>
     {{task_mobile_friendly}}
     {{tool_mobile_friendly}}
@@ -359,36 +388,39 @@
     <div class="factor-tech">Параметр: alt-атрибуты изображений</div>
     {{verdict_alt_attributes}}
     <p><span class="task-label">Назначение:</span> без alt-атрибутов ИИ не может интерпретировать изображения и теряет часть смысла страницы.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> изображения без alt-атрибутов — невидимый для ИИ контент. Это может привести к неполной интерпретации тематики страницы и снизить шансы на появление в ответах.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> изображения без alt-атрибутов - невидимый для ИИ контент. Это может привести к неполной интерпретации тематики страницы и снизить шансы на появление в ответах.</p>
     {{task_alt_attributes}}
     {{tool_alt_attributes}}
   </div>
 
   <hr class="divider" />
 
-  <h2>Итоговый чеклист</h2>
-  <p>Таблица содержит только параметры, требующие исправления. Отметьте каждый пункт после завершения.</p>
-
-  <table class="checklist-table">
-    <thead>
-      <tr>
-        <th style="width:38%">Параметр</th>
-        <th style="width:13%">Статус</th>
-        <th class="pri" style="width:12%">Приоритет</th>
-        <th style="width:30%">Задача</th>
-        <th class="cb">✓</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{checklist_rows}}
-    </tbody>
-  </table>
+  <div class="section-block">
+    <h2>Итоговый чеклист</h2>
+    <p>Таблица содержит только параметры, требующие исправления. Отметьте каждый пункт после завершения.</p>
+    <table class="checklist-table">
+      <thead>
+        <tr>
+          <th style="width:38%">Параметр</th>
+          <th style="width:13%">Статус</th>
+          <th class="pri" style="width:12%">Приоритет</th>
+          <th style="width:30%">Задача</th>
+          <th class="cb">v</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{checklist_rows}}
+      </tbody>
+    </table>
+  </div>
 
   <hr class="divider" />
 
-  <h2>Юридическое уведомление</h2>
-  <p>Настоящий документ носит исключительно консультативный характер и отражает лучшие практики, применяемые компанией AI Signal Max. Все рекомендации предоставлены добросовестно, на основании анализа открытых технических данных, доступных без авторизации.</p>
-  <p>Разработчик обязан использовать собственные знания, опыт и суждения для выбора оптимальных решений. Компания не несёт ответственности за результаты внедрения или возможные последствия, вызванные действиями третьих сторон. Все действия по внедрению должны соответствовать действующему законодательству.</p>
+  <div class="section-block">
+    <h2>Юридическое уведомление</h2>
+    <p>Настоящий документ носит исключительно консультативный характер и отражает лучшие практики, применяемые компанией AI Signal Max. Все рекомендации предоставлены добросовестно, на основании анализа открытых технических данных, доступных без авторизации.</p>
+    <p>Разработчик обязан использовать собственные знания, опыт и суждения для выбора оптимальных решений. Компания не несёт ответственности за результаты внедрения или возможные последствия, вызванные действиями третьих сторон. Все действия по внедрению должны соответствовать действующему законодательству.</p>
+  </div>
 
   <div class="footer">
     <p>© 2025 AI Signal Max. Все права защищены.</p>
