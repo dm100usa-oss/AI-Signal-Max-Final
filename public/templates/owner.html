@@ -30,19 +30,34 @@
     h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; color: rgb(15,23,42); }
     .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
 
-    h2 { font-size: 14pt; margin-top: 32px; margin-bottom: 8px; font-weight: 700; color: rgb(15,23,42); }
-    h3 { font-size: 12.5pt; margin-top: 24px; margin-bottom: 6px; font-weight: 700; color: rgb(30,64,175); }
+    h2 { font-size: 14pt; margin-top: 0; margin-bottom: 8px; font-weight: 700; color: rgb(15,23,42); page-break-after: avoid; break-after: avoid; }
+    h3 { font-size: 12.5pt; margin-top: 24px; margin-bottom: 6px; font-weight: 700; color: #2563eb; page-break-after: avoid; break-after: avoid; }
     p { margin: 10px 0; color: rgb(15,23,42); }
     .donut-wrap { display: flex; justify-content: center; margin: 20px 0 18px; }
+
+    .no-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
+    }
+    .section-block {
+      margin-top: 32px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
+    }
 
     .summary-box {
       margin: 20px auto;
       padding: 18px 22px;
       border-radius: 10px;
       width: 90%;
-      border: 1px solid rgb(229,231,235);
+      border: 1px solid rgb(209,213,219);
       background: rgb(249,250,251);
       color: rgb(55,65,81);
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .summary-box h3 {
       font-size: 15pt;
@@ -52,15 +67,12 @@
       color: rgb(15,23,42);
     }
     .summary-box p { text-align: left; margin: 8px 0; }
-    .summary-box.good { border-color: rgb(16,185,129); background: rgba(16,185,129,0.05); }
-    .summary-box.moderate { border-color: rgb(245,158,11); background: rgba(245,158,11,0.05); }
-    .summary-box.poor { border-color: rgb(239,68,68); background: rgba(239,68,68,0.05); }
-    .summary-box.good h3 { color: rgb(15,23,42); }
-    .summary-box.moderate h3 { color: rgb(15,23,42); }
-    .summary-box.poor h3 { color: rgb(15,23,42); }
+    .summary-box.good { border-color: #16a34a; background: rgba(22,163,74,0.05); }
+    .summary-box.moderate { border-color: #ca8a04; background: rgba(202,138,4,0.05); }
+    .summary-box.poor { border-color: #dc2626; background: rgba(220,38,38,0.05); }
 
     .ai-section { margin-top: 32px; }
-    .ai-section h2 { border-bottom: 2px solid rgb(30,64,175); padding-bottom: 6px; }
+    .ai-section h2 { border-bottom: 2px solid #2563eb; padding-bottom: 6px; }
     .ai-section p { margin: 14px 0; }
     .ai-section h3 { margin-top: 28px; }
 
@@ -68,10 +80,13 @@
       width: 100%;
       border-collapse: collapse;
       margin: 16px 0 20px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .ai-requirements td {
       padding: 12px 16px;
-      border: 1px solid rgb(229,231,235);
+      border: 1px solid rgb(209,213,219);
       vertical-align: top;
       font-size: 11.5pt;
     }
@@ -80,27 +95,35 @@
       text-align: center;
       font-weight: 700;
       color: #fff;
-      background: rgb(30,64,175);
-      border-color: rgb(30,64,175);
+      background: #2563eb;
+      border-color: #2563eb;
     }
     .ai-requirements td.text { background: rgb(249,250,251); }
+
     .highlight-box {
-      background: rgba(30,64,175,0.05);
-      border-left: 4px solid rgb(30,64,175);
+      background: rgba(37,99,235,0.05);
+      border-left: 4px solid #2563eb;
       border-radius: 0 8px 8px 0;
       padding: 14px 18px;
       margin: 18px 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .highlight-box p { margin: 0; }
+
     .example-table {
       width: 100%;
       border-collapse: collapse;
       margin: 14px 0 18px;
       font-size: 11pt;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .example-table td {
       padding: 10px 12px;
-      border: 1px solid rgb(229,231,235);
+      border: 1px solid rgb(209,213,219);
       vertical-align: middle;
     }
     .example-table td.icon {
@@ -109,10 +132,11 @@
       font-weight: 700;
       font-size: 13pt;
     }
-    .example-table tr.bad td { background: rgba(239,68,68,0.06); color: rgb(153,27,27); }
-    .example-table tr.bad td.icon { color: rgb(220,38,38); }
-    .example-table tr.good td { background: rgba(16,185,129,0.06); color: rgb(6,78,59); }
-    .example-table tr.good td.icon { color: rgb(5,150,105); }
+    .example-table tr.bad td { background: rgba(220,38,38,0.06); color: rgb(153,27,27); }
+    .example-table tr.bad td.icon { color: #dc2626; }
+    .example-table tr.good td { background: rgba(22,163,74,0.06); color: rgb(6,78,59); }
+    .example-table tr.good td.icon { color: #16a34a; }
+
     .divider {
       border: none;
       border-top: 1px solid rgb(229,231,235);
@@ -122,56 +146,88 @@
     .factor {
       margin-top: 14px;
       padding: 14px 18px;
-      border: 1px solid rgb(229,231,235);
+      border: 1px solid rgb(209,213,219);
       border-radius: 10px;
       background: #fff;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .factor-head {
       display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
       margin-bottom: 4px;
     }
     .factor-lead { display: flex; align-items: center; gap: 8px; color: rgb(15,23,42); }
-    .factor-lead.good .dot { border-color: rgb(16,185,129); }
-    .factor-lead.moderate .dot { border-color: rgb(245,158,11); }
-    .factor-lead.poor .dot { border-color: rgb(239,68,68); }
+    .factor-lead.good .dot { border-color: #16a34a; }
+    .factor-lead.moderate .dot { border-color: #ca8a04; }
+    .factor-lead.poor .dot { border-color: #dc2626; }
     .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; }
     .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
     .factor-tech { font-size: 10pt; color: rgb(107,114,128); margin: 2px 0 6px 22px; }
     .status { font-weight: 700; font-size: 11pt; white-space: nowrap; }
-    .status.good { color: rgb(16,185,129); }
-    .status.moderate { color: rgb(245,158,11); }
-    .status.poor { color: rgb(239,68,68); }
+    .status.good { color: #16a34a; }
+    .status.moderate { color: #ca8a04; }
+    .status.poor { color: #dc2626; }
+
+    .verdict-block {
+      margin-top: 24px;
+      padding: 18px 22px;
+      border-radius: 10px;
+      border: 1px solid rgb(209,213,219);
+      background: rgb(249,250,251);
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
+    }
+    .verdict-block p { margin: 0; font-size: 12pt; color: rgb(15,23,42); }
+    .verdict-label { font-weight: 700; color: rgb(15,23,42); }
 
     .conclusion-box {
       margin-top: 32px;
       padding: 22px 26px;
       border-radius: 12px;
       background: rgb(249,250,251);
-      border: 1px solid rgb(229,231,235);
+      border: 1px solid rgb(209,213,219);
+      page-break-inside: avoid;
+      break-inside: avoid;
+      overflow: hidden;
     }
     .conclusion-box h2 { margin-top: 0; color: rgb(15,23,42); }
     .conclusion-box p { margin: 12px 0; }
+
     .deliverables {
       margin: 18px 0;
       display: flex;
       gap: 12px;
-      flex-wrap: wrap;
     }
     .deliverable-item {
       flex: 1;
-      min-width: 160px;
       padding: 14px 16px;
       border-radius: 8px;
       background: #fff;
       border: 1px solid rgb(209,213,219);
       font-size: 11pt;
+      position: relative;
     }
-    .deliverable-item .di-icon { font-size: 18pt; margin-bottom: 6px; }
-    .deliverable-item .di-title { font-weight: 700; color: rgb(30,64,175); margin-bottom: 4px; }
-    .deliverable-item .di-desc { color: rgb(75,85,99); font-size: 10.5pt; }
+    .di-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #fff;
+      font-weight: 700;
+      font-size: 11pt;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .di-title { font-weight: 700; color: #2563eb; margin-bottom: 4px; }
+    .di-desc { color: rgb(75,85,99); font-size: 10.5pt; }
 
     .footer { margin-top: 40px; text-align: center; font-size: 10pt; color: rgb(107,114,128); }
     .footer .disclaimer { opacity: 0.7; font-size: 10pt; margin-top: 4px; }
+    a { color: #2563eb; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -202,84 +258,85 @@
   </div>
 
   <!-- ВВЕДЕНИЕ -->
-  <h2>Введение</h2>
-  <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения готовности к появлению в рекомендациях ИИ-ассистентов и объясняет, какие параметры на это влияют. Ниже вы найдёте подробный разбор важных параметров вашего сайта и объяснение того, как сайты обычно попадают в рекомендации ИИ, основанные на нашем опыте и практике.</p>
+  <div class="section-block">
+    <h2>Введение</h2>
+    <p>Этот отчёт подготовлен для владельца сайта. Он показывает текущее состояние ресурса с точки зрения готовности к появлению в рекомендациях ИИ-ассистентов и объясняет, какие параметры на это влияют. Ниже вы найдёте подробный разбор важных параметров вашего сайта и объяснение того, как сайты обычно попадают в рекомендации ИИ, основанные на нашем опыте и практике.</p>
+  </div>
 
   <!-- КАК САЙТЫ ПОПАДАЮТ В РЕКОМЕНДАЦИИ ИИ -->
   <div class="ai-section">
-    <h2>Как сайты попадают в рекомендации ИИ</h2>
-
-    <p>Сегодня пользователь предпочитает получать готовые ответы на свои вопросы, а не набор ссылок в поисковике. ИИ-ассистенты подстраиваются под это: они формируют готовые ответы, выбирая самые подходящие источники. Чтобы чаще появляться в этих ответах, сайт должен отвечать трём требованиям:</p>
-
-    <table class="ai-requirements">
-      <tr>
-        <td class="num">1</td>
-        <td class="text">Быть технически доступным для ИИ</td>
-      </tr>
-      <tr>
-        <td class="num">2</td>
-        <td class="text">Иметь простой и понятный контент — давать точные и готовые ответы в определённой категории</td>
-      </tr>
-      <tr>
-        <td class="num">3</td>
-        <td class="text">Вызывать доверие у ИИ как надёжный и безопасный источник информации</td>
-      </tr>
-    </table>
-
-    <h3>1. Техническая доступность</h3>
-
-    <p>ИИ-платформы сканируют сайты автоматически. Чтобы сайт был доступен для анализа, он должен быть открытым для ботов, проиндексированным в Google и Bing, быстро загружаться (до 2–3 секунд), корректно работать на мобильных устройствах, иметь чистые URL и не содержать дублей страниц.</p>
-
-    <h3>2. Понятный контент и готовые ответы</h3>
-
-    <p>Это важное различие: ИИ при запросе не ищет нужный сайт — он ищет нужный ответ. Он сначала выбирает страницы с нужным ответом, а потом оценивает сам сайт и приводит ссылку. Каждая страница должна прямо отвечать на конкретный вопрос пользователя, а не просто описывать услугу или компанию.</p>
-
-    <p>Например, для компании по ремонту труб:</p>
-    <table class="example-table">
-      <tr class="bad">
-        <td class="icon">✗</td>
-        <td>Наша компания понимает даже особенности ремонта труб, а не только обычные ситуации с ними</td>
-      </tr>
-      <tr class="good">
-        <td class="icon">✓</td>
-        <td>Наша компания ремонтирует водопроводные трубы</td>
-      </tr>
-      <tr class="good">
-        <td class="icon">✓</td>
-        <td>Сколько стоит ремонт трубы в городе</td>
-      </tr>
-      <tr class="good">
-        <td class="icon">✓</td>
-        <td>Как быстро устранить протечку трубы</td>
-      </tr>
-      <tr class="good">
-        <td class="icon">✓</td>
-        <td>Когда нужно менять трубы в доме</td>
-      </tr>
-    </table>
-
-    <p>ИИ обычно не переписывает сложный текст — он берёт уже готовые, понятные куски и использует их в ответах. Текст на странице должен содержать простые формулировки, короткие абзацы и понятные блоки. Также важно, чтобы сайт был посвящён одной теме и воспринимался ИИ как тематический авторитет в своей категории.</p>
-
-    <div class="highlight-box">
-      <p><strong>Главный принцип:</strong> контент должен быть написан так, чтобы его можно было взять и вставить как готовый ответ пользователю.</p>
+    <div class="no-break">
+      <h2>Как сайты попадают в рекомендации ИИ</h2>
+      <p>Сегодня пользователь предпочитает получать готовые ответы на свои вопросы, а не набор ссылок в поисковике. ИИ-ассистенты подстраиваются под это: они формируют готовые ответы, выбирая самые подходящие источники. Чтобы чаще появляться в этих ответах, сайт должен отвечать трём требованиям:</p>
+      <table class="ai-requirements">
+        <tr>
+          <td class="num">1</td>
+          <td class="text">Быть технически доступным для ИИ</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td class="text">Иметь простой и понятный контент - давать точные и готовые ответы в определённой категории</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td class="text">Вызывать доверие у ИИ как надёжный и безопасный источник информации</td>
+        </tr>
+      </table>
     </div>
 
-    <h3>3. Доверие как надёжный источник</h3>
+    <div class="no-break">
+      <h3>1. Техническая доступность</h3>
+      <p>ИИ-платформы сканируют сайты автоматически. Чтобы сайт был доступен для анализа, он должен быть открытым для ботов, проиндексированным в Google и Bing, быстро загружаться (до 2-3 секунд), корректно работать на мобильных устройствах, иметь чистые URL и не содержать дублей страниц.</p>
+    </div>
 
-    <p>ИИ выбирает те сайты, которые выглядят надёжно и подтверждают это фактами. На сайте обязательно должны быть: информация о компании и контакты, понятно кто автор или эксперт, реальные отзывы и примеры работ, конкретные результаты и цифры.</p>
+    <div class="no-break">
+      <h3>2. Понятный контент и готовые ответы</h3>
+      <p>Это важное различие: ИИ при запросе не ищет нужный сайт - он ищет нужный ответ. Он сначала выбирает страницы с нужным ответом, а потом оценивает сам сайт и приводит ссылку. Каждая страница должна прямо отвечать на конкретный вопрос пользователя, а не просто описывать услугу или компанию.</p>
+      <p>Например, для компании по ремонту труб:</p>
+      <table class="example-table">
+        <tr class="bad">
+          <td class="icon">x</td>
+          <td>Наша компания понимает даже особенности ремонта труб, а не только обычные ситуации с ними</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">v</td>
+          <td>Наша компания ремонтирует водопроводные трубы</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">v</td>
+          <td>Сколько стоит ремонт трубы в городе</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">v</td>
+          <td>Как быстро устранить протечку трубы</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">v</td>
+          <td>Когда нужно менять трубы в доме</td>
+        </tr>
+      </table>
+      <p>ИИ обычно не переписывает сложный текст - он берёт уже готовые, понятные куски и использует их в ответах. Текст на странице должен содержать простые формулировки, короткие абзацы и понятные блоки. Также важно, чтобы сайт был посвящён одной теме и воспринимался ИИ как тематический авторитет в своей категории.</p>
+      <div class="highlight-box">
+        <p><strong>Главный принцип:</strong> контент должен быть написан так, чтобы его можно было взять и вставить как готовый ответ пользователю.</p>
+      </div>
+    </div>
 
-    <p>Также важна единая информация на всех страницах — если данные противоречат друг другу, ИИ снижает доверие к сайту. Дополнительный сигнал доверия — упоминания вне сайта: профиль в Google, каталоги компаний, ссылки в статьях. ИИ смотрит не только на ваш сайт, но и на то, есть ли вы «в интернете вообще».</p>
-
-    <div class="highlight-box">
-      <p><strong>Главный принцип:</strong> ИИ выбирает не просто информацию, а надёжный источник. Он должен быть понятен, проверяем и подтверждён.</p>
+    <div class="no-break">
+      <h3>3. Доверие как надёжный источник</h3>
+      <p>ИИ выбирает те сайты, которые выглядят надёжно и подтверждают это фактами. На сайте обязательно должны быть: информация о компании и контакты, понятно кто автор или эксперт, реальные отзывы и примеры работ, конкретные результаты и цифры.</p>
+      <p>Также важна единая информация на всех страницах - если данные противоречат друг другу, ИИ снижает доверие к сайту. Дополнительный сигнал доверия - упоминания вне сайта: профиль в Google, каталоги компаний, ссылки в статьях. ИИ смотрит не только на ваш сайт, но и на то, есть ли вы в интернете вообще.</p>
+      <div class="highlight-box">
+        <p><strong>Главный принцип:</strong> ИИ выбирает не просто информацию, а надёжный источник. Он должен быть понятен, проверяем и подтверждён.</p>
+      </div>
     </div>
   </div>
 
   <hr class="divider" />
 
-  <p>Теперь посмотрим, как ваш сайт выглядит по каждому из этих параметров прямо сейчас.</p>
-
-  <h2>Проверенные параметры</h2>
+  <div class="no-break">
+    <p>Теперь посмотрим, как ваш сайт выглядит по каждому из этих параметров прямо сейчас.</p>
+    <h2>Проверенные параметры</h2>
+  </div>
 
   <!-- 1 -->
   <div class="factor">
@@ -291,7 +348,7 @@
       <div class="status {{status_robots_txt_class}}">{{status_robots_txt}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: robots.txt</div>
-    <p class="factor-desc">Этот файл говорит ИИ-платформам, какие страницы они могут читать. Если доступ закрыт — сайт невидим для ИИ полностью.</p>
+    <p class="factor-desc">Этот файл говорит ИИ-платформам, какие страницы они могут читать. Если доступ закрыт - сайт невидим для ИИ полностью.</p>
   </div>
 
   <!-- 2 -->
@@ -304,7 +361,7 @@
       <div class="status {{status_meta_description_class}}">{{status_meta_description}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: meta description</div>
-    <p class="factor-desc">Это короткий текст который ИИ читает чтобы понять тему сайта. Без него ИИ угадывает тему самостоятельно — и часто ошибается.</p>
+    <p class="factor-desc">Это короткий текст который ИИ читает чтобы понять тему сайта. Без него ИИ угадывает тему самостоятельно - и часто ошибается.</p>
   </div>
 
   <!-- 3 -->
@@ -330,7 +387,7 @@
       <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: подзаголовки H2</div>
-    <p class="factor-desc">Подзаголовки показывают ИИ структуру и разделы сайта — помогают понять в какой категории работает бизнес.</p>
+    <p class="factor-desc">Подзаголовки показывают ИИ структуру и разделы сайта - помогают понять в какой категории работает бизнес.</p>
   </div>
 
   <!-- 5 -->
@@ -382,7 +439,7 @@
       <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: structured data (JSON-LD)</div>
-    <p class="factor-desc">Это специальная разметка которая точно объясняет ИИ что на странице — компания, услуга, товар или статья.</p>
+    <p class="factor-desc">Это специальная разметка которая точно объясняет ИИ что на странице - компания, услуга, товар или статья.</p>
   </div>
 
   <!-- 9 -->
@@ -408,7 +465,7 @@
       <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: meta robots</div>
-    <p class="factor-desc">Если этот тег запрещает индексацию — страница скрыта от ИИ даже если всё остальное настроено правильно.</p>
+    <p class="factor-desc">Если этот тег запрещает индексацию - страница скрыта от ИИ даже если всё остальное настроено правильно.</p>
   </div>
 
   <!-- 11 -->
@@ -434,7 +491,7 @@
       <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: canonical</div>
-    <p class="factor-desc">Говорит ИИ какая версия страницы главная — без этого ИИ может путаться в дублях и снижать доверие к сайту.</p>
+    <p class="factor-desc">Говорит ИИ какая версия страницы главная - без этого ИИ может путаться в дублях и снижать доверие к сайту.</p>
   </div>
 
   <!-- 13 -->
@@ -463,27 +520,32 @@
     <p class="factor-desc">Без alt-атрибутов ИИ не понимает что на картинках и теряет часть смысла страницы.</p>
   </div>
 
+  <!-- ГЛАВНЫЙ ВЫВОД (задача №4) -->
+  <div class="verdict-block">
+    <p>{{verdict_conclusion}}</p>
+  </div>
+
   <!-- ЗАКЛЮЧЕНИЕ -->
   <div class="conclusion-box">
     <h2>Что дальше</h2>
-    <p>Вы получили полную картину того, как ваш сайт выглядит с точки зрения ИИ-платформ. Это уже первый шаг — большинство владельцев сайтов даже не знают, что именно мешает им появляться в ответах ИИ.</p>
+    <p>Вы получили полную картину того, как ваш сайт выглядит с точки зрения ИИ-платформ. Это уже первый шаг - большинство владельцев сайтов даже не знают, что именно мешает им появляться в ответах ИИ.</p>
     <p>Вместе с этим отчётом вы получили всё необходимое для того, чтобы это исправить:</p>
 
     <div class="deliverables">
       <div class="deliverable-item">
-        <div class="di-icon">📋</div>
+        <div class="di-num">1</div>
         <div class="di-title">Этот отчёт</div>
         <div class="di-desc">Понятное объяснение каждого параметра и его влияния на видимость в ИИ</div>
       </div>
       <div class="deliverable-item">
-        <div class="di-icon">🛠️</div>
+        <div class="di-num">2</div>
         <div class="di-title">ТЗ для разработчика</div>
-        <div class="di-desc">Готовый список конкретных задач — можно сразу передать разработчику</div>
+        <div class="di-desc">Готовый список конкретных задач - можно сразу передать разработчику</div>
       </div>
       <div class="deliverable-item">
-        <div class="di-icon">📱</div>
+        <div class="di-num">3</div>
         <div class="di-title">Результаты на экране</div>
-        <div class="di-desc">Наглядная сводка параметров — удобно показать команде или подрядчику</div>
+        <div class="di-desc">Наглядная сводка параметров - удобно показать команде или подрядчику</div>
       </div>
     </div>
 
