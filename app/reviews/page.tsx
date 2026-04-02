@@ -1,321 +1,268 @@
 "use client";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+export default function ReviewsPageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <ReviewsPage />
+    </Suspense>
+  );
+}
 
 function Dots() {
   return (
-    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle">
+    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-baseline">
       <span className="dot">.</span>
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
       <style jsx>{`
-        .dot { opacity: .2; animation: aiv-dots 1200ms infinite; }
-        .dot2 { animation-delay: 200ms; }
-        .dot3 { animation-delay: 400ms; }
+        .dot {
+          opacity: 0.2;
+          animation: aiv-dots 1200ms infinite;
+          position: relative;
+          top: 2px;
+        }
+        .dot2 {
+          animation-delay: 200ms;
+        }
+        .dot3 {
+          animation-delay: 400ms;
+        }
         @keyframes aiv-dots {
-          0% { opacity: .2; }
+          0% { opacity: 0.2; }
           30% { opacity: 1; }
-          60% { opacity: .2; }
-          100% { opacity: .2; }
+          60% { opacity: 0.2; }
+          100% { opacity: 0.2; }
         }
       `}</style>
     </span>
   );
 }
 
-const normalizeUrl = (v: string) =>
-  v.replace(/^\s*checked\s+website:\s*/i, "").trim();
-
-const isValidUrl = (u: string): boolean => {
-  try {
-    const url = new URL(u.trim());
-
-    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
-
-    const hostname = url.hostname.toLowerCase();
-
-    if (!hostname.includes(".")) return false;
-    if (hostname === "localhost") return false;
-
-    // блокируем IP-адреса
-    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return false;
-
-    const parts = hostname.split(".");
-    const tld = parts[parts.length - 1];
-
-    // TLD только буквы, минимум 2 символа
-    if (!/^[a-z]{2,}$/.test(tld)) return false;
-
-    // все части домена непустые
-    if (parts.some((p) => p.length === 0)) return false;
-
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-export default function Home() {
+function ReviewsPage() {
   const router = useRouter();
-  const [url, setUrl] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
-  const [wave, setWave] = useState(false);
+  const params = useSearchParams();
+  const isAddMode = params.get("add") === "true";
 
   const [rating, setRating] = useState<number>(4.9);
-  const [reviews, setReviews] = useState<number>(128);
-  const [statsLoaded, setStatsLoaded] = useState(false);
+  const [reviewsCount, setReviewsCount] = useState<number>(128);
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  const [name, setName] = useState("");
+  const [text, setText] = useState("");
+  const [userRating, setUserRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [hideForm, setHideForm] = useState(false);
 
   useEffect(() => {
-    async function fetchStats() {
+    async function fetchData() {
       try {
-        const resp = await fetch("/api/reviews/stats");
-        if (resp.ok) {
-          const data = await resp.json();
-          if (data?.rating && data?.reviews) {
-            setRating(data.rating);
-            setReviews(data.reviews);
-          }
-        }
-      } catch {}
-      setStatsLoaded(true);
+        const [statsResp, reviewsResp] = await Promise.all([
+          fetch("/api/reviews/stats"),
+          fetch("/api/reviews/list"),
+        ]);
+        const stats = await statsResp.json();
+        const data = await reviewsResp.json();
+        if (stats?.rating) setRating(stats.rating);
+        if (stats?.reviews) setReviewsCount(stats.reviews);
+        if (data?.ok && Array.isArray(data.reviews)) setReviews(data.reviews);
+      } catch (err) {
+        console.error("Ошибка загрузки отзывов:", err);
+      }
     }
-    fetchStats();
+    fetchData();
   }, []);
 
-  const go = useCallback(
-    async (mode: "quick" | "pro") => {
-      if (loading) return;
-      let u = normalizeUrl(url);
-      if (!u.startsWith("http://") && !u.startsWith("https://")) {
-        u = "https://" + u;
-      }
-      if (!isValidUrl(u)) {
-        setError("Введите корректный URL, включая https://");
-        return;
-      }
+  useEffect(() => {
+    if (showSuccess) {
+      const timer = setTimeout(() => setShowSuccess(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccess]);
 
-      const hostname = new URL(u).hostname.toLowerCase();
-
-      const blockedDomains = [
-        "example.com",
-        "example.org",
-        "example.net",
-        "test.com",
-        "test.org",
-        "127.0.0.1",
-        "0.0.0.0",
-        "dummy.com",
-        "invalid",
-        "example.local",
-        "test.local",
-      ];
-
-      if (blockedDomains.includes(hostname)) {
-        setError("Не удалось выполнить анализ сайта. Укажите другой сайт");
-        return;
-      }
-
-      setError(null);
-      setLoading(mode);
-
-      const minDuration = 2200;
-      const started = Date.now();
-
-      try {
-        const resp = await fetch("/api/precheck", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: u }),
-        });
-        const json = await resp.json();
-
-        if (!json?.ok) {
-          setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
-          setLoading(null);
-          return;
-        }
-      } catch {
-        setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
-        setLoading(null);
-        return;
-      }
-
-      const left = Math.max(0, minDuration - (Date.now() - started));
-      await new Promise((r) => setTimeout(r, left));
-
-      const q = new URLSearchParams({ url: u, status: "ok" }).toString();
-      router.push(`/preview/${mode}?${q}`);
-    },
-    [url, loading, router]
-  );
-
-  const clear = () => setUrl("");
-
-  const handleStarsClick = () => {
-    router.push("/reviews");
+  const renderStars = (rating: number) => {
+    const full = Math.floor(rating);
+    return Array.from({ length: 5 }, (_, i) => (
+      <span
+        key={i}
+        className={`inline-block ${i < full ? "text-yellow-400" : "text-transparent"}`}
+        style={{
+          fontSize: "18px",
+          WebkitTextStroke: "0.8px #eab308",
+          marginRight: "2px",
+        }}
+      >
+        ★
+      </span>
+    ));
   };
 
+  const handleBack = () => router.push("/");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    try {
+      const res = await fetch("/api/reviews/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, text, rating: userRating }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setStatus("success");
+        setShowSuccess(true);
+        setHideForm(true);
+        setName("");
+        setText("");
+        setUserRating(5);
+      } else setStatus("error");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  const sortedReviews = [...reviews].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-700">
-      <h1 className="text-center text-4xl font-semibold tracking-tight mb-2">
-        AI Signal Max
-      </h1>
-      <p className="text-center text-base text-neutral-700 mb-8 lowercase font-medium tracking-tight">
-        новое конкурентное преимущество
-      </p>
-      <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Проверьте, насколько ваш сайт готов к появлению в рекомендациях AI-ассистентов: ChatGPT · Copilot · Gemini · Claude · Perplexity · Grok и других
-      </p>
-
-      <div className="mb-2 relative">
-        <input
-          type="url"
-          inputMode="url"
-          placeholder="https://example.com"
-          value={url}
-          onChange={(e) => setUrl(normalizeUrl(e.target.value))}
-          onPaste={(e) => {
-            const pasted =
-              (e.clipboardData || (window as any).clipboardData).getData("text");
-            const cleaned = normalizeUrl(pasted);
-            if (cleaned !== pasted) {
-              e.preventDefault();
-              setUrl(cleaned);
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") go("quick");
-          }}
-          className={[
-            "w-full rounded-md border px-4 py-3 pr-12 text-base outline-none",
-            error
-              ? "border-rose-400 focus:ring-2 focus:ring-rose-300"
-              : "border-neutral-300 focus:ring-2 focus:ring-blue-500",
-          ].join(" ")}
-        />
-        {url && (
-          <button
-            type="button"
-            aria-label="Clear"
-            onClick={clear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 cursor-pointer"
-          >
-            ×
-          </button>
-        )}
-      </div>
-
-      {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
-
-      <button
-        onClick={() => go("quick")}
-        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 transition-colors cursor-pointer"
-      >
-        {loading === "quick" ? (
-          <span className="inline-flex items-center">Проверяем<Dots /></span>
-        ) : (
-          "Быстрая проверка $5.99"
-        )}
-      </button>
-
-      <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
-        Процент готовности сайта, 10 ключевых факторов и краткие рекомендации на экране
+    <main className="max-w-3xl mx-auto px-6 py-12 transition-opacity duration-700 relative">
+      <p className="text-center mb-8 text-lg">
+        <span
+          className="inline-block"
+          style={{ fontSize: "18px", color: "#facc15", WebkitTextStroke: "0.8px #eab308", letterSpacing: "2px" }}
+        >
+          ★★★★★
+        </span>{" "}
+        <span className="text-gray-700 ml-[6px]">
+          {rating.toFixed(1)} <span className="text-neutral-500">({reviewsCount})</span>
+        </span>
       </p>
 
-      <button
-        onClick={() => go("pro")}
-        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-colors cursor-pointer"
-      >
-        {loading === "pro" ? (
-          <span className="inline-flex items-center">Проверяем<Dots /></span>
-        ) : (
-          "Детальная проверка $19.99"
-        )}
-      </button>
-
-      <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
-        15 факторов, результат на экране и по email, расширенные рекомендации для владельца и готовое ТЗ для разработчика
-      </p>
-
-      <div className="flex flex-col items-center mb-10">
-        <style jsx>{`
-          .ratingText {
-            font-size: 17px;
-            line-height: 1;
-            color: #6b6b6b;
-            font-weight: 400;
-            user-select: none;
-          }
-          .stars {
-            position: relative;
-            display: flex;
-            gap: 10px;
-            padding: 4px 8px;
-            overflow: hidden;
-          }
-          .stars::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -140%;
-            width: 80%;
-            height: 100%;
-            background: linear-gradient(
-              90deg,
-              rgba(255,255,255,0) 0%,
-              rgba(255,255,255,0.5) 50%,
-              rgba(255,255,255,0) 100%
-            );
-            filter: blur(6px);
-            animation: shine 3.2s linear infinite;
-          }
-          @keyframes shine {
-            0% { left: -140%; }
-            55% { left: 160%; }
-            100% { left: 160%; }
-          }
-          .star {
-            font-size: 26px;
-            cursor: pointer;
-            user-select: none;
-            background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow:
-              0 0 1px rgba(255,180,0,0.55),
-              0 0 1px rgba(255,160,0,0.55);
-            transition: transform 0.2s ease, filter 0.2s ease;
-          }
-          .flash .star {
-            animation: clickFlash 0.45s ease;
-          }
-          @keyframes clickFlash {
-            0% { filter: brightness(2.7); transform: scale(1.11); }
-            100% { filter: brightness(1); transform: scale(1); }
-          }
-        `}</style>
-
-        <div className="flex items-center gap-4">
-          <span className="ratingText">{statsLoaded ? rating.toFixed(1) : ""}</span>
-
-          <div className={`stars ${wave ? "flash" : ""}`}>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <span key={i} onClick={handleStarsClick} className="star">★</span>
-            ))}
-          </div>
-
-          <span className="ratingText">{statsLoaded ? reviews : ""}</span>
+      <div className="mb-12 text-center">
+        <h2 className="text-sm font-medium text-neutral-500 mb-4">
+          что отмечают пользователи
+        </h2>
+        <div className="flex flex-wrap justify-center gap-3 text-sm font-medium">
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">полезно</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">понятно</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">удобно</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">экономит время и деньги</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">можно переслать разработчику</span>
+          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">подходит для повседневной работы</span>
         </div>
       </div>
 
-      <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
-        <br />
-        <span className="opacity-60">
-          Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической консультацией.
-        </span>
+      {isAddMode && !hideForm && (
+        <form onSubmit={handleSubmit} className="mb-12 flex flex-col gap-4 w-full max-w-md mx-auto">
+          <input
+            type="text"
+            placeholder="Ваше имя"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border border-gray-300 rounded-md p-2"
+            required
+          />
+          <div className="flex flex-col gap-2">
+            <label className="text-sm text-gray-600">Ваша оценка:</label>
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setUserRating(star)}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  className="text-3xl transition-all hover:scale-110"
+                  style={{
+                    color: star <= (hoverRating || userRating) ? "#facc15" : "#d1d5db",
+                    WebkitTextStroke: "1px #eab308",
+                  }}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+          <textarea
+            placeholder="Ваш отзыв..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="border border-gray-300 rounded-md p-2 h-32 resize-none"
+            required
+          />
+          <button
+            type="submit"
+            disabled={status === "loading" || userRating === 0}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
+          >
+            {status === "loading" ? (
+              <span className="inline-flex items-center">
+                Отправка
+                <Dots />
+              </span>
+            ) : (
+              "Отправить"
+            )}
+          </button>
+        </form>
+      )}
+
+      {showSuccess && (
+        <div className="bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 mb-10">
+          Спасибо! Ваш отзыв отправлен на модерацию.
+        </div>
+      )}
+
+      <p className="text-center leading-relaxed text-[16px] mb-14" style={{ color: "#475569" }}>
+        Поделитесь своим мнением, расскажите о себе или своей компании, вашу историю увидят тысячи пользователей по всему миру
+      </p>
+
+      <div className="space-y-6">
+        {sortedReviews.map((r, i) => (
+          <div
+            key={i}
+            className="bg-gray-50 rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center justify-start space-x-2 mb-3">
+              <div className="flex">{renderStars(r.rating || 5)}</div>
+              <span className="font-semibold text-gray-800">{r.name}</span>
+              {r.date && (
+                <span className="text-neutral-400 text-sm">
+                  ·{" "}
+                  {new Date(r.date).toLocaleDateString("ru-RU", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </span>
+              )}
+            </div>
+            <p className="text-gray-700 leading-relaxed text-[15px] text-justify">{r.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={handleBack}
+        className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
+        style={{ background: "linear-gradient(90deg,#2563eb 0%,#3b82f6 100%)", opacity: 0.9 }}
+      >
+        На главную
+      </button>
+
+      <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
+        <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
+        <p className="opacity-60">Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.</p>
+        <p className="opacity-60">Не являются юридической консультацией.</p>
       </footer>
     </main>
   );
