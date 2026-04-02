@@ -210,7 +210,7 @@ export default function Home() {
               <span key={i} onClick={handleStarsClick} className="star">★</span>
             ))}
           </div>
-          <span className="ratingText">{reviews !== null ? reviews : ""}</span>
+         <span className="ratingText">{reviews !== null ? `(${reviews})` : ""}</span>
         </div>
       </div>
 
