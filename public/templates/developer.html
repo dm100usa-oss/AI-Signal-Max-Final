@@ -101,9 +101,9 @@
     .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; }
     .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
     .factor-tech { font-size: 11pt; color: rgb(55,65,81); margin: 2px 0 4px 22px; }
-    .factor-verdict-good { font-size: 12pt; font-weight: 700; color: #16a34a; margin: 0 0 6px 22px; }
-    .factor-verdict-moderate { font-size: 12pt; font-weight: 700; color: #ca8a04; margin: 0 0 6px 22px; }
-    .factor-verdict-poor { font-size: 12pt; font-weight: 700; color: #dc2626; margin: 0 0 6px 22px; }
+    .factor-verdict-good { font-size: 12pt; font-weight: 700; color: #16a34a; margin: 8px 0 0 22px; }
+    .factor-verdict-moderate { font-size: 12pt; font-weight: 700; color: #ca8a04; margin: 8px 0 0 22px; }
+    .factor-verdict-poor { font-size: 12pt; font-weight: 700; color: #dc2626; margin: 8px 0 0 22px; }
     .status { font-weight: 700; font-size: 11pt; white-space: nowrap; }
     .status.good { color: #16a34a; }
     .status.moderate { color: #ca8a04; }
@@ -116,6 +116,7 @@
     .checklist-table td { padding: 9px 12px; border-bottom: 1px solid rgb(229,231,235); vertical-align: top; }
     .checklist-table tr:nth-child(even) td { background: rgb(249,250,251); }
     .checklist-table .cb { text-align: center; width: 30px; font-size: 14pt; }
+    .checklist-table .num { text-align: center; font-weight: 700; color: #2563eb; width: 30px; }
     .checklist-table .pri { text-align: center; width: 80px; font-size: 10pt; font-weight: 700; }
     .pri-urgent { color: #dc2626; }
     .pri-improve { color: #ca8a04; }
@@ -204,11 +205,11 @@
       <div class="status {{status_robots_txt_class}}">{{status_robots_txt}}</div>
     </div>
     <div class="factor-tech">Параметр: robots.txt</div>
-    {{verdict_robots_txt}}
     <p><span class="task-label">Назначение:</span> управляет доступом ИИ-ботов к содержимому сайта. Ошибки в файле могут значительно снизить шансы на появление сайта в ответах ИИ-платформ.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> без явного разрешения для GPTBot, ClaudeBot и Google-Extended шансы на сканирование сайта и включение его содержимого в ответы ИИ существенно снижаются.</p>
     {{task_robots_txt}}
     {{tool_robots_txt}}
+    {{verdict_robots_txt}}
   </div>
 
   <div class="factor">
@@ -217,11 +218,11 @@
       <div class="status {{status_meta_description_class}}">{{status_meta_description}}</div>
     </div>
     <div class="factor-tech">Параметр: meta description</div>
-    {{verdict_meta_description}}
     <p><span class="task-label">Назначение:</span> краткое описание страницы, которое помогает ИИ определить её тему и содержание.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> отсутствие или дублирование meta description снижает точность тематической идентификации сайта, что уменьшает шансы на появление в релевантных ответах ИИ.</p>
     {{task_meta_description}}
     {{tool_meta_description}}
+    {{verdict_meta_description}}
   </div>
 
   <div class="factor">
@@ -230,11 +231,11 @@
       <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
     </div>
     <div class="factor-tech">Параметр: title tag</div>
-    {{verdict_title_tag}}
     <p><span class="task-label">Назначение:</span> главный заголовок страницы - основной сигнал для ИИ о её теме.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> отсутствующий или неинформативный title снижает предсказуемость сайта как источника, что уменьшает шансы на попадание в тематические ответы ИИ.</p>
     {{task_title_tag}}
     {{tool_title_tag}}
+    {{verdict_title_tag}}
   </div>
 
   <div class="factor">
@@ -243,11 +244,11 @@
       <div class="status {{status_h1_present_class}}">{{status_h1_present}}</div>
     </div>
     <div class="factor-tech">Параметр: H1</div>
-    {{verdict_h1_present}}
     <p><span class="task-label">Назначение:</span> тег H1 задаёт главную тему страницы и помогает ИИ определить её контекст.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> отсутствие H1 или его дублирование с title снижает чёткость тематического сигнала страницы, что может уменьшить шансы на появление в ответах ИИ.</p>
     {{task_h1_present}}
     {{tool_h1_present}}
+    {{verdict_h1_present}}
   </div>
 
   <div class="factor">
@@ -256,11 +257,11 @@
       <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
     </div>
     <div class="factor-tech">Параметр: подзаголовки H2</div>
-    {{verdict_h2_present}}
     <p><span class="task-label">Назначение:</span> подзаголовки H2 помогают ИИ понять структуру страницы и определить тематическую категорию сайта.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> без подзаголовков H2 ИИ воспринимает страницу как неструктурированный текст, что затрудняет определение тематики и снижает шансы на цитирование в ответах.</p>
     {{task_h2_present}}
     {{tool_h2_present}}
+    {{verdict_h2_present}}
   </div>
 
   <div class="factor">
@@ -269,11 +270,11 @@
       <div class="status {{status_sitemap_xml_class}}">{{status_sitemap_xml}}</div>
     </div>
     <div class="factor-tech">Параметр: sitemap.xml</div>
-    {{verdict_sitemap_xml}}
     <p><span class="task-label">Назначение:</span> карта сайта показывает ИИ-платформам все страницы и их связи.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> без sitemap.xml ИИ-краулер может обнаружить только страницы, доступные по внешним ссылкам - остальной контент рискует остаться невидимым и не попасть в ответы.</p>
     {{task_sitemap_xml}}
     {{tool_sitemap_xml}}
+    {{verdict_sitemap_xml}}
   </div>
 
   <div class="factor">
@@ -282,11 +283,11 @@
       <div class="status {{status_https_class}}">{{status_https}}</div>
     </div>
     <div class="factor-tech">Параметр: HTTPS / SSL</div>
-    {{verdict_https}}
     <p><span class="task-label">Назначение:</span> защищённое соединение - базовый сигнал надёжности для ИИ-платформ.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> сайт без HTTPS может восприниматься как менее надёжный источник, что снижает вероятность его появления в ответах ИИ-ассистентов.</p>
     {{task_https}}
     {{tool_https}}
+    {{verdict_https}}
   </div>
 
   <div class="factor">
@@ -295,11 +296,11 @@
       <div class="status {{status_page_speed_class}}">{{status_page_speed}}</div>
     </div>
     <div class="factor-tech">Параметр: скорость ответа сервера</div>
-    {{verdict_page_speed}}
     <p><span class="task-label">Назначение:</span> медленный сайт ИИ-краулер может пропустить при сканировании.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> при высоком времени ответа сервера ИИ-краулеры могут сократить глубину сканирования - часть страниц рискует не попасть в индекс платформ.</p>
     {{task_page_speed}}
     {{tool_page_speed}}
+    {{verdict_page_speed}}
   </div>
 
   <div class="factor">
@@ -308,11 +309,11 @@
       <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
     </div>
     <div class="factor-tech">Параметр: structured data (JSON-LD)</div>
-    {{verdict_structured_data}}
     <p><span class="task-label">Назначение:</span> структурированные данные точно объясняют ИИ что на странице - компания, услуга, товар или статья.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> без JSON-LD разметки ИИ-платформам сложнее определить тип бизнеса и его услуги, что снижает шансы на попадание в тематические рекомендации.</p>
     {{task_structured_data}}
     {{tool_structured_data}}
+    {{verdict_structured_data}}
   </div>
 
   <div class="factor">
@@ -321,11 +322,11 @@
       <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
     </div>
     <div class="factor-tech">Параметр: Open Graph</div>
-    {{verdict_open_graph}}
     <p><span class="task-label">Назначение:</span> OG-теги определяют как выглядит ссылка на сайт при распространении и анализе.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> отсутствие OG-тегов снижает информативность ссылки при анализе, что уменьшает авторитетность сайта как источника для ИИ-платформ.</p>
     {{task_open_graph}}
     {{tool_open_graph}}
+    {{verdict_open_graph}}
   </div>
 
   <div class="factor">
@@ -334,11 +335,11 @@
       <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
     </div>
     <div class="factor-tech">Параметр: meta robots</div>
-    {{verdict_meta_robots}}
     <p><span class="task-label">Назначение:</span> управляет индексацией на уровне отдельной страницы.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> директива noindex на публичных страницах напрямую запрещает ИИ-платформам включать их содержимое в ответы - даже качественный контент остаётся невидимым.</p>
     {{task_meta_robots}}
     {{tool_meta_robots}}
+    {{verdict_meta_robots}}
   </div>
 
   <div class="factor">
@@ -347,11 +348,11 @@
       <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
     </div>
     <div class="factor-tech">Параметр: обработка страницы 404</div>
-    {{verdict_page_404}}
     <p><span class="task-label">Назначение:</span> корректная обработка несуществующих страниц - признак качественного сайта.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> некорректная обработка несуществующих URL может сигнализировать о низком техническом качестве сайта, что снижает его авторитетность как источника для ИИ.</p>
     {{task_page_404}}
     {{tool_page_404}}
+    {{verdict_page_404}}
   </div>
 
   <div class="factor">
@@ -360,11 +361,11 @@
       <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
     </div>
     <div class="factor-tech">Параметр: canonical</div>
-    {{verdict_canonical}}
     <p><span class="task-label">Назначение:</span> указывает ИИ какая версия страницы является основной, устраняет путаницу с дублями.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> без canonical-тегов ИИ-платформы могут индексировать дублирующиеся версии страниц, что снижает релевантность основного контента в ответах.</p>
     {{task_canonical}}
     {{tool_canonical}}
+    {{verdict_canonical}}
   </div>
 
   <div class="factor">
@@ -373,11 +374,11 @@
       <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
     </div>
     <div class="factor-tech">Параметр: mobile viewport</div>
-    {{verdict_mobile_friendly}}
     <p><span class="task-label">Назначение:</span> мобильная адаптация - признак качества сайта.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> отсутствие мобильной адаптации может сигнализировать об устаревшей технической базе сайта, снижая его приоритет как источника при формировании ответов ИИ.</p>
     {{task_mobile_friendly}}
     {{tool_mobile_friendly}}
+    {{verdict_mobile_friendly}}
   </div>
 
   <div class="factor">
@@ -386,26 +387,26 @@
       <div class="status {{status_alt_attributes_class}}">{{status_alt_attributes}}</div>
     </div>
     <div class="factor-tech">Параметр: alt-атрибуты изображений</div>
-    {{verdict_alt_attributes}}
     <p><span class="task-label">Назначение:</span> без alt-атрибутов ИИ не может интерпретировать изображения и теряет часть смысла страницы.</p>
     <p><span class="impact-label">Влияние на ИИ:</span> изображения без alt-атрибутов - невидимый для ИИ контент. Это может привести к неполной интерпретации тематики страницы и снизить шансы на появление в ответах.</p>
     {{task_alt_attributes}}
     {{tool_alt_attributes}}
+    {{verdict_alt_attributes}}
   </div>
 
   <hr class="divider" />
 
   <div class="section-block">
     <h2>Итоговый чеклист</h2>
-    <p>Таблица содержит только параметры, требующие исправления. Отметьте каждый пункт после завершения.</p>
+    <p>Таблица содержит только параметры, требующие исправления. Выполняйте задачи по порядку - сначала срочные, затем улучшения.</p>
     <table class="checklist-table">
       <thead>
         <tr>
-          <th style="width:38%">Параметр</th>
-          <th style="width:13%">Статус</th>
+          <th class="num" style="width:5%">№</th>
+          <th style="width:30%">Параметр</th>
           <th class="pri" style="width:12%">Приоритет</th>
-          <th style="width:30%">Задача</th>
-          <th class="cb">v</th>
+          <th style="width:46%">Задача</th>
+          <th class="cb" style="width:7%">v</th>
         </tr>
       </thead>
       <tbody>
