@@ -43,6 +43,9 @@ export async function generatePDF({
     visibility_text: getVisibilityTextFull(scoreValue),
     ...buildFactorStatuses(data.results),
     ...buildFactorClasses(data.results),
+    ...buildPriorityLists(data.results),
+    ...buildConditionalTasks(data.results),
+    checklist_rows: buildChecklistRows(data.results),
     assessment_p1: getAssessmentText1(scoreValue),
     assessment_p2: getAssessmentText2(scoreValue),
   };
@@ -198,4 +201,161 @@ function buildFactorClasses(results: Record<string, string>): Record<string, str
         : "poor";
   }
   return map;
+}
+
+// Человеческие названия параметров
+const FACTOR_NAMES: Record<string, string> = {
+  robots_txt: "Открыт ли сайт для ИИ",
+  meta_description: "Понимает ли ИИ, о чём сайт",
+  title_tag: "Видит ли ИИ заголовки страниц",
+  h2_present: "Понимает ли ИИ категорию сайта",
+  sitemap_xml: "Понятна ли ИИ структура сайта",
+  https: "Считает ли ИИ сайт безопасным",
+  page_speed: "Достаточна ли скорость сайта для ИИ",
+  structured_data: "Видит ли ИИ разметку страниц",
+  open_graph: "Содержит ли ссылка заголовок, описание и изображение",
+  meta_robots: "Не запрещена ли индексация страниц",
+  page_404: "Считает ли ИИ сайт качественным",
+  canonical: "Указана ли основная страница сайта",
+  mobile_friendly: "Удобен ли сайт на мобильных устройствах",
+  alt_attributes: "Понимает ли ИИ изображения на сайте",
+};
+
+// Краткие задачи для чеклиста
+const CHECKLIST_TASKS: Record<string, { poor: string; moderate: string }> = {
+  robots_txt: {
+    poor: "Открыть доступ для GPTBot, ClaudeBot, Google-Extended",
+    moderate: "Проверить корректность директив, добавить путь к sitemap.xml",
+  },
+  meta_description: {
+    poor: "Добавить уникальные описания 120–160 символов на все страницы",
+    moderate: "Устранить дублирующиеся и пустые описания",
+  },
+  title_tag: {
+    poor: "Добавить уникальный title 50–60 символов на каждую страницу",
+    moderate: "Проверить уникальность и информативность заголовков",
+  },
+  h2_present: {
+    poor: "Добавить информативные подзаголовки H2 на ключевые страницы",
+    moderate: "Проверить логику H2 — не дублировать H1",
+  },
+  sitemap_xml: {
+    poor: "Создать sitemap.xml, добавить в robots.txt, отправить в Search Console",
+    moderate: "Настроить автообновление, проверить валидность XML",
+  },
+  https: {
+    poor: "Установить SSL, настроить редирект HTTP → HTTPS, устранить mixed content",
+    moderate: "Проверить срок сертификата, включить HSTS",
+  },
+  page_speed: {
+    poor: "Добиться времени ответа до 1.5 сек: CDN, кэш, WebP, Gzip/Brotli",
+    moderate: "Аудит Lighthouse, устранить render-blocking ресурсы",
+  },
+  structured_data: {
+    poor: "Добавить JSON-LD разметку Schema.org (Organization, Service, Article)",
+    moderate: "Проверить разметку через Rich Results Test, устранить ошибки",
+  },
+  open_graph: {
+    poor: "Добавить og:title, og:description, og:image (1200x630px), og:url, og:type",
+    moderate: "Проверить наличие всех OG-тегов, убедиться в загрузке изображений",
+  },
+  meta_robots: {
+    poor: "Удалить noindex с публичных страниц, устранить конфликты директив",
+    moderate: "Аудит директив: служебные — noindex, публичные — index, follow",
+  },
+  page_404: {
+    poor: "Настроить возврат кода 404, создать кастомную страницу с навигацией",
+    moderate: "Проверить отсутствие soft 404 (код 200 на несуществующих страницах)",
+  },
+  canonical: {
+    poor: "Добавить canonical с абсолютным HTTPS-URL на все страницы",
+    moderate: "Проверить корректность canonical, устранить цепочки редиректов",
+  },
+  mobile_friendly: {
+    poor: "Добавить viewport meta-тег, устранить горизонтальную прокрутку",
+    moderate: "Тестирование Google Mobile-Friendly Test, устранить замечания",
+  },
+  alt_attributes: {
+    poor: "Добавить alt ко всем изображениям, описывающий содержание",
+    moderate: "Заполнить пустые alt, декоративным изображениям — alt=\"\"",
+  },
+};
+
+function buildPriorityLists(results: Record<string, string>): Record<string, string> {
+  const urgent: string[] = [];
+  const improve: string[] = [];
+  const ok: string[] = [];
+
+  for (const [key, status] of Object.entries(results)) {
+    const name = FACTOR_NAMES[key];
+    if (!name) continue;
+    const lower = (status || "").toLowerCase();
+    if (lower === "poor") urgent.push(`<li>${name}</li>`);
+    else if (lower === "moderate") improve.push(`<li>${name}</li>`);
+    else ok.push(`<li>${name}</li>`);
+  }
+
+  return {
+    priority_urgent_list: urgent.length ? urgent.join("") : "<li>Нет параметров требующих срочного исправления</li>",
+    priority_improve_list: improve.length ? improve.join("") : "<li>Нет параметров требующих улучшения</li>",
+    priority_ok_list: ok.length ? ok.join("") : "<li>Нет параметров с хорошим статусом</li>",
+  };
+}
+
+function buildConditionalTasks(results: Record<string, string>): Record<string, string> {
+  const map: Record<string, string> = {};
+
+  for (const key of Object.keys(FACTOR_NAMES)) {
+    const status = (results[key] || "poor").toLowerCase();
+    const isPoor = status === "poor";
+    const isModerate = status === "moderate";
+    const isGood = status === "good";
+
+    // Показываем задачу "Плохо" только если статус poor
+    map[`task_poor_${key}`] = isPoor ? "" : "<!--";
+    map[`/task_poor_${key}`] = isPoor ? "" : "-->";
+
+    // Показываем задачу "Средне" если статус poor или moderate
+    map[`task_moderate_${key}`] = (isPoor || isModerate) ? "" : "<!--";
+    map[`/task_moderate_${key}`] = (isPoor || isModerate) ? "" : "-->";
+
+    // Инструмент проверки показываем если не good
+    map[`task_tool_${key}`] = !isGood ? "" : "<!--";
+    map[`/task_tool_${key}`] = !isGood ? "" : "-->";
+  }
+
+  return map;
+}
+
+function buildChecklistRows(results: Record<string, string>): string {
+  const rows: string[] = [];
+
+  for (const [key, status] of Object.entries(results)) {
+    const name = FACTOR_NAMES[key];
+    const tasks = CHECKLIST_TASKS[key];
+    if (!name || !tasks) continue;
+
+    const lower = (status || "").toLowerCase();
+    if (lower === "good") continue; // Хорошо — не включаем
+
+    const isPoor = lower === "poor";
+    const statusLabel = isPoor ? "Плохо" : "Средне";
+    const statusClass = isPoor ? "poor" : "moderate";
+    const priorityLabel = isPoor ? "Срочно" : "Улучшить";
+    const priorityClass = isPoor ? "pri-urgent" : "pri-improve";
+    const task = isPoor ? tasks.poor : tasks.moderate;
+
+    rows.push(`
+      <tr>
+        <td>${name}</td>
+        <td><span class="status ${statusClass}">${statusLabel}</span></td>
+        <td class="pri"><span class="${priorityClass}">${priorityLabel}</span></td>
+        <td>${task}</td>
+        <td class="cb">☐</td>
+      </tr>`);
+  }
+
+  return rows.length
+    ? rows.join("")
+    : `<tr><td colspan="5" style="text-align:center;color:rgb(16,185,129);font-weight:700;">Все параметры настроены корректно</td></tr>`;
 }
