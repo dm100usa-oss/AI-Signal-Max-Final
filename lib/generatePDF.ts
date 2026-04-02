@@ -30,8 +30,6 @@ export async function generatePDF({
   const donutOffset = getDonutOffset(scoreValue);
   const visibilityLevel = getVisibilityText(scoreValue);
 
-  const priorityLists = buildPriorityLists(data.results);
-
   const placeholders: Record<string, string> = {
     website: data.website,
     date: data.date,
@@ -47,9 +45,6 @@ export async function generatePDF({
     ...buildFactorClasses(data.results),
     assessment_p1: getAssessmentText1(scoreValue),
     assessment_p2: getAssessmentText2(scoreValue),
-    priority_urgent_list: priorityLists.urgent,
-    priority_improve_list: priorityLists.improve,
-    priority_ok_list: priorityLists.ok,
   };
 
   const filledHtml = fillPlaceholders(template, placeholders);
@@ -179,44 +174,6 @@ function getAssessmentText2(score: number): string {
   if (score >= 40)
     return "Some parameters require improvement to achieve better indexing.";
   return "Several critical settings need attention to improve AI visibility.";
-}
-
-const FACTOR_NAMES: Record<string, string> = {
-  robots_txt: "Открыт ли сайт для ИИ (robots.txt)",
-  meta_description: "Понимает ли ИИ, о чём сайт (meta description)",
-  title_tag: "Видит ли ИИ заголовки страниц (title tag)",
-  h2_present: "Понимает ли ИИ категорию сайта (H2)",
-  sitemap_xml: "Понятна ли ИИ структура сайта (sitemap.xml)",
-  https: "Считает ли ИИ сайт безопасным (HTTPS)",
-  page_speed: "Достаточна ли скорость сайта (page speed)",
-  structured_data: "Видит ли ИИ разметку страниц (JSON-LD)",
-  open_graph: "Содержит ли ссылка заголовок и описание (OG)",
-  meta_robots: "Не запрещена ли индексация (meta robots)",
-  page_404: "Считает ли ИИ сайт качественным (404)",
-  canonical: "Указана ли основная страница (canonical)",
-  mobile_friendly: "Удобен ли сайт на мобильных (viewport)",
-  alt_attributes: "Понимает ли ИИ изображения (alt)",
-};
-
-function buildPriorityLists(results: Record<string, string>): { urgent: string; improve: string; ok: string } {
-  const urgent: string[] = [];
-  const improve: string[] = [];
-  const ok: string[] = [];
-
-  for (const [key, status] of Object.entries(results)) {
-    const name = FACTOR_NAMES[key];
-    if (!name) continue;
-    const lower = (status || "").toLowerCase();
-    if (lower === "poor") urgent.push(`<li>${name}</li>`);
-    else if (lower === "moderate") improve.push(`<li>${name}</li>`);
-    else if (lower === "good") ok.push(`<li>${name}</li>`);
-  }
-
-  return {
-    urgent: urgent.length ? urgent.join("") : "<li>Нет критических проблем</li>",
-    improve: improve.length ? improve.join("") : "<li>Нет параметров требующих улучшения</li>",
-    ok: ok.length ? ok.join("") : "<li>Нет параметров с хорошим статусом</li>",
-  };
 }
 
 function buildFactorStatuses(results: Record<string, string>): Record<string, string> {
