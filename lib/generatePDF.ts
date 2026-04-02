@@ -208,6 +208,7 @@ const FACTOR_NAMES: Record<string, string> = {
   robots_txt: "Открыт ли сайт для ИИ",
   meta_description: "Понимает ли ИИ, о чём сайт",
   title_tag: "Видит ли ИИ заголовки страниц",
+  h1_present: "Есть ли на странице главный заголовок",
   h2_present: "Понимает ли ИИ категорию сайта",
   sitemap_xml: "Понятна ли ИИ структура сайта",
   https: "Считает ли ИИ сайт безопасным",
@@ -234,6 +235,10 @@ const CHECKLIST_TASKS: Record<string, { poor: string; moderate: string }> = {
   title_tag: {
     poor: "Добавить уникальный title 50–60 символов на каждую страницу",
     moderate: "Проверить уникальность и информативность заголовков",
+  },
+  h1_present: {
+    poor: "Добавить один H1 на каждую страницу, отражающий главную тему",
+    moderate: "Проверить уникальность H1, убедиться что на странице только один",
   },
   h2_present: {
     poor: "Добавить информативные подзаголовки H2 на ключевые страницы",
@@ -305,23 +310,89 @@ function buildPriorityLists(results: Record<string, string>): Record<string, str
 function buildConditionalTasks(results: Record<string, string>): Record<string, string> {
   const map: Record<string, string> = {};
 
-  for (const key of Object.keys(FACTOR_NAMES)) {
+  const tasksPoor: Record<string, string> = {
+    robots_txt: "<p><span class=\"task-label\">Задача:</span> проверить файл robots.txt на наличие директивы Disallow: / — она блокирует всех ботов. Добавить явное разрешение для GPTBot, ClaudeBot, Google-Extended. Убедиться что файл доступен по адресу /robots.txt.</p>",
+    meta_description: "<p><span class=\"task-label\">Задача:</span> добавить тег &lt;meta name=\"description\"&gt; на все ключевые страницы. Текст 120–160 символов, естественный, отражает суть страницы.</p>",
+    title_tag: "<p><span class=\"task-label\">Задача:</span> добавить уникальный тег &lt;title&gt; на каждую страницу. Длина 50–60 символов. Не дублировать между страницами.</p>",
+    h1_present: "<p><span class=\"task-label\">Задача:</span> добавить один тег H1 на каждую страницу. Он должен отражать главную тему страницы, не дублировать title и не содержать вложенных ссылок.</p>",
+    h2_present: "<p><span class=\"task-label\">Задача:</span> добавить подзаголовки H2 на ключевые страницы. Они должны отражать разделы контента и отвечать на конкретные вопросы пользователя.</p>",
+    sitemap_xml: "<p><span class=\"task-label\">Задача:</span> создать файл sitemap.xml в корне сайта. Включить все публичные страницы. Указать путь в robots.txt. Отправить в Google Search Console.</p>",
+    https: "<p><span class=\"task-label\">Задача:</span> установить SSL-сертификат. Настроить автоматический редирект с HTTP на HTTPS. Устранить mixed content (смешанные HTTP/HTTPS ресурсы на страницах).</p>",
+    page_speed: "<p><span class=\"task-label\">Задача:</span> добиться времени ответа сервера до 1.5 сек. Подключить CDN, настроить кэширование на стороне сервера, оптимизировать изображения (WebP, сжатие), включить Gzip/Brotli сжатие.</p>",
+    structured_data: "<p><span class=\"task-label\">Задача:</span> добавить JSON-LD разметку Schema.org на ключевые страницы. Для бизнеса — LocalBusiness или Organization. Для услуг — Service. Для статей — Article.</p>",
+    open_graph: "<p><span class=\"task-label\">Задача:</span> добавить на все страницы теги og:title, og:description, og:image, og:url, og:type. Изображение минимум 1200x630px.</p>",
+    meta_robots: "<p><span class=\"task-label\">Задача:</span> проверить наличие тега &lt;meta name=\"robots\" content=\"noindex\"&gt; на публичных страницах — удалить его. Убедиться что не конфликтует с robots.txt и X-Robots-Tag.</p>",
+    page_404: "<p><span class=\"task-label\">Задача:</span> настроить сервер на возврат кода 404 для несуществующих страниц. Создать кастомную страницу 404 с навигацией на главную и основные разделы.</p>",
+    canonical: "<p><span class=\"task-label\">Задача:</span> добавить тег &lt;link rel=\"canonical\"&gt; на все страницы с абсолютным HTTPS-URL. Устранить циклические или конфликтующие canonical.</p>",
+    mobile_friendly: "<p><span class=\"task-label\">Задача:</span> добавить мета-тег &lt;meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"&gt;. Проверить отображение на мобильных устройствах — устранить горизонтальную прокрутку и мелкие элементы.</p>",
+    alt_attributes: "<p><span class=\"task-label\">Задача:</span> добавить атрибут alt ко всем изображениям на сайте. Текст должен описывать содержание изображения, не использовать ключевые слова как спам.</p>",
+  };
+
+  const tasksModerate: Record<string, string> = {
+    robots_txt: "<p><span class=\"task-label\">Задача:</span> проверить корректность директив — убедиться что нужные разделы открыты, служебные закрыты. Указать путь к sitemap.xml внутри файла.</p>",
+    meta_description: "<p><span class=\"task-label\">Задача:</span> проверить уникальность описаний на всех страницах. Устранить дубликаты и пустые значения.</p>",
+    title_tag: "<p><span class=\"task-label\">Задача:</span> проверить уникальность и информативность заголовков. Привести в соответствие с содержанием страницы.</p>",
+    h1_present: "<p><span class=\"task-label\">Задача:</span> проверить что на каждой странице только один H1. Убедиться что H1 уникален и логично отражает тему страницы.</p>",
+    h2_present: "<p><span class=\"task-label\">Задача:</span> проверить логику структуры H2 — убедиться что они не дублируют H1 и отражают реальные разделы страницы.</p>",
+    sitemap_xml: "<p><span class=\"task-label\">Задача:</span> убедиться что sitemap обновляется автоматически при добавлении страниц. Проверить валидность XML-формата.</p>",
+    https: "<p><span class=\"task-label\">Задача:</span> проверить срок действия сертификата. Включить HSTS. Устранить предупреждения о смешанном контенте.</p>",
+    page_speed: "<p><span class=\"task-label\">Задача:</span> провести аудит через Google Lighthouse. Устранить блокирующие загрузку ресурсы (render-blocking JS/CSS).</p>",
+    structured_data: "<p><span class=\"task-label\">Задача:</span> проверить корректность существующей разметки через Rich Results Test. Устранить ошибки и предупреждения.</p>",
+    open_graph: "<p><span class=\"task-label\">Задача:</span> проверить наличие всех обязательных OG-тегов. Убедиться что изображения загружаются корректно.</p>",
+    meta_robots: "<p><span class=\"task-label\">Задача:</span> провести аудит всех страниц на предмет корректности директив. Служебные страницы — noindex, публичные — index, follow.</p>",
+    page_404: "<p><span class=\"task-label\">Задача:</span> проверить что страница 404 возвращает именно код 404, а не 200 (soft 404). Улучшить дизайн страницы ошибки.</p>",
+    canonical: "<p><span class=\"task-label\">Задача:</span> проверить что canonical указывает на правильную версию страницы. Убедиться в отсутствии цепочек редиректов.</p>",
+    mobile_friendly: "<p><span class=\"task-label\">Задача:</span> провести тестирование через Google Mobile-Friendly Test. Устранить все выявленные замечания.</p>",
+    alt_attributes: "<p><span class=\"task-label\">Задача:</span> проверить все изображения — заполнить пустые alt. Декоративные изображения — alt=\"\".</p>",
+  };
+
+  const tools: Record<string, string> = {
+    robots_txt: "<p><span class=\"task-label\">Инструмент проверки:</span> Google Search Console — Robots Testing Tool.</p>",
+    meta_description: "<p><span class=\"task-label\">Инструмент проверки:</span> Google Search Console — Coverage.</p>",
+    title_tag: "<p><span class=\"task-label\">Инструмент проверки:</span> Screaming Frog SEO Spider.</p>",
+    h1_present: "<p><span class=\"task-label\">Инструмент проверки:</span> Screaming Frog SEO Spider.</p>",
+    h2_present: "<p><span class=\"task-label\">Инструмент проверки:</span> просмотр исходного кода страницы.</p>",
+    sitemap_xml: "<p><span class=\"task-label\">Инструмент проверки:</span> Google Search Console — Sitemaps.</p>",
+    https: "<p><span class=\"task-label\">Инструмент проверки:</span> SSL Labs — ssllabs.com/ssltest.</p>",
+    page_speed: "<p><span class=\"task-label\">Инструмент проверки:</span> Google PageSpeed Insights.</p>",
+    structured_data: "<p><span class=\"task-label\">Инструмент проверки:</span> Google Rich Results Test — search.google.com/test/rich-results.</p>",
+    open_graph: "<p><span class=\"task-label\">Инструмент проверки:</span> Facebook Sharing Debugger — developers.facebook.com/tools/debug.</p>",
+    meta_robots: "<p><span class=\"task-label\">Инструмент проверки:</span> Screaming Frog SEO Spider.</p>",
+    page_404: "<p><span class=\"task-label\">Инструмент проверки:</span> curl -I [url]/nonexistent-page — проверить код ответа.</p>",
+    canonical: "<p><span class=\"task-label\">Инструмент проверки:</span> Screaming Frog SEO Spider.</p>",
+    mobile_friendly: "<p><span class=\"task-label\">Инструмент проверки:</span> Google Mobile-Friendly Test — search.google.com/test/mobile-friendly.</p>",
+    alt_attributes: "<p><span class=\"task-label\">Инструмент проверки:</span> Screaming Frog SEO Spider — вкладка Images.</p>",
+  };
+
+  const allKeys = Object.keys(FACTOR_NAMES);
+  allKeys.push("h1_present");
+
+  for (const key of allKeys) {
     const status = (results[key] || "poor").toLowerCase();
     const isPoor = status === "poor";
     const isModerate = status === "moderate";
     const isGood = status === "good";
 
-    // Показываем задачу "Плохо" только если статус poor
-    map[`task_poor_${key}`] = isPoor ? "" : "<!--";
-    map[`/task_poor_${key}`] = isPoor ? "" : "-->";
+    // Вердикт
+    if (isGood) {
+      map[`verdict_${key}`] = `<div class="factor-verdict-good">Не требует доработки</div>`;
+    } else if (isModerate) {
+      map[`verdict_${key}`] = `<div class="factor-verdict-moderate">Требует доработки</div>`;
+    } else {
+      map[`verdict_${key}`] = `<div class="factor-verdict-poor">Требует исправления</div>`;
+    }
 
-    // Показываем задачу "Средне" если статус poor или moderate
-    map[`task_moderate_${key}`] = (isPoor || isModerate) ? "" : "<!--";
-    map[`/task_moderate_${key}`] = (isPoor || isModerate) ? "" : "-->";
-
-    // Инструмент проверки показываем если не good
-    map[`task_tool_${key}`] = !isGood ? "" : "<!--";
-    map[`/task_tool_${key}`] = !isGood ? "" : "-->";
+    // Одна задача по статусу
+    if (isGood) {
+      map[`task_${key}`] = "";
+      map[`tool_${key}`] = "";
+    } else if (isModerate) {
+      map[`task_${key}`] = tasksModerate[key] || "";
+      map[`tool_${key}`] = tools[key] || "";
+    } else {
+      map[`task_${key}`] = tasksPoor[key] || "";
+      map[`tool_${key}`] = tools[key] || "";
+    }
   }
 
   return map;
