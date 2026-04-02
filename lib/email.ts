@@ -14,22 +14,29 @@ type SendReportEmailParams = {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendReportEmail(params: SendReportEmailParams) {
-  const from = "AI Signal Max <reports@aivcheck.com>";
+  const from = "AI Signal Max <reports@aisignalmax.com>";
 
   const { to, url, mode, ownerBuffer, developerBuffer, score, results } = params;
 
-  const subject = `AI Signal Max — Reports for ${url} (${mode})`;
+  const subject = `Ваш отчёт AI Signal Max готов`;
   const html = `
-    <div style="font-family:Helvetica,Arial,sans-serif;color:#0F172A;line-height:1.6">
-      <h2 style="margin:0 0 6px">AI Signal Max</h2>
-      <p style="margin:0 0 12px">Attached are your Owner Report and Developer’s Checklist.</p>
-      <p style="margin:0 0 12px">
-        Website: <strong>${escapeHtml(url)}</strong><br/>
-        Mode: <strong>${escapeHtml(mode)}</strong>
-      </p>
-      <p style="font-size:12px;color:#6B7280;margin-top:18px">
-        Disclaimer: visibility scores are estimates based on publicly available data.<br/>
-        <a href="https://aivcheck.com/disclaimer">https://aivcheck.com/disclaimer</a>
+    <div style="font-family:Helvetica,Arial,sans-serif;color:#0F172A;line-height:1.7;max-width:600px">
+      <p style="margin:0 0 12px">Здравствуйте,</p>
+      <p style="margin:0 0 12px">Спасибо, что воспользовались нашим сервисом.</p>
+      <p style="margin:0 0 16px">Мы провели анализ сайта <strong>${escapeHtml(url)}</strong> и подготовили два документа — они прикреплены к этому письму.</p>
+      <p style="margin:0 0 6px"><strong>Отчёт для владельца</strong> — объясняет текущий уровень готовности сайта и факторы, которые влияют на появление в ответах ИИ-ассистентов.</p>
+      <p style="margin:0 0 16px"><strong>ТЗ для разработчика</strong> — структурированный список технических задач. Можно сразу передать в работу.</p>
+      <p style="margin:0 0 8px"><strong>Что делать дальше:</strong></p>
+      <ol style="margin:0 0 16px;padding-left:20px">
+        <li style="margin-bottom:6px">Ознакомьтесь с отчётом</li>
+        <li style="margin-bottom:6px">Передайте ТЗ разработчику</li>
+        <li style="margin-bottom:6px">После внедрения повторите проверку на <a href="https://aisignalmax.com" style="color:#2563EB">aisignalmax.com</a> — чтобы оценить результат</li>
+      </ol>
+      <p style="margin:0 0 24px">Если по каким-либо причинам у Вас нет разработчика или связь с ним утрачена — просто ответьте на это письмо, поможем найти решение.</p>
+      <p style="margin:0 0 4px">С уважением,</p>
+      <p style="margin:0 0 24px"><strong>AI Signal Max</strong></p>
+      <p style="font-size:11px;color:#9CA3AF;margin-top:16px;border-top:1px solid #E5E7EB;padding-top:12px">
+        Показатели готовности рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической или технической консультацией.
       </p>
     </div>
   `;
