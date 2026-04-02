@@ -14,7 +14,7 @@ type SendReportEmailParams = {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendReportEmail(params: SendReportEmailParams) {
-  const from = "AI Signal Max <reports@aisignalmax.com>";
+  const from = "AI Signal Max <reports@aivcheck.com>";
 
   const { to, url, mode, ownerBuffer, developerBuffer, score, results } = params;
 
