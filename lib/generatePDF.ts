@@ -49,6 +49,7 @@ export async function generatePDF({
     assessment_p1: getAssessmentText1(scoreValue),
     assessment_p2: getAssessmentText2(scoreValue),
     verdict_conclusion: getVerdictConclusion(scoreValue),
+    score_factor_card: getScoreFactorCard(scoreValue),
   };
 
   const filledHtml = fillPlaceholders(template, placeholders);
@@ -162,6 +163,25 @@ function getVisibilityTextFull(score: number): string {
   if (score >= 40)
     return `Ваш сайт частично готов к рекомендациям со стороны ИИ-систем. <strong>Вы близки к хорошему результату</strong> — достаточно доработать детали, чтобы структура стала понятнее для ИИ. Тогда сайт сможет чаще появляться в ответах, и вы получите больше переходов и обращений.<br/><br/>Отдельные параметры пока настроены не полностью, из-за этого сайт не всегда попадает в ответы ИИ. <strong>Их точечная корректировка повысит готовность сайта к рекомендациям и позволит чаще появляться в ответах.</strong>`;
   return `Ваш сайт пока не готов к рекомендациям со стороны ИИ-систем. <strong>В текущем состоянии он не попадает в ответы</strong>, из-за чего вы теряете потенциальных клиентов и обращения.<br/><br/>Критически важные параметры настроены некорректно или отсутствуют. <strong>Без их исправления это значительно снижает шансы на появление сайта в ответах ИИ.</strong>`;
+}
+
+function getScoreFactorCard(score: number): string {
+  const statusClass = score >= 75 ? "good" : score >= 40 ? "moderate" : "poor";
+  const statusLabel = score >= 75 ? "Хорошо" : score >= 40 ? "Средне" : "Плохо";
+  const desc = score >= 75
+    ? "Технические параметры сайта в целом настроены корректно. Сайт доступен для ИИ-краулеров и имеет хорошие шансы появляться в ответах ИИ-ассистентов."
+    : score >= 40
+    ? "Часть технических параметров настроена правильно, однако имеющиеся недочёты снижают шансы на появление в ответах ИИ-ассистентов."
+    : "Ряд критических технических параметров настроен некорректно или отсутствует. Это существенно снижает шансы сайта на появление в ответах ИИ-ассистентов.";
+
+  return `<div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead ${statusClass}"><span class="dot"></span><div class="factor-name">Готов ли ваш сайт к рекомендациям ИИ</div></div>
+      <div class="status ${statusClass}">${statusLabel}</div>
+    </div>
+    <div class="factor-tech">Итоговая оценка: ${score}%</div>
+    <p class="factor-desc">${desc}</p>
+  </div>`;
 }
 
 function getVerdictConclusion(score: number): string {
@@ -409,26 +429,34 @@ function buildConditionalTasks(results: Record<string, string>): Record<string, 
 
 function buildChecklistRows(results: Record<string, string>): string {
   const rows: string[] = [];
+  let num = 0;
+
+  // Сначала Poor (Срочно), потом Moderate (Улучшить)
+  const poor: [string, string][] = [];
+  const moderate: [string, string][] = [];
 
   for (const [key, status] of Object.entries(results)) {
+    const lower = (status || "").toLowerCase();
+    if (lower === "poor") poor.push([key, status]);
+    else if (lower === "moderate") moderate.push([key, status]);
+  }
+
+  for (const [key] of [...poor, ...moderate]) {
     const name = FACTOR_NAMES[key];
     const tasks = CHECKLIST_TASKS[key];
     if (!name || !tasks) continue;
 
-    const lower = (status || "").toLowerCase();
-    if (lower === "good") continue; // Хорошо — не включаем
-
-    const isPoor = lower === "poor";
-    const statusLabel = isPoor ? "Плохо" : "Средне";
-    const statusClass = isPoor ? "poor" : "moderate";
+    const status = (results[key] || "").toLowerCase();
+    const isPoor = status === "poor";
     const priorityLabel = isPoor ? "Срочно" : "Улучшить";
     const priorityClass = isPoor ? "pri-urgent" : "pri-improve";
     const task = isPoor ? tasks.poor : tasks.moderate;
+    num++;
 
     rows.push(`
       <tr>
+        <td class="num">${num}</td>
         <td>${name}</td>
-        <td><span class="status ${statusClass}">${statusLabel}</span></td>
         <td class="pri"><span class="${priorityClass}">${priorityLabel}</span></td>
         <td>${task}</td>
         <td class="cb">☐</td>
@@ -437,5 +465,5 @@ function buildChecklistRows(results: Record<string, string>): string {
 
   return rows.length
     ? rows.join("")
-    : `<tr><td colspan="5" style="text-align:center;color:rgb(16,185,129);font-weight:700;">Все параметры настроены корректно</td></tr>`;
+    : `<tr><td colspan="5" style="text-align:center;color:#16a34a;font-weight:700;">Все параметры настроены корректно</td></tr>`;
 }
