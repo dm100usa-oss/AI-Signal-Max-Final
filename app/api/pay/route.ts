@@ -26,7 +26,7 @@ function isValidUrl(url: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    const { mode, url } = await req.json();
+    const { mode, url, lang = "en" } = await req.json();
 
     // проверка режима
     if (mode !== "quick" && mode !== "pro") {
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         url
       )}&status=ok&paid=1`,
       cancel_url: `${base}/`,
-      metadata: { url, mode },
+      metadata: { url, mode, lang },
     });
 
     // сохранение данных

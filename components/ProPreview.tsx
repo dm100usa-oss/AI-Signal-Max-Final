@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useLang } from "@/hooks/useTranslation";
+import en from "@/locales/en";
+import ru from "@/locales/ru";
 
 function Dots({ colorClass }: { colorClass: string }) {
   return (
@@ -16,11 +19,7 @@ function Dots({ colorClass }: { colorClass: string }) {
 function TopLights({ active }: { active: boolean }) {
   return (
     <div
-      className={`
-        flex justify-center mb-6 h-6 items-center space-x-3 
-        transition-all duration-700 
-        ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[-6px]"}
-      `}
+      className={`flex justify-center mb-6 h-6 items-center space-x-3 transition-all duration-700 ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[-6px]"}`}
       style={{ pointerEvents: "none" }}
     >
       <span className={`top-light yellow-light ${active ? "light-active" : ""}`}></span>
@@ -34,24 +33,9 @@ export default function FullPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "https://example.com";
-
-  const factors = [
-    "Открыт ли сайт для ИИ",
-    "Понимает ли ИИ, о чём ваш сайт",
-    "Видит ли ИИ заголовки страниц",
-    "Понимает ли ИИ категорию вашего сайта",
-    "Понятна ли ИИ структура сайта",
-    "Считает ли ИИ ваш сайт безопасным",
-    "Достаточна ли скорость сайта для ИИ",
-    "Видит ли ИИ разметку страниц",
-    "Содержит ли ссылка заголовок, описание и изображение",
-    "Не запрещена ли индексация страниц",
-    "Считает ли ИИ ваш сайт качественным",
-    "Указана ли основная страница сайта",
-    "Удобен ли ваш сайт на мобильных устройствах",
-    "Понимает ли ИИ изображения на сайте",
-    "Будет ли ИИ рекомендовать ваш сайт",
-  ];
+  const lang = useLang();
+  const t = lang === "ru" ? ru.proPreview : en.proPreview;
+  const tf = lang === "ru" ? ru.footer : en.footer;
 
   const totalTime = 47;
   const auditTime = 30;
@@ -66,7 +50,6 @@ export default function FullPreview() {
   const [reportsDone, setReportsDone] = useState(false);
   const [finished, setFinished] = useState(false);
   const [reportStage, setReportStage] = useState<"audit" | "owner" | "dev" | "final">("audit");
-
   const [checks, setChecks] = useState<number[]>([]);
 
   useEffect(() => {
@@ -88,11 +71,11 @@ export default function FullPreview() {
     const startFactorInterval = () => {
       const factorInterval = setInterval(() => {
         setCurrent((p) => {
-          const next = p < factors.length - 1 ? p + 1 : p;
+          const next = p < t.factors.length - 1 ? p + 1 : p;
           if (next !== p) setChecks((c) => [...c, next]);
           return next;
         });
-      }, (auditTime / factors.length) * 1000);
+      }, (auditTime / t.factors.length) * 1000);
       cleanup.push(factorInterval);
     };
 
@@ -118,7 +101,6 @@ export default function FullPreview() {
         });
       }, 1000);
       cleanup.push(reportProgressTimer);
-
       setTimeout(() => setReportStage("dev"), 6000);
     }, reportStartDelay);
 
@@ -134,7 +116,7 @@ export default function FullPreview() {
           const resp = await fetch("/api/pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mode: "pro", url })
+            body: JSON.stringify({ mode: "pro", url }),
           });
           const json = await resp.json();
           if (json?.url) router.push(json.url);
@@ -150,12 +132,20 @@ export default function FullPreview() {
     return () => cleanup.forEach(clearInterval);
   }, [router, url]);
 
+  const reportStageLabel =
+    reportStage === "final"
+      ? t.finalReport
+      : reportStage === "audit"
+      ? t.auditLabel
+      : reportStage === "owner"
+      ? t.ownerReport
+      : t.devReport;
+
   return (
     <main
       className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white"
       style={{ transform: "translateY(-10vh)" }}
     >
-
       <TopLights active={fadeHeader && !finished} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
@@ -163,11 +153,11 @@ export default function FullPreview() {
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
-        {url} &nbsp; | &nbsp; Date:{" "}
-        {new Date().toLocaleDateString("en-US", {
+        {url} &nbsp; | &nbsp; {t.dateLabel}:{" "}
+        {new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
           year: "numeric",
           month: "long",
-          day: "numeric"
+          day: "numeric",
         })}
       </p>
 
@@ -177,7 +167,7 @@ export default function FullPreview() {
         }`}
       >
         <span className="flex items-center justify-center">
-          Мы начали детальную проверку
+          {t.started}
           <span className="inline-flex w-[1.7ch] justify-start ml-1">
             {fadeHeader && <Dots colorClass="text-green-400/70" />}
           </span>
@@ -187,7 +177,7 @@ export default function FullPreview() {
       <div className="rounded-md p-0">
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
-            {factors[current]}
+            {t.factors[current]}
           </p>
         </div>
 
@@ -201,7 +191,7 @@ export default function FullPreview() {
           {auditDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Проверка завершена
+                {t.auditDone}
               </p>
             </div>
           )}
@@ -209,13 +199,7 @@ export default function FullPreview() {
 
         <div className="h-[32px] flex items-center justify-center mb-2">
           <p key={reportStage} className="text-sm sm:text-base text-neutral-600 font-medium animate-fadeInUp">
-            {reportStage === "final"
-              ? "Отчёт для владельца • ТЗ для разработчика"
-              : reportStage === "audit"
-              ? "Аудит 15 ключевых факторов"
-              : reportStage === "owner"
-              ? "Формируем отчёт для владельца сайта"
-              : "Создаём ТЗ для разработчика"}
+            {reportStageLabel}
           </p>
         </div>
 
@@ -235,14 +219,7 @@ export default function FullPreview() {
                   } bg-gray-200 transition-all duration-500`}
                 >
                   {active && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      className="w-4 h-4 text-green-500"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" strokeWidth="3">
                       <path d="M5 13l4 4L19 7" />
                     </svg>
                   )}
@@ -261,7 +238,7 @@ export default function FullPreview() {
           {reportsDone && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn">
-                Отчёты созданы
+                {t.reportsDone}
               </p>
             </div>
           )}
@@ -275,154 +252,46 @@ export default function FullPreview() {
                 style={{ width: `${(timeLeft / totalTime) * 100}%` }}
               />
               <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-                {`Детальная проверка завершится через ${timeLeft} сек`}
+                {t.timerText(timeLeft)}
               </div>
             </>
           )}
           {finished && (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-green-500 via-green-600 to-green-700 animate-fadeIn">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center justify-center">
-                Получить результат <Dots colorClass="text-white" />
+                {t.getResult} <Dots colorClass="text-white" />
               </p>
             </div>
           )}
         </div>
       </div>
+
       <style jsx global>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fadeInUp {
-          animation: fadeInUp 0.8s ease forwards;
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-
-        .animate-fadeIn {
-          animation: fadeIn 1.2s ease forwards;
-        }
-
-        @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
-        }
-
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-        }
-
-        .dot2 {
-          animation-delay: 200ms;
-        }
-
-        .dot3 {
-          animation-delay: 400ms;
-        }
-
-        @keyframes softGreenWave {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-
-        .animate-softGreenWave {
-          animation: softGreenWave 5s ease-in-out infinite;
-          background-size: 200% 100%;
-        }
-
-        /* ПОЧТИ ИСЧЕЗНОВЕНИЕ + ЧЁТКАЯ ОЧЕРЁДНОСТЬ */
-        @keyframes minimalWave {
-          0% {
-            opacity: 0;
-          }
-          20% {
-            opacity: 0;
-          }
-          32% {
-            opacity: 0.9;
-          }
-          46% {
-            opacity: 0;
-          }
-          100% {
-            opacity: 0;
-          }
-        }
-
-        .top-light {
-          width: 12px;
-          height: 12px;
-          border-radius: 9999px;
-          border: 1px solid rgba(0,0,0,0.12);
-          opacity: 0;
-          animation: none;
-        }
-
-        .light-active {
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1);
-        }
-
-        .yellow-light {
-          background: #fbbf24;
-        }
-
-        .blue-light {
-          background: #3b82f6;
-        }
-
-        .green-light {
-          background: #10b981;
-        }
-
-        .light-active.yellow-light {
-          animation-delay: 0s;
-        }
-
-        .light-active.blue-light {
-          animation-delay: 0.35s;
-        }
-
-        .light-active.green-light {
-          animation-delay: 0.7s;
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeInUp { animation: fadeInUp 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fadeIn { animation: fadeIn 1.2s ease forwards; }
+        @keyframes aiv-dots { 0% { opacity: 0.2; } 30% { opacity: 1; } 60% { opacity: 0.2; } 100% { opacity: 0.2; } }
+        .dot { opacity: 0.2; animation: aiv-dots 1200ms infinite; }
+        .dot2 { animation-delay: 200ms; }
+        .dot3 { animation-delay: 400ms; }
+        @keyframes softGreenWave { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .animate-softGreenWave { animation: softGreenWave 5s ease-in-out infinite; background-size: 200% 100%; }
+        @keyframes minimalWave { 0% { opacity: 0; } 20% { opacity: 0; } 32% { opacity: 0.9; } 46% { opacity: 0; } 100% { opacity: 0; } }
+        .top-light { width: 12px; height: 12px; border-radius: 9999px; border: 1px solid rgba(0,0,0,0.12); opacity: 0; animation: none; }
+        .light-active { animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1); }
+        .yellow-light { background: #fbbf24; }
+        .blue-light { background: #3b82f6; }
+        .green-light { background: #10b981; }
+        .light-active.yellow-light { animation-delay: 0s; }
+        .light-active.blue-light { animation-delay: 0.35s; }
+        .light-active.green-light { animation-delay: 0.7s; }
       `}</style>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
+        {tf.copyright}
         <br />
-        <span className="opacity-60">Visibility scores are estimated. Not legal advice.</span>
+        <span className="opacity-60">{tf.disclaimer}</span>
       </footer>
     </main>
   );

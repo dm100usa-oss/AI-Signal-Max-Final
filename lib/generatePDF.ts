@@ -3,6 +3,7 @@ import path from "node:path";
 
 type GeneratePDFParams = {
   type: "owner" | "developer";
+  lang?: "en" | "ru";
   data: {
     website: string;
     score: string;
@@ -18,9 +19,13 @@ const API_KEY =
 
 export async function generatePDF({
   type,
+  lang = "ru",
   data,
 }: GeneratePDFParams): Promise<Buffer> {
-  const filename = type === "owner" ? "owner.html" : "developer.html";
+  const isEn = lang === "en";
+  const filename = type === "owner"
+    ? (isEn ? "owner_en.html" : "owner.html")
+    : (isEn ? "developer_en.html" : "developer.html");
   const templatePath = path.join(process.cwd(), "public", "templates", filename);
   const template = await fs.readFile(templatePath, "utf8");
 

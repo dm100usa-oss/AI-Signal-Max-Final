@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation, Lang } from "@/hooks/useTranslation";
 
 function Dots() {
   return (
@@ -47,6 +48,7 @@ const isValidUrl = (u: string): boolean => {
 
 export default function Home() {
   const router = useRouter();
+  const { t, lang, setLang } = useTranslation();
   const [url, setUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
@@ -79,7 +81,7 @@ export default function Home() {
         u = "https://" + u;
       }
       if (!isValidUrl(u)) {
-        setError("Введите корректный URL, включая https://");
+        setError(t.home.errorInvalidUrl);
         return;
       }
       const hostname = new URL(u).hostname.toLowerCase();
@@ -89,7 +91,7 @@ export default function Home() {
         "dummy.com", "invalid", "example.local", "test.local",
       ];
       if (blockedDomains.includes(hostname)) {
-        setError("Не удалось выполнить анализ сайта. Укажите другой сайт");
+        setError(t.home.errorCannotCheck);
         return;
       }
       setError(null);
@@ -100,16 +102,16 @@ export default function Home() {
         const resp = await fetch("/api/precheck", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: u }),
+          body: JSON.stringify({ mode, url: u, lang }),
         });
         const json = await resp.json();
         if (!json?.ok) {
-          setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
+          setError(t.home.errorNotAccessible);
           setLoading(null);
           return;
         }
       } catch {
-        setError("Мы не можем проверить этот сайт. Убедитесь, что он доступен");
+        setError(t.home.errorNotAccessible);
         setLoading(null);
         return;
       }
@@ -118,7 +120,7 @@ export default function Home() {
       const q = new URLSearchParams({ url: u, status: "ok" }).toString();
       router.push(`/preview/${mode}?${q}`);
     },
-    [url, loading, router]
+    [url, loading, router, t]
   );
 
   const clear = () => setUrl("");
@@ -126,21 +128,40 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-700">
+
+      {/* EN / RU switcher */}
+      <div className="fixed top-4 right-4 z-50 flex rounded-md overflow-hidden border border-neutral-200 text-sm font-medium">
+        {(["en", "ru"] as Lang[]).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className={[
+              "px-3 py-1 transition-colors cursor-pointer",
+              lang === l
+                ? "bg-neutral-900 text-white"
+                : "bg-white text-neutral-500 hover:bg-neutral-100",
+            ].join(" ")}
+          >
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-2">
         AI Signal Max
       </h1>
       <p className="text-center text-base text-neutral-700 mb-8 lowercase font-medium tracking-tight">
-        новое конкурентное преимущество
+        {t.home.tagline}
       </p>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed">
-        Проверьте, насколько ваш сайт готов к появлению в рекомендациях AI-ассистентов: ChatGPT · Copilot · Gemini · Claude · Perplexity · Grok и других
+        {t.home.description}
       </p>
 
       <div className="mb-2 relative">
         <input
           type="url"
           inputMode="url"
-          placeholder="https://example.com"
+          placeholder={t.home.placeholder}
           value={url}
           onChange={(e) => setUrl(normalizeUrl(e.target.value))}
           onPaste={(e) => {
@@ -166,20 +187,20 @@ export default function Home() {
 
       <button onClick={() => go("quick")}
         className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 transition-colors cursor-pointer">
-        {loading === "quick" ? <span className="inline-flex items-center">Проверяем<Dots /></span> : "Быстрая проверка $5.99"}
+        {loading === "quick" ? <span className="inline-flex items-center">{t.home.quickChecking}<Dots /></span> : t.home.quickButton}
       </button>
 
       <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
-        Процент готовности сайта, 10 ключевых факторов и краткие рекомендации на экране
+        {t.home.quickDesc}
       </p>
 
       <button onClick={() => go("pro")}
         className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-colors cursor-pointer">
-        {loading === "pro" ? <span className="inline-flex items-center">Проверяем<Dots /></span> : "Детальная проверка $19.99"}
+        {loading === "pro" ? <span className="inline-flex items-center">{t.home.proChecking}<Dots /></span> : t.home.proButton}
       </button>
 
       <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
-        15 факторов, результат на экране и по email, расширенные рекомендации для владельца и готовое ТЗ для разработчика
+        {t.home.proDesc}
       </p>
 
       <div className="flex flex-col items-center mb-10">
@@ -215,10 +236,10 @@ export default function Home() {
       </div>
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
+        {t.footer.copyright}
         <br />
         <span className="opacity-60">
-          Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической консультацией.
+          {t.footer.disclaimer}
         </span>
       </footer>
     </main>

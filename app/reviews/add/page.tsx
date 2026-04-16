@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useLang } from "@/hooks/useTranslation";
+import en from "@/locales/en";
+import ru from "@/locales/ru";
 
 export default function AddReviewPage() {
+  const lang = useLang();
+  const t = lang === "ru" ? ru.addReview : en.addReview;
+
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -26,11 +32,7 @@ export default function AddReviewPage() {
         setName("");
         setText("");
         setShowMessage(true);
-
-        // скрыть сообщение через 3 секунды
-        setTimeout(() => {
-          setShowMessage(false);
-        }, 3000);
+        setTimeout(() => setShowMessage(false), 3000);
       } else {
         setStatus("error");
       }
@@ -43,7 +45,7 @@ export default function AddReviewPage() {
     <div className="flex flex-col items-center justify-center min-h-screen px-4 transition-all duration-500">
       {!showMessage && status !== "success" && (
         <>
-          <h1 className="text-2xl font-semibold mb-6">Оставить отзыв</h1>
+          <h1 className="text-2xl font-semibold mb-6">{t.title}</h1>
 
           <form
             onSubmit={handleSubmit}
@@ -51,14 +53,14 @@ export default function AddReviewPage() {
           >
             <input
               type="text"
-              placeholder="Ваше имя"
+              placeholder={t.namePlaceholder}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="border border-gray-300 rounded-md p-2"
               required
             />
             <textarea
-              placeholder="Ваш отзыв..."
+              placeholder={t.reviewPlaceholder}
               value={text}
               onChange={(e) => setText(e.target.value)}
               className="border border-gray-300 rounded-md p-2 h-32 resize-none"
@@ -69,7 +71,7 @@ export default function AddReviewPage() {
               disabled={status === "loading"}
               className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
             >
-              {status === "loading" ? "Отправка..." : "Отправить"}
+              {status === "loading" ? t.submitting : t.submitButton}
             </button>
           </form>
         </>
@@ -77,13 +79,13 @@ export default function AddReviewPage() {
 
       {showMessage && (
         <div className="bg-green-50 border border-green-400 text-green-700 px-6 py-4 rounded-xl shadow-md text-center transition-opacity duration-700">
-          <p className="text-lg font-medium">Спасибо!</p>
-          <p>Ваш отзыв отправлен на модерацию.</p>
+          <p className="text-lg font-medium">{t.successTitle}</p>
+          <p>{t.successMessage}</p>
         </div>
       )}
 
       {status === "error" && !showMessage && (
-        <p className="text-red-600 mt-4">Ошибка. Попробуйте позже.</p>
+        <p className="text-red-600 mt-4">{t.errorMessage}</p>
       )}
     </div>
   );

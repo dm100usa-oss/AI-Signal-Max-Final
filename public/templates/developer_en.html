@@ -1,0 +1,359 @@
+<!-- === DEVELOPER_EN.HTML === -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Developer Brief — AI Signal Max</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 14mm;
+      @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 10pt;
+        color: rgb(107,114,128);
+      }
+    }
+    @page:first { @bottom-center { content: ""; } }
+
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body { font-family: Helvetica, Arial, sans-serif; color: rgb(15,23,42); line-height: 1.6; font-size: 12pt; }
+
+    p, .factor-desc { text-align: justify; text-align-last: left; }
+    .center { text-align: center; }
+    .logo { display: block; margin: 0 auto; width: 160px; }
+    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; color: rgb(15,23,42); }
+    .subtitle { font-size: 16pt; text-align: center; margin: 6px 0 0; font-weight: 400; color: rgb(55,65,81); }
+    .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
+
+    h2 { font-size: 14pt; margin-top: 0; margin-bottom: 8px; font-weight: 700; color: rgb(15,23,42); page-break-after: avoid; break-after: avoid; }
+    p { margin: 10px 0; color: rgb(15,23,42); }
+    ul { margin: 10px 0 10px 24px; line-height: 1.8; }
+
+    .no-break { page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+    .section-block { margin-top: 32px; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+
+    .highlight-box {
+      background: rgba(37,99,235,0.05); border-left: 4px solid #2563eb;
+      border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0;
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .highlight-box p { margin: 0; }
+    .divider { border: none; border-top: 1px solid rgb(229,231,235); margin: 32px 0; }
+
+    .priority-block {
+      margin: 14px 0; padding: 16px 20px; border-radius: 10px;
+      border: 1px solid rgb(209,213,219); background: rgb(249,250,251);
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .priority-block-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .priority-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; flex-shrink: 0; }
+    .priority-block-head h3 { margin: 0; font-size: 12.5pt; font-weight: 700; }
+    .priority-urgent .priority-dot { color: #dc2626; }
+    .priority-urgent h3 { color: #dc2626; }
+    .priority-improve .priority-dot { color: #ca8a04; }
+    .priority-improve h3 { color: #ca8a04; }
+    .priority-ok .priority-dot { color: #16a34a; }
+    .priority-ok h3 { color: #16a34a; }
+    .priority-urgent { border-color: #dc2626; background: rgba(220,38,38,0.04); }
+    .priority-improve { border-color: #ca8a04; background: rgba(202,138,4,0.04); }
+    .priority-ok { border-color: #16a34a; background: rgba(22,163,74,0.04); }
+    .priority-block p { margin: 0; font-size: 11pt; color: rgb(55,65,81); }
+
+    .factor {
+      margin-top: 14px; padding: 14px 18px; border: 1px solid rgb(209,213,219);
+      border-radius: 10px; background: #fff;
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .factor-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+    .factor-lead { display: flex; align-items: center; gap: 8px; color: rgb(15,23,42); }
+    .factor-lead.good .dot { border-color: #16a34a; }
+    .factor-lead.moderate .dot { border-color: #ca8a04; }
+    .factor-lead.poor .dot { border-color: #dc2626; }
+    .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; }
+    .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
+    .factor-tech { font-size: 11pt; color: rgb(55,65,81); margin: 2px 0 4px 22px; }
+    .status { font-weight: 700; font-size: 11pt; white-space: nowrap; }
+    .status.good { color: #16a34a; }
+    .status.moderate { color: #ca8a04; }
+    .status.poor { color: #dc2626; }
+    .task-label { font-weight: 700; color: rgb(15,23,42); }
+    .impact-label { font-weight: 700; color: #2563eb; }
+
+    .checklist-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 11pt; }
+    .checklist-table th { background: #2563eb; color: #fff; padding: 10px 12px; text-align: left; font-weight: 700; }
+    .checklist-table td { padding: 9px 12px; border-bottom: 1px solid rgb(229,231,235); vertical-align: top; }
+    .checklist-table tr:nth-child(even) td { background: rgb(249,250,251); }
+    .checklist-table .cb { text-align: center; width: 30px; font-size: 14pt; }
+    .checklist-table .num { text-align: center; font-weight: 700; color: #2563eb; width: 30px; }
+    .checklist-table .pri { text-align: center; width: 80px; font-size: 10pt; font-weight: 700; }
+    .pri-urgent { color: #dc2626; }
+    .pri-improve { color: #ca8a04; }
+
+    .footer { margin-top: 40px; text-align: center; font-size: 10pt; color: rgb(107,114,128); }
+    .footer .disclaimer { opacity: 0.7; font-size: 10pt; margin-top: 4px; }
+    a { color: #2563eb; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="center">
+    <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
+    <h1>Developer Brief</h1>
+    <div class="subtitle">Preparing your website for AI assistant recommendations</div>
+    <div class="meta">Website: {{website}} &nbsp;|&nbsp; Date: {{date}} &nbsp;|&nbsp; Readiness Score: {{score}}%</div>
+  </div>
+
+  <p style="margin-top:28px;">This document is provided to the developer based on the results of a technical website audit by AI Signal Max. It contains specific tasks for each parameter that affects your website's appearance in AI assistant answers — ChatGPT, Gemini, Claude, Copilot, and others.</p>
+  <p>This falls under GEO (Generative Engine Optimization) — unlike classic SEO, the goal is not search rankings but appearing in AI platform answers. This requires correct technical structure, content accessibility for AI crawlers, and proper metadata. Each task below is aimed at exactly that.</p>
+
+  <div class="section-block">
+    <h2>About this document</h2>
+    <p>This document was generated automatically based on analysis of publicly available technical parameters of <strong>{{website}}</strong>, performed at the owner's request. The analysis is conducted without accessing internal systems — only publicly available data is checked: HTTP response headers, meta tags, robots.txt and sitemap.xml files, SSL certificate presence, server response time, and other external parameters.</p>
+    <p>This document is intended for the developer or technical specialist responsible for maintaining the website. It is recommended to complete tasks starting with the "Fix Urgently" block, then move to the "Improve" block. After completing the tasks, the website owner can run another check at <a href="https://aisignalmax.com">aisignalmax.com</a>.</p>
+  </div>
+
+  <div class="section-block">
+    <h2>AI Signal Max Methodology (aiv.01)</h2>
+    <div class="highlight-box">
+      <p>The score is based on analysis of 15 technical parameters, each of which affects the website's chances of appearing in AI platform answers. The final score is calculated as a weighted sum of parameters. Color coding: <strong style="color:#16a34a">Good</strong> — parameter is configured correctly, <strong style="color:#ca8a04">Average</strong> — needs improvement, <strong style="color:#dc2626">Poor</strong> — critical issue reducing chances of appearing in answers.</p>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>Basic Technical Requirements</h2>
+    <p>To increase the website's chances of appearing in AI platform answers, the following basic principles must be followed:</p>
+    <ul>
+      <li><strong>Security:</strong> HTTPS on all pages, valid SSL certificate, automatic redirect from HTTP, HSTS enabled.</li>
+      <li><strong>Crawler accessibility:</strong> correct robots.txt with explicit permission for AI bots (GPTBot, ClaudeBot, Google-Extended), up-to-date sitemap.xml.</li>
+      <li><strong>Performance:</strong> server response time under 1.5 seconds, caching, Gzip/Brotli compression, image optimization.</li>
+      <li><strong>Metadata:</strong> unique title and meta description on each page, correct canonical links, no conflicting indexing directives.</li>
+      <li><strong>Structured data:</strong> JSON-LD Schema.org markup for precise identification of business type and content.</li>
+      <li><strong>Mobile responsiveness:</strong> viewport meta tag present, correct display on mobile devices.</li>
+      <li><strong>Content quality:</strong> alt attributes on all images, correct 404 error handling, Open Graph tags for correct link display.</li>
+      <li><strong>Content accessibility without JS:</strong> important content must be available in the page source without JavaScript rendering — AI crawlers often read pages without executing scripts.</li>
+    </ul>
+  </div>
+
+  <div class="section-block">
+    <h2>Task Priorities</h2>
+    <div class="priority-block priority-urgent">
+      <div class="priority-block-head"><span class="priority-dot"></span><h3>Fix Urgently</h3></div>
+      <p>Parameters with <strong>Poor</strong> status critically affect AI recommendations and must be addressed first.</p>
+    </div>
+    <div class="priority-block priority-improve">
+      <div class="priority-block-head"><span class="priority-dot"></span><h3>Improve</h3></div>
+      <p>Parameters with <strong>Average</strong> status are partially working — improving them will increase chances of appearing in AI answers.</p>
+    </div>
+    <div class="priority-block priority-ok">
+      <div class="priority-block-head"><span class="priority-dot"></span><h3>Configured Correctly</h3></div>
+      <p>Parameters with <strong>Good</strong> status — no changes needed.</p>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="no-break"><h2>Detailed Tasks by Parameter</h2></div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_robots_txt_class}}"><span class="dot"></span><div class="factor-name">Is your site open to AI</div></div>
+      <div class="status {{status_robots_txt_class}}">{{status_robots_txt}}</div>
+    </div>
+    <div class="factor-tech">Parameter: robots.txt</div>
+    <p><span class="task-label">Purpose:</span> controls AI bot access to site content. Errors in this file can significantly reduce chances of appearing in AI platform answers.</p>
+    <p><span class="impact-label">AI impact:</span> without explicit permission for GPTBot, ClaudeBot, and Google-Extended, the chances of AI scanning your site and including its content in answers are significantly reduced.</p>
+    {{task_robots_txt}}{{tool_robots_txt}}{{verdict_robots_txt}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_description_class}}"><span class="dot"></span><div class="factor-name">Does AI understand what your site is about</div></div>
+      <div class="status {{status_meta_description_class}}">{{status_meta_description}}</div>
+    </div>
+    <div class="factor-tech">Parameter: meta description</div>
+    <p><span class="task-label">Purpose:</span> a brief page description that helps AI determine its topic and content.</p>
+    <p><span class="impact-label">AI impact:</span> missing or duplicate meta descriptions reduce the accuracy of topical identification, decreasing chances of appearing in relevant AI answers.</p>
+    {{task_meta_description}}{{tool_meta_description}}{{verdict_meta_description}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_title_tag_class}}"><span class="dot"></span><div class="factor-name">Can AI see your page titles</div></div>
+      <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
+    </div>
+    <div class="factor-tech">Parameter: title tag</div>
+    <p><span class="task-label">Purpose:</span> the main page heading — the primary signal for AI about the page's topic.</p>
+    <p><span class="impact-label">AI impact:</span> a missing or uninformative title reduces the site's predictability as a source, decreasing chances of appearing in topical AI answers.</p>
+    {{task_title_tag}}{{tool_title_tag}}{{verdict_title_tag}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_h1_present_class}}"><span class="dot"></span><div class="factor-name">Does the page have a main heading</div></div>
+      <div class="status {{status_h1_present_class}}">{{status_h1_present}}</div>
+    </div>
+    <div class="factor-tech">Parameter: H1</div>
+    <p><span class="task-label">Purpose:</span> the H1 tag sets the main topic of the page and helps AI determine its context.</p>
+    <p><span class="impact-label">AI impact:</span> missing or duplicated H1 reduces the clarity of the page's topical signal, which may decrease chances of appearing in AI answers.</p>
+    {{task_h1_present}}{{tool_h1_present}}{{verdict_h1_present}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_h2_present_class}}"><span class="dot"></span><div class="factor-name">Does AI understand your site's category</div></div>
+      <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
+    </div>
+    <div class="factor-tech">Parameter: H2 subheadings</div>
+    <p><span class="task-label">Purpose:</span> H2 subheadings help AI understand page structure and determine the site's topical category.</p>
+    <p><span class="impact-label">AI impact:</span> without H2 subheadings, AI perceives the page as unstructured text, making it harder to determine the topic and reducing chances of being cited in answers.</p>
+    {{task_h2_present}}{{tool_h2_present}}{{verdict_h2_present}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_sitemap_xml_class}}"><span class="dot"></span><div class="factor-name">Is your site structure clear to AI</div></div>
+      <div class="status {{status_sitemap_xml_class}}">{{status_sitemap_xml}}</div>
+    </div>
+    <div class="factor-tech">Parameter: sitemap.xml</div>
+    <p><span class="task-label">Purpose:</span> the sitemap shows AI platforms all pages and their relationships.</p>
+    <p><span class="impact-label">AI impact:</span> without sitemap.xml, AI crawlers can only discover pages accessible via external links — the rest of the content risks remaining invisible and not appearing in answers.</p>
+    {{task_sitemap_xml}}{{tool_sitemap_xml}}{{verdict_sitemap_xml}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_https_class}}"><span class="dot"></span><div class="factor-name">Does AI consider your site safe</div></div>
+      <div class="status {{status_https_class}}">{{status_https}}</div>
+    </div>
+    <div class="factor-tech">Parameter: HTTPS / SSL</div>
+    <p><span class="task-label">Purpose:</span> secure connection — a basic reliability signal for AI platforms.</p>
+    <p><span class="impact-label">AI impact:</span> a site without HTTPS may be perceived as a less reliable source, reducing its likelihood of appearing in AI assistant answers.</p>
+    {{task_https}}{{tool_https}}{{verdict_https}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_page_speed_class}}"><span class="dot"></span><div class="factor-name">Is your site fast enough for AI</div></div>
+      <div class="status {{status_page_speed_class}}">{{status_page_speed}}</div>
+    </div>
+    <div class="factor-tech">Parameter: server response time</div>
+    <p><span class="task-label">Purpose:</span> a slow site may be skipped by AI crawlers during scanning.</p>
+    <p><span class="impact-label">AI impact:</span> high server response time may cause AI crawlers to reduce scanning depth — some pages risk not being indexed by platforms.</p>
+    {{task_page_speed}}{{tool_page_speed}}{{verdict_page_speed}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_structured_data_class}}"><span class="dot"></span><div class="factor-name">Can AI see your page markup</div></div>
+      <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
+    </div>
+    <div class="factor-tech">Parameter: structured data (JSON-LD)</div>
+    <p><span class="task-label">Purpose:</span> structured data precisely explains to AI what's on the page — a company, service, product, or article.</p>
+    <p><span class="impact-label">AI impact:</span> without JSON-LD markup, it's harder for AI platforms to determine the type of business and its services, reducing chances of topical recommendations.</p>
+    {{task_structured_data}}{{tool_structured_data}}{{verdict_structured_data}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_open_graph_class}}"><span class="dot"></span><div class="factor-name">Does your link include a title, description, and image</div></div>
+      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+    </div>
+    <div class="factor-tech">Parameter: Open Graph</div>
+    <p><span class="task-label">Purpose:</span> OG tags define how a site link looks when shared and analyzed.</p>
+    <p><span class="impact-label">AI impact:</span> missing OG tags reduce link informativeness during analysis, decreasing the site's authority as a source for AI platforms.</p>
+    {{task_open_graph}}{{tool_open_graph}}{{verdict_open_graph}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_robots_class}}"><span class="dot"></span><div class="factor-name">Are your pages allowed to be indexed</div></div>
+      <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
+    </div>
+    <div class="factor-tech">Parameter: meta robots</div>
+    <p><span class="task-label">Purpose:</span> controls indexing at the individual page level.</p>
+    <p><span class="impact-label">AI impact:</span> a noindex directive on public pages directly prevents AI platforms from including their content in answers — even quality content remains invisible.</p>
+    {{task_meta_robots}}{{tool_meta_robots}}{{verdict_meta_robots}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_page_404_class}}"><span class="dot"></span><div class="factor-name">Does AI consider your site high quality</div></div>
+      <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
+    </div>
+    <div class="factor-tech">Parameter: 404 page handling</div>
+    <p><span class="task-label">Purpose:</span> correct handling of non-existent pages — a sign of a quality website.</p>
+    <p><span class="impact-label">AI impact:</span> incorrect handling of non-existent URLs may signal low technical quality, reducing the site's authority as a source for AI.</p>
+    {{task_page_404}}{{tool_page_404}}{{verdict_page_404}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_canonical_class}}"><span class="dot"></span><div class="factor-name">Is your main page properly set</div></div>
+      <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
+    </div>
+    <div class="factor-tech">Parameter: canonical</div>
+    <p><span class="task-label">Purpose:</span> tells AI which version of a page is the main one, eliminates confusion with duplicates.</p>
+    <p><span class="impact-label">AI impact:</span> without canonical tags, AI platforms may index duplicate page versions, reducing the relevance of main content in answers.</p>
+    {{task_canonical}}{{tool_canonical}}{{verdict_canonical}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_mobile_friendly_class}}"><span class="dot"></span><div class="factor-name">Is your site mobile-friendly</div></div>
+      <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
+    </div>
+    <div class="factor-tech">Parameter: mobile viewport</div>
+    <p><span class="task-label">Purpose:</span> mobile responsiveness — a quality signal for the site.</p>
+    <p><span class="impact-label">AI impact:</span> lack of mobile responsiveness may signal an outdated technical base, reducing the site's priority as a source in AI answers.</p>
+    {{task_mobile_friendly}}{{tool_mobile_friendly}}{{verdict_mobile_friendly}}
+  </div>
+
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_alt_attributes_class}}"><span class="dot"></span><div class="factor-name">Can AI understand images on your site</div></div>
+      <div class="status {{status_alt_attributes_class}}">{{status_alt_attributes}}</div>
+    </div>
+    <div class="factor-tech">Parameter: image alt attributes</div>
+    <p><span class="task-label">Purpose:</span> without alt attributes, AI cannot interpret images and loses part of the page's meaning.</p>
+    <p><span class="impact-label">AI impact:</span> images without alt attributes are invisible content for AI. This may lead to incomplete interpretation of the page's topic and reduce chances of appearing in answers.</p>
+    {{task_alt_attributes}}{{tool_alt_attributes}}{{verdict_alt_attributes}}
+  </div>
+
+  <hr class="divider" />
+
+  <div class="section-block">
+    <h2>Final Checklist</h2>
+    <p>This table contains only parameters requiring fixes. Complete tasks in order — urgent ones first, then improvements.</p>
+    <table class="checklist-table">
+      <thead>
+        <tr>
+          <th class="num" style="width:5%">#</th>
+          <th style="width:30%">Parameter</th>
+          <th class="pri" style="width:12%">Priority</th>
+          <th style="width:46%">Task</th>
+          <th class="cb" style="width:7%">✓</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{checklist_rows}}
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="section-block">
+    <h2>Legal Notice</h2>
+    <p>This document is purely advisory in nature and reflects best practices applied by AI Signal Max. All recommendations are provided in good faith, based on analysis of publicly available technical data accessible without authorization.</p>
+    <p>The developer must use their own knowledge, experience, and judgment to choose optimal solutions. The company bears no responsibility for implementation results or possible consequences caused by third-party actions. All implementation actions must comply with applicable law.</p>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 AI Signal Max. All rights reserved.</p>
+    <p class="disclaimer">Readiness scores are estimated and based on publicly available data. Not legal or technical advice.</p>
+  </div>
+
+</body>
+</html>
+<!-- === DEVELOPER_EN.HTML === -->

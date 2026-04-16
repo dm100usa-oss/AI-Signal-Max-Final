@@ -2,6 +2,9 @@
 
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useLang } from "@/hooks/useTranslation";
+import en from "@/locales/en";
+import ru from "@/locales/ru";
 
 type Mode = "quick" | "pro";
 
@@ -12,30 +15,10 @@ function Dots() {
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
       <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-        }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
-        @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
-        }
+        .dot { opacity: 0.2; animation: aiv-dots 1200ms infinite; }
+        .dot2 { animation-delay: 200ms; }
+        .dot3 { animation-delay: 400ms; }
+        @keyframes aiv-dots { 0% { opacity: 0.2; } 30% { opacity: 1; } 60% { opacity: 0.2; } 100% { opacity: 0.2; } }
       `}</style>
     </span>
   );
@@ -53,6 +36,9 @@ export default function PreviewPage({
   const status = (searchParams?.status || "ok").toLowerCase();
   const paid = (searchParams?.paid || "") === "1";
   const router = useRouter();
+  const lang = useLang();
+  const t = lang === "ru" ? ru.preview : en.preview;
+  const tf = lang === "ru" ? ru.footer : en.footer;
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,7 +48,7 @@ export default function PreviewPage({
       ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
       : true;
 
-  const date = new Date().toLocaleDateString("en-US", {
+  const date = new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -102,127 +88,35 @@ export default function PreviewPage({
     }
   }, [status, router]);
 
-  const quickItems = useMemo(
-    () => [
-      {
-        name: "Robots.txt",
-        text: "Controls whether AI platforms can see your site. If misconfigured and blocking access, your website may disappear from AI answers.",
-      },
-      {
-        name: "Sitemap.xml",
-        text: "Tells AI which pages exist and should be indexed. If missing or set up incorrectly, important parts of your site remain invisible.",
-      },
-      {
-        name: "X-Robots-Tag",
-        text: "A server-side setting that tells AI whether your pages can appear in results. If disallowed, those pages will not show up in AI answers.",
-      },
-      {
-        name: "Meta Robots",
-        text: "A tag inside the page that controls whether AI can display it. If misconfigured with a block, the page disappears from AI results.",
-      },
-      {
-        name: "Canonical",
-        text: "Tells AI which page is the main version. Without it, duplicate pages compete, and AI may show the wrong one.",
-      },
-    ],
-    []
-  );
-
-  const proItems = useMemo(
-    () => [
-      {
-        name: "Robots.txt",
-        text: "Controls whether AI platforms can see your site. If misconfigured and blocking access, your website may disappear from AI answers.",
-      },
-      {
-        name: "Sitemap.xml",
-        text: "Tells AI which pages exist and should be indexed. If missing or set up incorrectly, important parts of your site remain invisible.",
-      },
-      {
-        name: "X-Robots-Tag",
-        text: "A server-side setting that tells AI whether your pages can appear in results. If disallowed, those pages will not show up in AI answers.",
-      },
-      {
-        name: "Meta Robots",
-        text: "A tag inside the page that controls whether AI can display it. If misconfigured with a block, the page disappears from AI results.",
-      },
-      {
-        name: "Canonical",
-        text: "Tells AI which page is the main version. Without it, duplicate pages compete, and AI may show the wrong one.",
-      },
-      {
-        name: "Title Tag",
-        text: "The title is the first thing users see in results. If missing or too generic, AI may show random text.",
-      },
-      {
-        name: "Meta Description",
-        text: "A short description under the title that explains why users should click. If missing or vague, AI inserts random text.",
-      },
-      {
-        name: "Open Graph",
-        text: "Special tags that make your site links look good in AI answers and social media. Without them, users see random text or cropped images.",
-      },
-      {
-        name: "H1 Headings",
-        text: "The main heading of a page tells AI and visitors what it’s about. If missing or duplicated, AI cannot clearly understand the content.",
-      },
-      {
-        name: "Structured Data (Schema Markup)",
-        text: "Special markup (JSON-LD) that explains what’s on your site: product, service, article, or company. Without it, AI doesn’t fully understand your content.",
-      },
-      {
-        name: "Mobile Friendly",
-        text: "If the design breaks on mobile or buttons don’t work, AI considers it inconvenient.",
-      },
-      {
-        name: "HTTPS",
-        text: "A secure protocol that ensures safe connections. Sites without HTTPS are flagged as unsafe.",
-      },
-      {
-        name: "Alt Attributes",
-        text: "Captions for images that help AI interpret visuals. Without alt texts, images remain invisible.",
-      },
-      {
-        name: "Favicon",
-        text: "A small site icon shown in browsers and AI previews. Without it, your site looks unfinished.",
-      },
-      {
-        name: "404 Page",
-        text: "An error page that tells AI a resource doesn’t exist. If misconfigured, AI may treat broken links as valid.",
-      },
-    ],
-    []
-  );
-
   const payButton =
     mode === "quick"
       ? "bg-blue-600 hover:bg-blue-700 text-white"
       : "bg-green-600 hover:bg-green-700 text-white";
+
+  const factors = mode === "quick" ? t.factorsQuick : t.factorsPro;
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-10">
       <div className="mx-auto w-full max-w-2xl">
         <div className="rounded-xl border border-neutral-200 bg-white p-8 shadow-sm">
           <h1 className="mb-2 text-center text-2xl font-semibold">
-            Your result is ready
+            {t.resultReady}
           </h1>
 
           {url && status === "ok" && (
             <div className="mb-6 text-center text-sm text-neutral-600">
-              Website: {url} &nbsp; | &nbsp; Date: {date}
+              {t.websiteLabel}: {url} &nbsp; | &nbsp; {t.dateLabel}: {date}
             </div>
           )}
 
           {status === "ok" && (
             <>
               <div className="mb-6 text-center text-base font-medium text-neutral-800">
-                {mode === "quick"
-                  ? "We checked 5 key factors for your website’s AI visibility:"
-                  : "We checked all 15 key factors for your website’s visibility in AI results:"}
+                {mode === "quick" ? t.quickFactorsIntro : t.proFactorsIntro}
               </div>
 
               <ul className="mb-6 space-y-4">
-                {(mode === "quick" ? quickItems : proItems).map((item, i) => (
+                {factors.map((item, i) => (
                   <li key={i} className="flex items-center">
                     <span
                       className={`mr-3 inline-block size-3 flex-none rounded-full ${
@@ -240,16 +134,13 @@ export default function PreviewPage({
 
               {mode === "pro" && !paid && (
                 <div className="mb-4">
-                  <label
-                    htmlFor="email"
-                    className="mb-1 block text-sm text-neutral-700"
-                  >
-                    Your email to receive the PDF after payment
+                  <label htmlFor="email" className="mb-1 block text-sm text-neutral-700">
+                    {t.emailLabel}
                   </label>
                   <input
                     id="email"
                     type="email"
-                    placeholder="you@example.com"
+                    placeholder={t.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className={[
@@ -262,9 +153,7 @@ export default function PreviewPage({
                     ].join(" ")}
                   />
                   {!emailValid && (
-                    <p className="mt-1 text-xs text-rose-600">
-                      Please enter a valid email.
-                    </p>
+                    <p className="mt-1 text-xs text-rose-600">{t.emailError}</p>
                   )}
                 </div>
               )}
@@ -278,33 +167,26 @@ export default function PreviewPage({
                     payButton,
                   ].join(" ")}
                 >
-                  {mode === "pro" ? "Get Full Report" : "Get Results"}
+                  {mode === "pro" ? t.getFullReportButton : t.getResultsButton}
                   {loading && <Dots />}
                 </button>
               ) : (
                 <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-center text-sm text-emerald-800">
-                  {mode === "pro"
-                    ? "Payment confirmed. Your PDF report will be sent to your email."
-                    : "Payment confirmed. Thank you for checking your website’s AI visibility with us."}
+                  {mode === "pro" ? t.paidPro : t.paidQuick}
                 </div>
               )}
 
               <p className="mt-6 text-center text-xs text-neutral-500">
-                <span className="opacity-60">
-                  Visibility scores are estimated and based on publicly
-                  available data. Not legal advice.
-                </span>
+                <span className="opacity-60">{tf.disclaimer}</span>
               </p>
             </>
           )}
         </div>
 
         <footer className="mt-8 text-center text-xs text-neutral-500">
-          © 2025 AI Signal Max. All rights reserved.
+          {tf.copyright}
           <br />
-          <span className="opacity-60">
-            Visibility scores are estimated and based on publicly available data. Not legal advice.
-          </span>
+          <span className="opacity-60">{tf.disclaimer}</span>
         </footer>
       </div>
     </main>

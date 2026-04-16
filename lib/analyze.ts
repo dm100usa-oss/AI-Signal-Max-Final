@@ -177,7 +177,7 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
   const url = origin + "/robots.txt";
   try {
     const res = await fetchWithTimeout(url, { method: "GET" });
-    if (!res.ok) return item("robots_txt", false, "robots.txt not found", "Закрыт");
+    if (!res.ok) return item("robots_txt", false, "robots.txt not found", "Blocked");
     const text = await res.text();
     const blocksAll =
       /Disallow:\s*\/\s*$/im.test(text) ||
@@ -186,10 +186,10 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
       "robots_txt",
       blocksAll ? false : true,
       blocksAll ? "robots.txt blocks all" : "robots.txt valid",
-      blocksAll ? "Закрыт" : "Открыт"
+      blocksAll ? "Blocked" : "Open"
     );
   } catch {
-    return item("robots_txt", null, "robots.txt not accessible", "Закрыт");
+    return item("robots_txt", null, "robots.txt not accessible", "Blocked");
   }
 }
 
@@ -220,8 +220,8 @@ async function checkSitemap(
         const sitemapCount = (text.match(/<sitemap>/gi) || []).length;
         const count = urlCount > 0 ? urlCount : sitemapCount;
         const lastmodRaw = textMatch(text, /<lastmod>([^<]+)<\/lastmod>/i);
-        const countStr = count > 0 ? `${count}` : "Найден";
-        const lastmodFormatted = lastmodRaw ? formatDate(lastmodRaw) : "Не найдено";
+        const countStr = count > 0 ? `${count}` : "Found";
+        const lastmodFormatted = lastmodRaw ? formatDate(lastmodRaw) : "Not found";
         return {
           pageCount: item("sitemap_xml", true, `Found ${p}`, countStr),
           lastmod: item("sitemap_lastmod", lastmodRaw ? true : null, `lastmod: ${lastmodRaw}`, lastmodFormatted),
@@ -233,8 +233,8 @@ async function checkSitemap(
   // Sitemap не найден — ищем дату в других местах
   const lastmodFormatted = getFallbackDate(html, headers);
   return {
-    pageCount: item("sitemap_xml", false, "Sitemap not found", "Не найден"),
-    lastmod: item("sitemap_lastmod", lastmodFormatted ? true : null, "fallback date", lastmodFormatted || "Не найдено"),
+    pageCount: item("sitemap_xml", false, "Sitemap not found", "Not found"),
+    lastmod: item("sitemap_lastmod", lastmodFormatted ? true : null, "fallback date", lastmodFormatted || "Not found"),
   };
 }
 
@@ -294,7 +294,7 @@ function checkTitle(html: string | null): CheckItem {
   const t = stripTags(
     textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || ""
   );
-  return item("title_tag", t.length ? true : false, t.length ? `Title: ${t}` : "Missing <title>", t || "Не найден");
+  return item("title_tag", t.length ? true : false, t.length ? `Title: ${t}` : "Missing <title>", t || "Not found");
 }
 
 function checkMetaDescription(html: string | null): CheckItem {
@@ -307,7 +307,7 @@ function checkMetaDescription(html: string | null): CheckItem {
     "meta_description",
     d.trim().length ? true : false,
     d ? `Meta description: ${d}` : "Missing meta description",
-    d || "Не найдено"
+    d || "Not found"
   );
 }
 
@@ -323,50 +323,50 @@ function checkOpenGraph(html: string | null): CheckItem {
       /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["'][^>]*>/i
     ) || "";
   if (t && d) return item("open_graph", true, "OG tags found", t);
-  if (!t && !d) return item("open_graph", false, "OG tags missing", "Не найдено");
-  return item("open_graph", null, "OG tags partially found", t || "Частично");
+  if (!t && !d) return item("open_graph", false, "OG tags missing", "Not found");
+  return item("open_graph", null, "OG tags partially found", t || "Partial");
 }
 
 function checkH1(html: string | null): CheckItem {
   const h1 = stripTags(
     textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || ""
   );
-  return item("h1_present", h1.length ? true : false, h1 ? `H1: ${h1}` : "Missing H1", h1 || "Не найден");
+  return item("h1_present", h1.length ? true : false, h1 ? `H1: ${h1}` : "Missing H1", h1 || "Not found");
 }
 
 function checkH2(html: string | null): CheckItem {
   const h2 = decodeEntities(stripTags(
     textMatch(html, /<h2[^>]*>([\s\S]*?)<\/h2>/i) || ""
   ));
-  return item("h2_present", h2.length ? true : null, h2 ? `H2: ${h2}` : "Missing H2", h2 || "Не найден");
+  return item("h2_present", h2.length ? true : null, h2 ? `H2: ${h2}` : "Missing H2", h2 || "Not found");
 }
 
 function checkContacts(html: string | null): CheckItem {
-  if (!html) return item("contacts", null, "No contacts found", "Не найдено");
+  if (!html) return item("contacts", null, "No contacts found", "Not found");
   const phone = textMatch(html, /href=["']tel:([^"']+)["']/i);
   if (phone) return item("contacts", true, `Phone: ${phone}`, phone.trim());
   const email = textMatch(html, /href=["']mailto:([^"']+)["']/i);
   if (email) return item("contacts", true, `Email: ${email}`, email.trim());
-  return item("contacts", null, "No contacts found", "Не найдено");
+  return item("contacts", null, "No contacts found", "Not found");
 }
 
 const LANG_MAP: Record<string, string> = {
-  ru: "Русский", en: "English", de: "Deutsch", fr: "Français",
+  ru: "Russian", en: "English", de: "Deutsch", fr: "Français",
   es: "Español", it: "Italiano", pt: "Português", zh: "中文",
   ja: "日本語", ko: "한국어", ar: "العربية", tr: "Türkçe",
-  pl: "Polski", nl: "Nederlands", uk: "Українська",
+  pl: "Polski", nl: "Nederlands", uk: "Ukrainian",
 };
 
 function checkLanguage(html: string | null): CheckItem {
   const lang = textMatch(html, /<html[^>]+lang=["']([^"']+)["']/i);
-  if (!lang) return item("site_language", null, "No lang attribute", "Не определён");
+  if (!lang) return item("site_language", null, "No lang attribute", "Unknown");
   const code = lang.split("-")[0].toLowerCase();
   const name = LANG_MAP[code] || lang.toUpperCase();
   return item("site_language", true, `Language: ${lang}`, name);
 }
 
 function checkJSONLD(html: string | null): CheckItem {
-  if (!html) return item("structured_data", false, "No JSON-LD structured data", "Не обнаружен");
+  if (!html) return item("structured_data", false, "No JSON-LD structured data", "Not detected");
   const re =
     /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   let ok = false;
@@ -386,7 +386,7 @@ function checkJSONLD(html: string | null): CheckItem {
     "structured_data",
     ok ? true : false,
     ok ? "Valid JSON-LD present" : "No JSON-LD structured data",
-    ok ? (schemaType || "Найден") : "Не обнаружен"
+    ok ? (schemaType || "Found") : "Not detected"
   );
 }
 
@@ -396,9 +396,9 @@ function checkViewport(html: string | null): CheckItem {
       html,
       /<meta[^>]+name=["']viewport["'][^>]+content=["']([^"']+)["'][^>]*>/i
     ) || "";
-  if (!v) return item("mobile_friendly", false, "Missing viewport meta", "Нет");
+  if (!v) return item("mobile_friendly", false, "Missing viewport meta", "No");
   const ok = /width\s*=\s*device-width/i.test(v);
-  return item("mobile_friendly", ok ? true : null, `viewport: ${v}`, ok ? "Да" : "Нет");
+  return item("mobile_friendly", ok ? true : null, `viewport: ${v}`, ok ? "Yes" : "No");
 }
 
 function checkAltAttributes(html: string | null): CheckItem {

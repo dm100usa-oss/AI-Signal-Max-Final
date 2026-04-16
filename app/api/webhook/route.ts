@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const url = session.metadata?.url;
       const mode = session.metadata?.mode || "pro";
+      const lang = (session.metadata?.lang || "en") as "en" | "ru";
 
       const email =
         session.metadata?.email ||
@@ -73,11 +74,13 @@ export async function POST(req: Request) {
       } else {
         const ownerBuffer = await generatePDF({
           type: "owner",
+          lang,
           data: baseData,
         });
 
         const developerBuffer = await generatePDF({
           type: "developer",
+          lang,
           data: baseData,
         });
 
@@ -86,6 +89,7 @@ export async function POST(req: Request) {
             to: email,
             url,
             mode,
+            lang,
             ownerBuffer,
             developerBuffer,
             score,

@@ -2,6 +2,9 @@
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useLang } from "@/hooks/useTranslation";
+import en from "@/locales/en";
+import ru from "@/locales/ru";
 
 export default function ReviewsPageWrapper() {
   return (
@@ -18,20 +21,10 @@ function Dots() {
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
       <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-          position: relative;
-          top: 2px;
-        }
+        .dot { opacity: 0.2; animation: aiv-dots 1200ms infinite; position: relative; top: 2px; }
         .dot2 { animation-delay: 200ms; }
         .dot3 { animation-delay: 400ms; }
-        @keyframes aiv-dots {
-          0% { opacity: 0.2; }
-          30% { opacity: 1; }
-          60% { opacity: 0.2; }
-          100% { opacity: 0.2; }
-        }
+        @keyframes aiv-dots { 0% { opacity: 0.2; } 30% { opacity: 1; } 60% { opacity: 0.2; } 100% { opacity: 0.2; } }
       `}</style>
     </span>
   );
@@ -41,6 +34,9 @@ function ReviewsPage() {
   const router = useRouter();
   const params = useSearchParams();
   const isAddMode = params.get("add") === "true";
+  const lang = useLang();
+  const t = lang === "ru" ? ru.reviews : en.reviews;
+  const tf = lang === "ru" ? ru.footer : en.footer;
 
   const [rating, setRating] = useState<number | null>(null);
   const [reviewsCount, setReviewsCount] = useState<number | null>(null);
@@ -68,7 +64,7 @@ function ReviewsPage() {
         if (stats?.reviews) setReviewsCount(stats.reviews);
         if (data?.ok && Array.isArray(data.reviews)) setReviews(data.reviews);
       } catch (err) {
-        console.error("Ошибка загрузки отзывов:", err);
+        console.error("Error loading reviews:", err);
       }
     }
     fetchData();
@@ -143,15 +139,12 @@ function ReviewsPage() {
 
       <div className="mb-12 text-center">
         <h2 className="text-sm font-medium text-neutral-500 mb-4">
-          что отмечают пользователи
+          {t.whatUsersNote}
         </h2>
         <div className="flex flex-wrap justify-center gap-3 text-sm font-medium">
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">полезно</span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">понятно</span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">удобно</span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">экономит время и деньги</span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">можно переслать разработчику</span>
-          <span className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">подходит для повседневной работы</span>
+          {t.tags.map((tag, i) => (
+            <span key={i} className="px-4 py-1 rounded-full bg-blue-50 text-blue-600">{tag}</span>
+          ))}
         </div>
       </div>
 
@@ -159,14 +152,14 @@ function ReviewsPage() {
         <form onSubmit={handleSubmit} className="mb-12 flex flex-col gap-4 w-full max-w-md mx-auto">
           <input
             type="text"
-            placeholder="Ваше имя"
+            placeholder={t.namePlaceholder}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="border border-gray-300 rounded-md p-2"
             required
           />
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-600">Ваша оценка:</label>
+            <label className="text-sm text-gray-600">{t.ratingLabel}</label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -187,7 +180,7 @@ function ReviewsPage() {
             </div>
           </div>
           <textarea
-            placeholder="Ваш отзыв..."
+            placeholder={t.reviewPlaceholder}
             value={text}
             onChange={(e) => setText(e.target.value)}
             className="border border-gray-300 rounded-md p-2 h-32 resize-none"
@@ -199,9 +192,9 @@ function ReviewsPage() {
             className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
           >
             {status === "loading" ? (
-              <span className="inline-flex items-center">Отправка<Dots /></span>
+              <span className="inline-flex items-center">{t.submitting}<Dots /></span>
             ) : (
-              "Отправить"
+              t.submitButton
             )}
           </button>
         </form>
@@ -209,12 +202,16 @@ function ReviewsPage() {
 
       {showSuccess && (
         <div className="bg-green-50 border border-green-200 rounded-xl text-green-700 text-center py-4 shadow-sm transition-all duration-700 mb-10">
-          Спасибо! Ваш отзыв отправлен на модерацию.
+          {t.successMessage}
         </div>
       )}
 
+      {status === "error" && !showSuccess && (
+        <div className="text-red-600 text-center mb-6">{t.errorMessage}</div>
+      )}
+
       <p className="text-center leading-relaxed text-[16px] mb-14" style={{ color: "#475569" }}>
-        Поделитесь своим мнением, расскажите о себе или своей компании, вашу историю увидят тысячи пользователей по всему миру
+        {t.shareText}
       </p>
 
       <div className="space-y-6">
@@ -229,7 +226,7 @@ function ReviewsPage() {
               {r.date && (
                 <span className="text-neutral-400 text-sm">
                   ·{" "}
-                  {new Date(r.date).toLocaleDateString("ru-RU", {
+                  {new Date(r.date).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
                     day: "numeric",
                     month: "long",
                     year: "numeric",
@@ -247,13 +244,12 @@ function ReviewsPage() {
         className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
         style={{ background: "linear-gradient(90deg,#2563eb 0%,#3b82f6 100%)", opacity: 0.9 }}
       >
-        На главную
+        {t.backHome}
       </button>
 
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
-        <p className="text-neutral-700">© 2025 AI Signal Max. All rights reserved.</p>
-        <p className="opacity-60">Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных.</p>
-        <p className="opacity-60">Не являются юридической консультацией.</p>
+        <p className="text-neutral-700">{tf.copyright}</p>
+        <p className="opacity-60">{tf.disclaimer}</p>
       </footer>
     </main>
   );

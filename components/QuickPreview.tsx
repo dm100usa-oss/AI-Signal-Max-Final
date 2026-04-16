@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useLang } from "@/hooks/useTranslation";
+import en from "@/locales/en";
+import ru from "@/locales/ru";
 
 function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
   return (
@@ -10,29 +13,11 @@ function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
       <span className="dot dot2">.</span>
       <span className="dot dot3">.</span>
       <style jsx>{`
-        .dot {
-          opacity: 0.2;
-          animation: aiv-dots 1200ms infinite;
-        }
-        .dot2 {
-          animation-delay: 200ms;
-        }
-        .dot3 {
-          animation-delay: 400ms;
-        }
+        .dot { opacity: 0.2; animation: aiv-dots 1200ms infinite; }
+        .dot2 { animation-delay: 200ms; }
+        .dot3 { animation-delay: 400ms; }
         @keyframes aiv-dots {
-          0% {
-            opacity: 0.2;
-          }
-          30% {
-            opacity: 1;
-          }
-          60% {
-            opacity: 0.2;
-          }
-          100% {
-            opacity: 0.2;
-          }
+          0% { opacity: 0.2; } 30% { opacity: 1; } 60% { opacity: 0.2; } 100% { opacity: 0.2; }
         }
       `}</style>
     </span>
@@ -51,53 +36,14 @@ function TopLights({ active }: { active: boolean }) {
       <span className={`top-light green-light ${active ? "light-active" : ""}`} />
 
       <style jsx>{`
-        .top-light {
-          width: 12px;
-          height: 12px;
-          border-radius: 9999px;
-          opacity: 0;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          box-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.6);
-        }
-
-        .yellow-light {
-          background: radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 65%);
-        }
-
-        .blue-light {
-          background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 65%);
-        }
-
-        .green-light {
-          background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669 65%);
-        }
-
-        .light-active {
-          animation: minimalWave 3.3s infinite cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .blue-light.light-active {
-          animation-delay: 0.35s;
-        }
-
-        .green-light.light-active {
-          animation-delay: 0.7s;
-        }
-
-        @keyframes minimalWave {
-          0% {
-            opacity: 0;
-          }
-          15% {
-            opacity: 0.85;
-          }
-          30% {
-            opacity: 0;
-          }
-          100% {
-            opacity: 0;
-          }
-        }
+        .top-light { width: 12px; height: 12px; border-radius: 9999px; opacity: 0; border: 1px solid rgba(0,0,0,0.08); box-shadow: inset 0 0 0.5px rgba(255,255,255,0.6); }
+        .yellow-light { background: radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 65%); }
+        .blue-light { background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 65%); }
+        .green-light { background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669 65%); }
+        .light-active { animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1); }
+        .blue-light.light-active { animation-delay: 0.35s; }
+        .green-light.light-active { animation-delay: 0.7s; }
+        @keyframes minimalWave { 0% { opacity: 0; } 15% { opacity: 0.85; } 30% { opacity: 0; } 100% { opacity: 0; } }
       `}</style>
     </div>
   );
@@ -107,25 +53,15 @@ export default function QuickPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
+  const lang = useLang();
+  const t = lang === "ru" ? ru.quickPreview : en.quickPreview;
+  const tf = lang === "ru" ? ru.footer : en.footer;
 
-  const today = new Date().toLocaleDateString("ru-RU", {
+  const today = new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
-
-  const factors = [
-    "Открыт ли сайт для ИИ",
-    "Понимает ли ИИ, о чём ваш сайт",
-    "Видит ли ИИ заголовки страниц",
-    "Понимает ли ИИ категорию вашего сайта",
-    "Понятна ли ИИ структура сайта",
-    "Считает ли ИИ ваш сайт безопасным",
-    "Достаточна ли скорость сайта для ИИ",
-    "Видит ли ИИ разметку страниц",
-    "Содержит ли ссылка заголовок, описание и изображение",
-    "Будет ли ИИ рекомендовать ваш сайт",
-  ];
 
   const totalTime = 20;
   const [current, setCurrent] = useState(0);
@@ -144,8 +80,8 @@ export default function QuickPreview() {
     }, 1000);
 
     const factorTimer = setInterval(() => {
-      setCurrent((p) => (p < factors.length - 1 ? p + 1 : p));
-    }, (totalTime / factors.length) * 1000);
+      setCurrent((p) => (p < t.factors.length - 1 ? p + 1 : p));
+    }, (totalTime / t.factors.length) * 1000);
 
     setTimeout(() => setFadeHeader(true), 1500);
     setTimeout(() => setShowDots(true), 1900);
@@ -186,8 +122,8 @@ export default function QuickPreview() {
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
-  {url} &nbsp; | &nbsp; Дата: {today}
-</p>
+        {url} &nbsp; | &nbsp; {t.dateLabel}: {today}
+      </p>
 
       <div className="my-6 flex items-center justify-center">
         <div
@@ -197,7 +133,7 @@ export default function QuickPreview() {
               : "opacity-100 text-neutral-800 translate-y-0"
           }`}
         >
-          Мы начали проверку
+          {t.started}
           <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
             {showDots && (
               <>
@@ -212,22 +148,11 @@ export default function QuickPreview() {
       <div className="rounded-md p-0">
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
-            {factors[current]}
+            {t.factors[current]}
           </p>
           <style jsx>{`
-            @keyframes fadeInUp {
-              from {
-                opacity: 0;
-                transform: translateY(10px);
-              }
-              to {
-                opacity: 1;
-                transform: translateY(0);
-              }
-            }
-            .animate-fadeInUp {
-              animation: fadeInUp 0.8s ease forwards;
-            }
+            @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .animate-fadeInUp { animation: fadeInUp 0.8s ease forwards; }
           `}</style>
         </div>
 
@@ -239,28 +164,19 @@ export default function QuickPreview() {
           {showResultText && (
             <div className="absolute inset-0 flex items-center justify-center">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center">
-                Получить результат
+                {t.getResult}
                 <Dots colorClass="text-white ml-1" />
               </p>
               <style jsx>{`
-                @keyframes fadeIn {
-                  from {
-                    opacity: 0;
-                  }
-                  to {
-                    opacity: 1;
-                  }
-                }
-                .animate-fadeIn {
-                  animation: fadeIn 1s ease forwards;
-                }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                .animate-fadeIn { animation: fadeIn 1s ease forwards; }
               `}</style>
             </div>
           )}
         </div>
 
         <p className="text-center text-sm text-neutral-600 mb-4">
-          Анализ 10 ключевых факторов
+          {t.analyzing}
         </p>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
@@ -283,14 +199,14 @@ export default function QuickPreview() {
 
           {!finished && (
             <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
-              {timeLeft > 0 ? `Проверка завершится через ${timeLeft} сек` : ""}
+              {timeLeft > 0 ? t.timerText(timeLeft) : ""}
             </div>
           )}
 
           {finished && showFinal && (
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
-                Проверка завершена
+                {t.checkComplete}
               </p>
             </div>
           )}
@@ -298,11 +214,9 @@ export default function QuickPreview() {
       </div>
 
       <footer className="mt-20 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
+        {tf.copyright}
         <br />
-        <span className="opacity-60">
-          Visibility scores are estimated and based on publicly available data. Not legal advice.
-        </span>
+        <span className="opacity-60">{tf.disclaimer}</span>
       </footer>
     </main>
   );

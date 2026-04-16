@@ -12,16 +12,16 @@ export default function QuickPreview_v2() {
   const [showFinal, setShowFinal] = useState(false);
 
   const steps = [
-    "Открыт ли сайт для ИИ",
-    "Понимает ли ИИ, о чём ваш сайт",
-    "Может ли ИИ читать содержание страниц",
-    "Видит ли ИИ заголовки и описания",
-    "Понимает ли ИИ структуру сайта",
-    "Видит ли ИИ изображения на сайте",
-    "Считает ли ИИ ваш сайт безопасным и заслуживающим доверия",
-    "Учитывает ли ИИ ваш сайт при поиске",
-    "Видит ли ИИ ваш сайт среди конкурентов",
-    "Как оценивает ИИ ваш сайт",
+    "Is your site open to AI",
+    "Does AI understand what your site is about",
+    "Can AI read your page content",
+    "Can AI see your titles and descriptions",
+    "Does AI understand your site structure",
+    "Can AI see images on your site",
+    "Does AI consider your site safe and trustworthy",
+    "Does AI include your site in search results",
+    "Can AI find your site among competitors",
+    "How does AI rate your site",
   ];
 
   const durations = [1000, 1400, 1000, 800, 1000, 800, 1400, 1300, 1600, 1500];

@@ -1,0 +1,472 @@
+<!-- === OWNER_EN.HTML === -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Visibility Report — AI Signal Max</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 14mm;
+      @bottom-center {
+        content: "Page " counter(page) " of " counter(pages);
+        font-size: 10pt;
+        color: rgb(107,114,128);
+      }
+    }
+    @page:first { @bottom-center { content: ""; } }
+
+    html, body { margin: 0; padding: 0; background: #fff; }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      color: rgb(15,23,42);
+      line-height: 1.6;
+      font-size: 12pt;
+    }
+
+    p, .factor-desc, .summary-box p { text-align: justify; text-align-last: left; }
+    .center { text-align: center; }
+    .logo { display: block; margin: 0 auto; width: 160px; }
+    h1 { font-size: 22pt; text-align: center; margin: 10px 0 0; font-weight: 700; color: rgb(15,23,42); }
+    .meta { text-align: center; font-size: 11pt; color: rgb(55,65,81); margin-top: 8px; }
+
+    h2 { font-size: 14pt; margin-top: 0; margin-bottom: 8px; font-weight: 700; color: rgb(15,23,42); page-break-after: avoid; break-after: avoid; }
+    h3 { font-size: 12.5pt; margin-top: 24px; margin-bottom: 6px; font-weight: 700; color: #2563eb; page-break-after: avoid; break-after: avoid; }
+    p { margin: 10px 0; color: rgb(15,23,42); }
+    .donut-wrap { display: flex; justify-content: center; margin: 20px 0 18px; }
+
+    .no-break { page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+    .section-block { margin-top: 32px; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+
+    .summary-box {
+      margin: 20px auto; padding: 18px 22px; border-radius: 10px; width: 90%;
+      border: 1px solid rgb(209,213,219); background: rgb(249,250,251); color: rgb(55,65,81);
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .summary-box h3 { font-size: 15pt; font-weight: 700; margin-bottom: 10px; text-align: center; color: rgb(15,23,42); }
+    .summary-box p { text-align: left; margin: 8px 0; }
+    .summary-box.good { border-color: #16a34a; background: rgba(22,163,74,0.05); }
+    .summary-box.moderate { border-color: #ca8a04; background: rgba(202,138,4,0.05); }
+    .summary-box.poor { border-color: #dc2626; background: rgba(220,38,38,0.05); }
+
+    .ai-section { margin-top: 32px; }
+    .ai-section h2 { border-bottom: 2px solid #2563eb; padding-bottom: 6px; }
+    .ai-section p { margin: 14px 0; }
+    .ai-section h3 { margin-top: 28px; }
+
+    .ai-requirements {
+      width: 100%; border-collapse: collapse; margin: 16px 0 20px;
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .ai-requirements td { padding: 12px 16px; border: 1px solid rgb(209,213,219); vertical-align: top; font-size: 11.5pt; }
+    .ai-requirements td.num { width: 36px; text-align: center; font-weight: 700; color: #fff; background: #2563eb; border-color: #2563eb; }
+    .ai-requirements td.text { background: rgb(249,250,251); }
+
+    .highlight-box {
+      background: rgba(37,99,235,0.05); border-left: 4px solid #2563eb;
+      border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 18px 0;
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .highlight-box p { margin: 0; }
+
+    .example-table {
+      width: 100%; border-collapse: collapse; margin: 14px 0 18px; font-size: 11pt;
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .example-table td { padding: 10px 12px; border: 1px solid rgb(209,213,219); vertical-align: middle; }
+    .example-table td.icon { width: 32px; text-align: center; font-weight: 700; font-size: 13pt; }
+    .example-table tr.bad td { background: rgba(220,38,38,0.06); color: rgb(153,27,27); }
+    .example-table tr.bad td.icon { color: #dc2626; }
+    .example-table tr.good td { background: rgba(22,163,74,0.06); color: rgb(6,78,59); }
+    .example-table tr.good td.icon { color: #16a34a; }
+
+    .divider { border: none; border-top: 1px solid rgb(229,231,235); margin: 32px 0; }
+
+    .factor {
+      margin-top: 14px; padding: 14px 18px; border: 1px solid rgb(209,213,219);
+      border-radius: 10px; background: #fff;
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .factor-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+    .factor-lead { display: flex; align-items: center; gap: 8px; color: rgb(15,23,42); }
+    .factor-lead.good .dot { border-color: #16a34a; }
+    .factor-lead.moderate .dot { border-color: #ca8a04; }
+    .factor-lead.poor .dot { border-color: #dc2626; }
+    .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; background: #fff; display: inline-block; box-sizing: border-box; }
+    .factor-name { font-weight: 700; font-size: 12.5pt; color: rgb(15,23,42); }
+    .factor-tech { font-size: 10pt; color: rgb(107,114,128); margin: 2px 0 6px 22px; }
+    .status { font-weight: 700; font-size: 11pt; white-space: nowrap; }
+    .status.good { color: #16a34a; }
+    .status.moderate { color: #ca8a04; }
+    .status.poor { color: #dc2626; }
+
+    .verdict-block {
+      margin-top: 24px; padding: 18px 22px; border-radius: 10px;
+      border: 1px solid rgb(209,213,219); background: rgb(249,250,251);
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .verdict-block p { margin: 0; font-size: 12pt; color: rgb(15,23,42); }
+
+    .conclusion-box {
+      margin-top: 32px; padding: 22px 26px; border-radius: 12px;
+      background: rgb(249,250,251); border: 1px solid rgb(209,213,219);
+      page-break-inside: avoid; break-inside: avoid; overflow: hidden;
+    }
+    .conclusion-box h2 { margin-top: 0; color: rgb(15,23,42); }
+    .conclusion-box p { margin: 12px 0; }
+
+    .deliverables { margin: 18px 0; display: flex; gap: 12px; }
+    .deliverable-item {
+      flex: 1; padding: 14px 16px; border-radius: 8px; background: #fff;
+      border: 1px solid rgb(209,213,219); font-size: 11pt;
+    }
+    .di-num {
+      width: 24px; height: 24px; border-radius: 50%; background: #2563eb; color: #fff;
+      font-weight: 700; font-size: 11pt; display: flex; align-items: center;
+      justify-content: center; margin-bottom: 8px;
+    }
+    .di-title { font-weight: 700; color: #2563eb; margin-bottom: 4px; }
+    .di-desc { color: rgb(75,85,99); font-size: 10.5pt; }
+
+    .footer { margin-top: 40px; text-align: center; font-size: 10pt; color: rgb(107,114,128); }
+    .footer .disclaimer { opacity: 0.7; font-size: 10pt; margin-top: 4px; }
+    a { color: #2563eb; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="center">
+    <img src="data:image/png;base64,{{base64_logo}}" alt="AI Signal Max" class="logo" />
+    <h1>AI Visibility Report</h1>
+    <div class="meta">Website: {{website}} &nbsp;|&nbsp; Date: {{date}}</div>
+  </div>
+
+  <!-- DONUT -->
+  <div class="donut-wrap">
+    <svg width="260" height="260" viewBox="0 0 260 260">
+      <circle cx="130" cy="130" r="90" stroke="#e5e7eb" stroke-width="14" fill="none" />
+      <circle cx="130" cy="130" r="90" stroke="{{donut_color}}" stroke-width="14"
+              fill="none" stroke-linecap="round" stroke-dasharray="565.49"
+              stroke-dashoffset="{{donut_offset}}" transform="rotate(-90 130 130)" />
+      <text x="130" y="130" text-anchor="middle" dominant-baseline="central"
+            font-size="48" font-weight="700" fill="#111827">{{score}}%</text>
+    </svg>
+  </div>
+
+  <!-- STATUS CARD -->
+  <div class="summary-box {{visibility_class}}">
+    <h3>{{visibility_title}}</h3>
+    <p>{{visibility_text}}</p>
+  </div>
+
+  <!-- INTRODUCTION -->
+  <div class="section-block">
+    <h2>Introduction</h2>
+    <p>This report was prepared for the website owner. It shows the current state of your site in terms of readiness to appear in AI assistant recommendations and explains what factors affect this. Below you will find a detailed breakdown of your site's key parameters and an explanation of how websites typically get recommended by AI, based on our experience and practice.</p>
+  </div>
+
+  <!-- HOW WEBSITES GET INTO AI RECOMMENDATIONS -->
+  <div class="ai-section">
+    <div class="no-break">
+      <h2>How websites get into AI recommendations</h2>
+      <p>Today's users prefer to get ready-made answers rather than a list of links. AI assistants have adapted to this: they generate direct answers by selecting the most relevant sources. To appear in these answers more often, a website must meet three requirements:</p>
+      <table class="ai-requirements">
+        <tr>
+          <td class="num">1</td>
+          <td class="text">Be technically accessible to AI</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td class="text">Have clear, direct content — provide precise answers in a specific category</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td class="text">Be trusted by AI as a reliable and safe source of information</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="no-break">
+      <h3>1. Technical accessibility</h3>
+      <p>AI platforms scan websites automatically. For your site to be accessible for analysis, it must be open to bots, indexed in Google and Bing, load quickly (under 2–3 seconds), work correctly on mobile devices, have clean URLs, and not contain duplicate pages.</p>
+    </div>
+
+    <div class="no-break">
+      <h3>2. Clear content and ready-made answers</h3>
+      <p>This is an important distinction: when responding to a query, AI doesn't look for a website — it looks for an answer. It first selects pages with the right answer, then evaluates the site itself and includes the link. Each page should directly answer a specific user question, not just describe a service or company.</p>
+      <p>For example, for a pipe repair company:</p>
+      <table class="example-table">
+        <tr class="bad">
+          <td class="icon">✗</td>
+          <td>Our company understands even the subtleties of pipe repair, not just common situations</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">✓</td>
+          <td>Our company repairs water pipes</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">✓</td>
+          <td>How much does pipe repair cost in the city</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">✓</td>
+          <td>How to quickly fix a pipe leak</td>
+        </tr>
+        <tr class="good">
+          <td class="icon">✓</td>
+          <td>When to replace pipes in your home</td>
+        </tr>
+      </table>
+      <p>AI usually doesn't rewrite complex text — it takes already clear, concise pieces and uses them in answers. Page text must contain simple wording, short paragraphs, and clear sections. It's also important that the site covers one topic and is perceived by AI as a topical authority in its category.</p>
+      <div class="highlight-box">
+        <p><strong>Key principle:</strong> content should be written so it can be taken and inserted directly as a ready answer to a user.</p>
+      </div>
+    </div>
+
+    <div class="no-break">
+      <h3>3. Trust as a reliable source</h3>
+      <p>AI selects websites that look trustworthy and back it up with facts. Your site must include: information about the company and contact details, clear authorship or expertise, real reviews and examples of work, specific results and numbers.</p>
+      <p>Consistent information across all pages is also important — if data contradicts itself, AI reduces trust in the site. Additional trust signals include off-site mentions: a Google profile, company directories, links in articles. AI looks not only at your site but also at whether you exist on the internet at all.</p>
+      <div class="highlight-box">
+        <p><strong>Key principle:</strong> AI selects not just information, but a reliable source. It must be clear, verifiable, and confirmed.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="no-break">
+    <p>Now let's look at how your site performs on each of these parameters right now.</p>
+    <h2>Checked Parameters</h2>
+  </div>
+
+  <!-- 1 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_robots_txt_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Is your site open to AI</div>
+      </div>
+      <div class="status {{status_robots_txt_class}}">{{status_robots_txt}}</div>
+    </div>
+    <div class="factor-tech">Primary check: robots.txt</div>
+    <p class="factor-desc">This file tells AI platforms which pages they can read. If access is blocked, your site is completely invisible to AI.</p>
+  </div>
+
+  <!-- 2 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_description_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Does AI understand what your site is about</div>
+      </div>
+      <div class="status {{status_meta_description_class}}">{{status_meta_description}}</div>
+    </div>
+    <div class="factor-tech">Primary check: meta description</div>
+    <p class="factor-desc">This short text is what AI reads to understand the site's topic. Without it, AI guesses the topic on its own — and often gets it wrong.</p>
+  </div>
+
+  <!-- 3 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_title_tag_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Can AI see your page titles</div>
+      </div>
+      <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
+    </div>
+    <div class="factor-tech">Primary check: title tag</div>
+    <p class="factor-desc">This is the main page heading AI uses to understand what the page is about. Without it, the page loses meaning for AI.</p>
+  </div>
+
+  <!-- 4 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_h2_present_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Does AI understand your site's category</div>
+      </div>
+      <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
+    </div>
+    <div class="factor-tech">Primary check: H2 subheadings</div>
+    <p class="factor-desc">Subheadings show AI the structure and sections of your site — they help determine which category your business belongs to.</p>
+  </div>
+
+  <!-- 5 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_sitemap_xml_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Is your site structure clear to AI</div>
+      </div>
+      <div class="status {{status_sitemap_xml_class}}">{{status_sitemap_xml}}</div>
+    </div>
+    <div class="factor-tech">Primary check: sitemap.xml</div>
+    <p class="factor-desc">Without a sitemap, AI may not find some pages and won't know how they relate to each other.</p>
+  </div>
+
+  <!-- 6 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_https_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Does AI consider your site safe</div>
+      </div>
+      <div class="status {{status_https_class}}">{{status_https}}</div>
+    </div>
+    <div class="factor-tech">Primary check: HTTPS</div>
+    <p class="factor-desc">Sites without HTTPS automatically receive low trust from AI platforms.</p>
+  </div>
+
+  <!-- 7 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_page_speed_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Is your site fast enough for AI</div>
+      </div>
+      <div class="status {{status_page_speed_class}}">{{status_page_speed}}</div>
+    </div>
+    <div class="factor-tech">Primary check: server response time</div>
+    <p class="factor-desc">A slow site may simply be skipped by AI crawlers during scanning.</p>
+  </div>
+
+  <!-- 8 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_structured_data_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Can AI see your page markup</div>
+      </div>
+      <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
+    </div>
+    <div class="factor-tech">Primary check: structured data (JSON-LD)</div>
+    <p class="factor-desc">This is special markup that precisely explains to AI what's on the page — a company, service, product, or article.</p>
+  </div>
+
+  <!-- 9 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_open_graph_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Does your link include a title, description, and image</div>
+      </div>
+      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+    </div>
+    <div class="factor-tech">Primary check: Open Graph</div>
+    <p class="factor-desc">These tags define how your site's link looks when shared or analyzed by AI platforms.</p>
+  </div>
+
+  <!-- 10 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_meta_robots_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Are your pages allowed to be indexed</div>
+      </div>
+      <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
+    </div>
+    <div class="factor-tech">Primary check: meta robots</div>
+    <p class="factor-desc">If this tag blocks indexing, the page is hidden from AI even if everything else is configured correctly.</p>
+  </div>
+
+  <!-- 11 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_page_404_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Does AI consider your site high quality</div>
+      </div>
+      <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
+    </div>
+    <div class="factor-tech">Primary check: 404 page handling</div>
+    <p class="factor-desc">A site that responds correctly to bad requests is perceived by AI as high quality and reliable.</p>
+  </div>
+
+  <!-- 12 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_canonical_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Is your main page properly set</div>
+      </div>
+      <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
+    </div>
+    <div class="factor-tech">Primary check: canonical</div>
+    <p class="factor-desc">Tells AI which version of a page is the main one — without this, AI may get confused by duplicates and reduce trust in your site.</p>
+  </div>
+
+  <!-- 13 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_mobile_friendly_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Is your site mobile-friendly</div>
+      </div>
+      <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
+    </div>
+    <div class="factor-tech">Primary check: mobile viewport</div>
+    <p class="factor-desc">AI platforms consider mobile adaptability as a quality signal for a website.</p>
+  </div>
+
+  <!-- 14 -->
+  <div class="factor">
+    <div class="factor-head">
+      <div class="factor-lead {{status_alt_attributes_class}}">
+        <span class="dot"></span>
+        <div class="factor-name">Can AI understand images on your site</div>
+      </div>
+      <div class="status {{status_alt_attributes_class}}">{{status_alt_attributes}}</div>
+    </div>
+    <div class="factor-tech">Primary check: image alt attributes</div>
+    <p class="factor-desc">Without alt attributes, AI doesn't understand what's in the images and loses part of the page's meaning.</p>
+  </div>
+
+  <!-- OVERALL READINESS CARD -->
+  {{score_factor_card}}
+
+  <!-- MAIN CONCLUSION -->
+  <div class="verdict-block">
+    <p>{{verdict_conclusion}}</p>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion-box">
+    <h2>What's next</h2>
+    <p>You now have a complete picture of how your website looks from AI platforms' perspective. This is already the first step — most website owners don't even know what prevents them from appearing in AI answers.</p>
+    <p>Along with this report, you have everything you need to fix it:</p>
+
+    <div class="deliverables">
+      <div class="deliverable-item">
+        <div class="di-num">1</div>
+        <div class="di-title">This report</div>
+        <div class="di-desc">A clear explanation of each parameter and its impact on AI visibility</div>
+      </div>
+      <div class="deliverable-item">
+        <div class="di-num">2</div>
+        <div class="di-title">Developer brief</div>
+        <div class="di-desc">A ready list of specific tasks — hand it directly to your developer</div>
+      </div>
+      <div class="deliverable-item">
+        <div class="di-num">3</div>
+        <div class="di-title">On-screen results</div>
+        <div class="di-desc">A visual summary of parameters — easy to share with your team or contractor</div>
+      </div>
+    </div>
+
+    <p>Pass the developer brief to your developer and ask them to complete the tasks in priority order. After implementation, run another check at <a href="https://aisignalmax.com">aisignalmax.com</a> to confirm the improvement.</p>
+    <p>In addition to technical parameters, we also recommend reviewing your site's content against the recommendations in this report. This is the second important factor for appearing in AI answers.</p>
+    <p>If for any reason you don't have a developer or have lost contact with one, simply reply to this email — we'll help you find a solution.</p>
+
+    <p>Thank you for using AI Signal Max. Our recommendations are based on analysis of real AI platform behavior and reflect best practices in content and technical site optimization.</p>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 AI Signal Max. All rights reserved.</p>
+    <p class="disclaimer">Readiness scores are estimated and based on publicly available data. Not legal or technical advice.</p>
+  </div>
+
+</body>
+</html>
+<!-- === OWNER_EN.HTML === -->

@@ -5,6 +5,7 @@ type SendReportEmailParams = {
   to: string;
   url: string;
   mode: string;
+  lang?: "en" | "ru";
   ownerBuffer: Buffer;
   developerBuffer: Buffer;
   score?: number;
@@ -15,11 +16,35 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendReportEmail(params: SendReportEmailParams) {
   const from = "AI Signal Max <reports@aivcheck.com>";
+  const { to, url, mode, lang = "en", ownerBuffer, developerBuffer, score, results } = params;
 
-  const { to, url, mode, ownerBuffer, developerBuffer, score, results } = params;
+  const isEn = lang === "en";
 
-  const subject = `Ваш отчёт AI Signal Max готов`;
-  const html = `
+  const subject = isEn
+    ? "Your AI Signal Max report is ready"
+    : "Ваш отчёт AI Signal Max готов";
+
+  const html = isEn ? `
+    <div style="font-family:Helvetica,Arial,sans-serif;color:#0F172A;line-height:1.7;max-width:600px">
+      <p style="margin:0 0 12px">Hello,</p>
+      <p style="margin:0 0 12px">Thank you for using our service.</p>
+      <p style="margin:0 0 16px">We have completed the analysis of <strong>${escapeHtml(url)}</strong> and prepared two documents — they are attached to this email.</p>
+      <p style="margin:0 0 6px"><strong>Owner Report</strong> — explains your site's current AI readiness level and the factors that influence its appearance in AI assistant answers.</p>
+      <p style="margin:0 0 16px"><strong>Developer Brief</strong> — a structured list of technical tasks ready to hand off immediately.</p>
+      <p style="margin:0 0 8px"><strong>What to do next:</strong></p>
+      <ol style="margin:0 0 16px;padding-left:20px">
+        <li style="margin-bottom:6px">Review the owner report</li>
+        <li style="margin-bottom:6px">Pass the developer brief to your developer</li>
+        <li style="margin-bottom:6px">After implementing the changes, run another check at <a href="https://aisignalmax.com" style="color:#2563EB">aisignalmax.com</a> to measure your improvement</li>
+      </ol>
+      <p style="margin:0 0 24px">If you don't have a developer or need help finding one — just reply to this email and we'll help you find a solution.</p>
+      <p style="margin:0 0 4px">Best regards,</p>
+      <p style="margin:0 0 24px"><strong>AI Signal Max</strong></p>
+      <p style="font-size:11px;color:#9CA3AF;margin-top:16px;border-top:1px solid #E5E7EB;padding-top:12px">
+        Visibility scores are estimated and based on publicly available data. Not legal or technical advice.
+      </p>
+    </div>
+  ` : `
     <div style="font-family:Helvetica,Arial,sans-serif;color:#0F172A;line-height:1.7;max-width:600px">
       <p style="margin:0 0 12px">Здравствуйте,</p>
       <p style="margin:0 0 12px">Спасибо, что воспользовались нашим сервисом.</p>
@@ -47,8 +72,8 @@ export async function sendReportEmail(params: SendReportEmailParams) {
     subject,
     html,
     attachments: [
-      { filename: "AI_Signal_Max_Owner.pdf", content: ownerBuffer },
-      { filename: "AI_Signal_Max_Developer.pdf", content: developerBuffer },
+      { filename: isEn ? "AI_Signal_Max_Owner_Report.pdf" : "AI_Signal_Max_Otchet_Vladeltsa.pdf", content: ownerBuffer },
+      { filename: isEn ? "AI_Signal_Max_Developer_Brief.pdf" : "AI_Signal_Max_TZ_Razrabotchika.pdf", content: developerBuffer },
     ],
   });
 
