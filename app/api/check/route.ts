@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const raw = (body?.url as string | undefined)?.trim();
     const mode = (body?.mode as "quick" | "pro" | undefined) ?? "quick";
+    const peek = body?.peek === true;
 
     if (!raw) return NextResponse.json({ error: "URL is required" }, { status: 400 });
     if (!/^https?:\/\/[\w.-]+\.[a-z]{2,}/i.test(raw))
@@ -42,6 +43,25 @@ export async function POST(req: NextRequest) {
       const ip = getClientIp(req);
       const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
       const limitKey = `freeq:${ip}:${day}`;
+
+      // peek — только проверяем счётчик, не увеличивая его (до анимации)
+      if (peek) {
+        let used = 0;
+        try {
+          used = Number((await redis.get(limitKey)) ?? 0);
+        } catch (e) {
+          console.error("rate-limit peek error:", e);
+          used = 0;
+        }
+        if (used >= FREE_QUICK_LIMIT) {
+          return NextResponse.json(
+            { error: "limit_reached", limit: FREE_QUICK_LIMIT },
+            { status: 429 }
+          );
+        }
+        return NextResponse.json({ ok: true });
+      }
+
       let count = 0;
       try {
         count = await redis.incr(limitKey);

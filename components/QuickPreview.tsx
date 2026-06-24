@@ -73,8 +73,36 @@ export default function QuickPreview() {
   const [showFinal, setShowFinal] = useState(false);
   const [showResultText, setShowResultText] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
+  const [checkingLimit, setCheckingLimit] = useState(true);
+
+  // Проверка лимита ДО анимации (peek — не списывает)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const resp = await fetch("/api/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "quick", url, peek: true }),
+        });
+        if (cancelled) return;
+        if (resp.status === 429) {
+          setLimitReached(true);
+        }
+      } catch {
+        // при ошибке проверки не блокируем — пойдёт обычным путём
+      } finally {
+        if (!cancelled) setCheckingLimit(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
 
   useEffect(() => {
+    if (checkingLimit || limitReached) return;
+
     const progressTimer = setInterval(() => {
       setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
@@ -119,7 +147,17 @@ export default function QuickPreview() {
       clearInterval(progressTimer);
       clearInterval(factorTimer);
     };
-  }, [router, url]);
+  }, [router, url, checkingLimit, limitReached]);
+
+  if (checkingLimit) {
+    return (
+      <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+        <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
+          AI Signal Max
+        </h1>
+      </main>
+    );
+  }
 
   if (limitReached) {
     return (
