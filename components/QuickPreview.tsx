@@ -72,6 +72,7 @@ export default function QuickPreview() {
   const [showDots, setShowDots] = useState(false);
   const [showFinal, setShowFinal] = useState(false);
   const [showResultText, setShowResultText] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
 
   useEffect(() => {
     const progressTimer = setInterval(() => {
@@ -93,16 +94,23 @@ export default function QuickPreview() {
 
       setTimeout(async () => {
         try {
-          const resp = await fetch("/api/pay", {
+          const resp = await fetch("/api/check", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ mode: "quick", url }),
           });
+          if (resp.status === 429) {
+            setLimitReached(true);
+            return;
+          }
           const json = await resp.json();
-          if (json?.url) router.push(json.url);
-          else router.push("/pay");
+          if (json && !json.error) {
+            router.push(`/success/quick?url=${encodeURIComponent(url)}&status=ok`);
+          } else {
+            router.push("/scan-failed");
+          }
         } catch {
-          router.push("/pay");
+          router.push("/scan-failed");
         }
       }, 4000);
     }, totalTime * 1000);
@@ -112,6 +120,36 @@ export default function QuickPreview() {
       clearInterval(factorTimer);
     };
   }, [router, url]);
+
+  if (limitReached) {
+    return (
+      <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+        <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
+          AI Signal Max
+        </h1>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
+          <p className="text-xl font-semibold text-neutral-900 mb-3">
+            {t.limitTitle}
+          </p>
+          <p className="text-base text-neutral-600 mb-6">
+            {t.limitText}
+          </p>
+          <button
+            onClick={() => router.push("/")}
+            className="w-full max-w-xs px-6 py-3 rounded-2xl text-white font-medium text-base"
+            style={{ background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)" }}
+          >
+            {t.backHome}
+          </button>
+        </div>
+        <footer className="mt-20 text-center text-xs text-neutral-500">
+          {tf.copyright}
+          <br />
+          <span className="opacity-60">{tf.disclaimer}</span>
+        </footer>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">

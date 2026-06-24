@@ -43,6 +43,9 @@ const en = {
     timerText: (sec: number) => `Check completes in ${sec} sec`,
     checkComplete: "Check complete",
     getResult: "Get your result",
+    limitTitle: "Daily limit reached",
+    limitText: "You've used your 3 free quick checks for today. Please try again tomorrow.",
+    backHome: "Back to home",
   },
 
   proPreview: {
