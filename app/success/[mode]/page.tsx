@@ -51,7 +51,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const data = await res.json();
 
         if (!data || !data.score) throw new Error("No valid data");
-        setScore(data.score);
+        // общий скор = новый aiScores.overall (старый data.score как запасной)
+        const overallScore = data.aiScores?.overall ?? data.score;
+        setScore(overallScore);
         if (data.aiScores) setAiScores(data.aiScores);
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
@@ -64,7 +66,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const allFactors = langT.factors;
 
         const scoreStatus: "Good" | "Moderate" | "Poor" =
-          data.score >= 75 ? "Good" : data.score >= 40 ? "Moderate" : "Poor";
+          overallScore >= 75 ? "Good" : overallScore >= 40 ? "Moderate" : "Poor";
 
         const mappedFactors = allFactors.map((f) => ({
           ...f,
@@ -81,9 +83,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         setFactors(mode === "quick" ? quickFactors : mappedFactors);
 
         const s = t.summaries;
-        if (data.score >= 75) {
+        if (overallScore >= 75) {
           setSummary(mode === "pro" ? s.highPro : s.highQuick);
-        } else if (data.score >= 40) {
+        } else if (overallScore >= 40) {
           setSummary(mode === "pro" ? s.mediumPro : s.mediumQuick);
         } else {
           setSummary(mode === "pro" ? s.lowPro : s.lowQuick);

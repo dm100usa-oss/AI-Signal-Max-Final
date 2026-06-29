@@ -57,7 +57,9 @@ export async function POST(req: Request) {
         return new Response("No data found", { status: 404 });
       }
 
-      const { score, results } = data;
+      const { results } = data;
+      // общий скор для PDF = новый aiScores.overall (старый score как запасной)
+      const score = data.aiScores?.overall ?? data.score;
       console.log(`Webhook started for ${url} | Score: ${score}`);
 
       const baseData = {
