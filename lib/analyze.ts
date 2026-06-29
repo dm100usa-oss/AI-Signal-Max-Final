@@ -535,7 +535,7 @@ function checkReviews(html: string | null): CheckItem {
   if (!html) return item("reviews" as CheckKey, null, "No HTML", "Not detected");
   const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
   const ok = /"(aggregateRating|review|Review)"/i.test(ld) || /(rating|review|отзыв|звёзд|stars|★)/i.test(html);
-  return item("reviews" as CheckKey, ok ? true : null, ok ? "Reviews/rating found" : "No reviews", ok ? "Yes" : "No");
+  return item("reviews" as CheckKey, ok ? true : false, ok ? "Reviews/rating found" : "No reviews", ok ? "Yes" : "No");
 }
 
 function checkOrgSchema(html: string | null): CheckItem {
@@ -549,13 +549,13 @@ function checkAuthor(html: string | null): CheckItem {
   if (!html) return item("author" as CheckKey, null, "No HTML", "Not detected");
   const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
   const ok = /"author"/i.test(ld) || /rel=["']author["']/i.test(html) || /(автор|author)[\s:]/i.test(html);
-  return item("author" as CheckKey, ok ? true : null, ok ? "Author found" : "No author", ok ? "Yes" : "No");
+  return item("author" as CheckKey, ok ? true : false, ok ? "Author found" : "No author", ok ? "Yes" : "No");
 }
 
 function checkSocial(html: string | null): CheckItem {
   if (!html) return item("social" as CheckKey, null, "No HTML", "Not detected");
   const ok = /(facebook\.com|instagram\.com|twitter\.com|x\.com|linkedin\.com|youtube\.com|t\.me|vk\.com)/i.test(html);
-  return item("social" as CheckKey, ok ? true : null, ok ? "Social links found" : "No social links", ok ? "Yes" : "No");
+  return item("social" as CheckKey, ok ? true : false, ok ? "Social links found" : "No social links", ok ? "Yes" : "No");
 }
 
 // Виден ли контент в сыром HTML без JavaScript.
