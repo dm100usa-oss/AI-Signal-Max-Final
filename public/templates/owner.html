@@ -369,7 +369,7 @@
     <div class="factor-head">
       <div class="factor-lead {{status_title_tag_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Видит ли ИИ заголовки страниц</div>
+        <div class="factor-name">Видит ли ИИ название сайта</div>
       </div>
       <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
     </div>
@@ -382,12 +382,12 @@
     <div class="factor-head">
       <div class="factor-lead {{status_h2_present_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Понимает ли ИИ категорию вашего сайта</div>
+        <div class="factor-name">Может ли ИИ ориентироваться на странице</div>
       </div>
       <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: подзаголовки H2</div>
-    <p class="factor-desc">Подзаголовки показывают ИИ структуру и разделы сайта - помогают понять в какой категории работает бизнес.</p>
+    <p class="factor-desc">Подзаголовки делят текст на разделы и помогают ИИ ориентироваться на странице - находить нужные части и брать их в ответ.</p>
   </div>
 
   <!-- 5 -->
@@ -434,7 +434,7 @@
     <div class="factor-head">
       <div class="factor-lead {{status_structured_data_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Видит ли ИИ разметку страниц</div>
+        <div class="factor-name">Видит ли ИИ разметку данных сайта</div>
       </div>
       <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
     </div>
@@ -445,14 +445,14 @@
   <!-- 9 -->
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_open_graph_class}}">
+      <div class="factor-lead {{status_theme_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Содержит ли ссылка заголовок, описание и изображение</div>
+        <div class="factor-name">Понимает ли ИИ категорию вашего сайта</div>
       </div>
-      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+      <div class="status {{status_theme_class}}">{{status_theme}}</div>
     </div>
-    <div class="factor-tech">Основной фактор проверки: Open Graph</div>
-    <p class="factor-desc">Эти теги определяют как выглядит ссылка на ваш сайт когда её публикуют или анализируют ИИ-платформы.</p>
+    <div class="factor-tech">Основной фактор проверки: категория сайта</div>
+    <p class="factor-desc">ИИ определяет категорию сайта по заголовку, описанию и разметке. Когда категория ясна - ИИ точнее понимает, в каких вопросах рекомендовать сайт.</p>
   </div>
 
   <!-- 10 -->
@@ -460,12 +460,12 @@
     <div class="factor-head">
       <div class="factor-lead {{status_meta_robots_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Не запрещена ли индексация страниц</div>
+        <div class="factor-name">Может ли ИИ читать страницы сайта</div>
       </div>
       <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
     </div>
-    <div class="factor-tech">Основной фактор проверки: meta robots</div>
-    <p class="factor-desc">Если этот тег запрещает индексацию - страница скрыта от ИИ даже если всё остальное настроено правильно.</p>
+    <div class="factor-tech">Основной фактор проверки: meta robots и x-robots-tag</div>
+    <p class="factor-desc">Проверяется, нет ли запретов на чтение страниц - в коде страницы и в ответе сервера. Если стоит запрет, страница скрыта от ИИ, даже если всё остальное настроено правильно.</p>
   </div>
 
   <!-- 11 -->
@@ -473,12 +473,12 @@
     <div class="factor-head">
       <div class="factor-lead {{status_page_404_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Считает ли ИИ ваш сайт качественным</div>
+        <div class="factor-name">Корректна ли работа сайта для ИИ</div>
       </div>
       <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: обработка страницы 404</div>
-    <p class="factor-desc">Сайт который корректно отвечает на плохие запросы воспринимается ИИ как качественный и надёжный.</p>
+    <p class="factor-desc">Сайт, который корректно отвечает на несуществующие адреса, воспринимается ИИ как технически исправный и надёжный.</p>
   </div>
 
   <!-- 12 -->
@@ -486,12 +486,12 @@
     <div class="factor-head">
       <div class="factor-lead {{status_canonical_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Указана ли основная страница сайта</div>
+        <div class="factor-name">Понимает ли ИИ приоритет страниц</div>
       </div>
       <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
     </div>
     <div class="factor-tech">Основной фактор проверки: canonical</div>
-    <p class="factor-desc">Говорит ИИ какая версия страницы главная - без этого ИИ может путаться в дублях и снижать доверие к сайту.</p>
+    <p class="factor-desc">Говорит ИИ, какие страницы приоритетные - без этого ИИ может путаться в похожих страницах и снижать доверие к сайту.</p>
   </div>
 
   <!-- 13 -->
@@ -499,7 +499,7 @@
     <div class="factor-head">
       <div class="factor-lead {{status_mobile_friendly_class}}">
         <span class="dot"></span>
-        <div class="factor-name">Удобен ли ваш сайт на мобильных устройствах</div>
+        <div class="factor-name">Удобен ли сайт на мобильных устройствах</div>
       </div>
       <div class="status {{status_mobile_friendly_class}}">{{status_mobile_friendly}}</div>
     </div>

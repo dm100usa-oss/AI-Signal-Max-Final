@@ -227,7 +227,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_title_tag_class}}"><span class="dot"></span><div class="factor-name">Видит ли ИИ заголовки страниц</div></div>
+      <div class="factor-lead {{status_title_tag_class}}"><span class="dot"></span><div class="factor-name">Видит ли ИИ название сайта</div></div>
       <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
     </div>
     <div class="factor-tech">Параметр: title tag</div>
@@ -253,7 +253,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_h2_present_class}}"><span class="dot"></span><div class="factor-name">Понимает ли ИИ категорию сайта</div></div>
+      <div class="factor-lead {{status_h2_present_class}}"><span class="dot"></span><div class="factor-name">Может ли ИИ ориентироваться на странице</div></div>
       <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
     </div>
     <div class="factor-tech">Параметр: подзаголовки H2</div>
@@ -305,7 +305,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_structured_data_class}}"><span class="dot"></span><div class="factor-name">Видит ли ИИ разметку страниц</div></div>
+      <div class="factor-lead {{status_structured_data_class}}"><span class="dot"></span><div class="factor-name">Видит ли ИИ разметку данных сайта</div></div>
       <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
     </div>
     <div class="factor-tech">Параметр: structured data (JSON-LD)</div>
@@ -318,20 +318,20 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_open_graph_class}}"><span class="dot"></span><div class="factor-name">Содержит ли ссылка заголовок, описание и изображение</div></div>
-      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+      <div class="factor-lead {{status_theme_class}}"><span class="dot"></span><div class="factor-name">Понимает ли ИИ категорию вашего сайта</div></div>
+      <div class="status {{status_theme_class}}">{{status_theme}}</div>
     </div>
-    <div class="factor-tech">Параметр: Open Graph</div>
-    <p><span class="task-label">Назначение:</span> OG-теги определяют как выглядит ссылка на сайт при распространении и анализе.</p>
-    <p><span class="impact-label">Влияние на ИИ:</span> отсутствие OG-тегов снижает информативность ссылки при анализе, что уменьшает авторитетность сайта как источника для ИИ-платформ.</p>
-    {{task_open_graph}}
-    {{tool_open_graph}}
-    {{verdict_open_graph}}
+    <div class="factor-tech">Параметр: категория сайта</div>
+    <p><span class="task-label">Назначение:</span> категория сайта определяется ИИ по заголовку, описанию и разметке.</p>
+    <p><span class="impact-label">Влияние на ИИ:</span> когда категория сайта ясна, ИИ точнее понимает, в каких вопросах рекомендовать сайт. Размытая тема снижает шансы попасть в релевантные ответы.</p>
+    {{task_theme}}
+    {{tool_theme}}
+    {{verdict_theme}}
   </div>
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_meta_robots_class}}"><span class="dot"></span><div class="factor-name">Не запрещена ли индексация страниц</div></div>
+      <div class="factor-lead {{status_meta_robots_class}}"><span class="dot"></span><div class="factor-name">Может ли ИИ читать страницы сайта</div></div>
       <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
     </div>
     <div class="factor-tech">Параметр: meta robots</div>
@@ -344,7 +344,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_page_404_class}}"><span class="dot"></span><div class="factor-name">Считает ли ИИ сайт качественным</div></div>
+      <div class="factor-lead {{status_page_404_class}}"><span class="dot"></span><div class="factor-name">Корректна ли работа сайта для ИИ</div></div>
       <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
     </div>
     <div class="factor-tech">Параметр: обработка страницы 404</div>
@@ -357,7 +357,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_canonical_class}}"><span class="dot"></span><div class="factor-name">Указана ли основная страница сайта</div></div>
+      <div class="factor-lead {{status_canonical_class}}"><span class="dot"></span><div class="factor-name">Понимает ли ИИ приоритет страниц</div></div>
       <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
     </div>
     <div class="factor-tech">Параметр: canonical</div>

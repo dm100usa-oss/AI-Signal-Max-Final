@@ -179,7 +179,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_title_tag_class}}"><span class="dot"></span><div class="factor-name">Can AI see your page titles</div></div>
+      <div class="factor-lead {{status_title_tag_class}}"><span class="dot"></span><div class="factor-name">Can AI see your site name</div></div>
       <div class="status {{status_title_tag_class}}">{{status_title_tag}}</div>
     </div>
     <div class="factor-tech">Parameter: title tag</div>
@@ -201,7 +201,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_h2_present_class}}"><span class="dot"></span><div class="factor-name">Does AI understand your site's category</div></div>
+      <div class="factor-lead {{status_h2_present_class}}"><span class="dot"></span><div class="factor-name">Can AI navigate the page</div></div>
       <div class="status {{status_h2_present_class}}">{{status_h2_present}}</div>
     </div>
     <div class="factor-tech">Parameter: H2 subheadings</div>
@@ -245,7 +245,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_structured_data_class}}"><span class="dot"></span><div class="factor-name">Can AI see your page markup</div></div>
+      <div class="factor-lead {{status_structured_data_class}}"><span class="dot"></span><div class="factor-name">Can AI see your site's data markup</div></div>
       <div class="status {{status_structured_data_class}}">{{status_structured_data}}</div>
     </div>
     <div class="factor-tech">Parameter: structured data (JSON-LD)</div>
@@ -256,18 +256,18 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_open_graph_class}}"><span class="dot"></span><div class="factor-name">Does your link include a title, description, and image</div></div>
-      <div class="status {{status_open_graph_class}}">{{status_open_graph}}</div>
+      <div class="factor-lead {{status_theme_class}}"><span class="dot"></span><div class="factor-name">Does AI understand your site's category</div></div>
+      <div class="status {{status_theme_class}}">{{status_theme}}</div>
     </div>
-    <div class="factor-tech">Parameter: Open Graph</div>
-    <p><span class="task-label">Purpose:</span> OG tags define how a site link looks when shared and analyzed.</p>
-    <p><span class="impact-label">AI impact:</span> missing OG tags reduce link informativeness during analysis, decreasing the site's authority as a source for AI platforms.</p>
-    {{task_open_graph}}{{tool_open_graph}}{{verdict_open_graph}}
+    <div class="factor-tech">Parameter: site category</div>
+    <p><span class="task-label">Purpose:</span> the site category is determined by AI from the title, description and markup.</p>
+    <p><span class="impact-label">AI impact:</span> when the site category is clear, AI better understands which questions to recommend the site for. A vague topic reduces the chance of appearing in relevant answers.</p>
+    {{task_theme}}{{tool_theme}}{{verdict_theme}}
   </div>
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_meta_robots_class}}"><span class="dot"></span><div class="factor-name">Are your pages allowed to be indexed</div></div>
+      <div class="factor-lead {{status_meta_robots_class}}"><span class="dot"></span><div class="factor-name">Can AI read your pages</div></div>
       <div class="status {{status_meta_robots_class}}">{{status_meta_robots}}</div>
     </div>
     <div class="factor-tech">Parameter: meta robots</div>
@@ -278,7 +278,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_page_404_class}}"><span class="dot"></span><div class="factor-name">Does AI consider your site high quality</div></div>
+      <div class="factor-lead {{status_page_404_class}}"><span class="dot"></span><div class="factor-name">Does your site work correctly for AI</div></div>
       <div class="status {{status_page_404_class}}">{{status_page_404}}</div>
     </div>
     <div class="factor-tech">Parameter: 404 page handling</div>
@@ -289,7 +289,7 @@
 
   <div class="factor">
     <div class="factor-head">
-      <div class="factor-lead {{status_canonical_class}}"><span class="dot"></span><div class="factor-name">Is your main page properly set</div></div>
+      <div class="factor-lead {{status_canonical_class}}"><span class="dot"></span><div class="factor-name">Does AI understand page priority</div></div>
       <div class="status {{status_canonical_class}}">{{status_canonical}}</div>
     </div>
     <div class="factor-tech">Parameter: canonical</div>
