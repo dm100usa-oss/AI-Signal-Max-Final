@@ -107,15 +107,21 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     factors[key] = { status };
   }
 
-  // --- AI Scores: собираем факторы, которые ЕСТЬ на сайте ---
+  // --- AI Scores ---
+  // present: фактор есть (passed === true)
+  // notApplicable: фактор не определён/не применим (passed === null) — выпадает из расчёта
+  // passed === false — реальный провал, остаётся в знаменателе и снижает скор
   const present = new Set<FactorKey>();
+  const notApplicable = new Set<FactorKey>();
   for (const [key, it] of Object.entries(all)) {
     if (it.passed === true) present.add(key as FactorKey);
+    else if (it.passed === null) notApplicable.add(key as FactorKey);
   }
   for (const [key, it] of Object.entries(newFacts)) {
     if (it.passed === true) present.add(key as FactorKey);
+    else if (it.passed === null) notApplicable.add(key as FactorKey);
   }
-  const aiScores = computeAiScores(present);
+  const aiScores = computeAiScores(present, notApplicable);
 
   // язык проверяемой страницы (из <html lang="...">) — на нём будет отчёт
   const langRaw = (html || "").match(/<html[^>]+lang=["']([^"']+)["']/i)?.[1] || "";
@@ -218,7 +224,7 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
   const url = origin + "/robots.txt";
   try {
     const res = await fetchWithTimeout(url, { method: "GET" });
-    if (!res.ok) return item("robots_txt", false, "robots.txt not found", "Blocked");
+    if (!res.ok) return item("robots_txt", true, "No robots.txt — crawling allowed", "Open");
     const text = await res.text();
     const blocksAll =
       /Disallow:\s*\/\s*$/im.test(text) ||
@@ -230,7 +236,7 @@ async function checkRobotsTxt(origin: string): Promise<CheckItem> {
       blocksAll ? "Blocked" : "Open"
     );
   } catch {
-    return item("robots_txt", null, "robots.txt not accessible", "Blocked");
+    return item("robots_txt", null, "robots.txt not accessible", "Unknown");
   }
 }
 

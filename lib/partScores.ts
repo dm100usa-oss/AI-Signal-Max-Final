@@ -11,7 +11,7 @@ export type FactorKey =
   | "structured_data" | "alt_attributes" | "contacts" | "site_language"
   // 9 новых факторов (20-28)
   | "theme" | "services" | "prices" | "faq" | "tables"
-  | "reviews" | "org_schema" | "author" | "social";
+  | "reviews" | "org_schema" | "author" | "social" | "no_js";
 
 export type FactorType = "required" | "bonus";
 
@@ -23,12 +23,13 @@ export interface WeightRow {
 
 // --- Часть 1: Техника ---
 export const TECH: WeightRow[] = [
-  { key: "robots_txt",     weight: 20, type: "required" },
-  { key: "meta_robots",    weight: 15, type: "required" },
-  { key: "x_robots_tag",   weight: 12, type: "required" },
-  { key: "https",          weight: 12, type: "required" },
-  { key: "sitemap_xml",    weight: 12, type: "required" },
-  { key: "page_speed",     weight: 10, type: "required" },
+  { key: "robots_txt",     weight: 18, type: "required" },
+  { key: "meta_robots",    weight: 13, type: "required" },
+  { key: "no_js",          weight: 12, type: "required" },
+  { key: "x_robots_tag",   weight: 10, type: "required" },
+  { key: "https",          weight: 10, type: "required" },
+  { key: "sitemap_xml",    weight: 10, type: "required" },
+  { key: "page_speed",     weight: 8,  type: "required" },
   { key: "canonical",      weight: 8,  type: "bonus" },
   { key: "mobile_friendly",weight: 6,  type: "bonus" },
   { key: "page_404",       weight: 5,  type: "bonus" },
@@ -84,16 +85,17 @@ export const OVERALL: WeightRow[] = [
   { key: "h2_present",      weight: 5, type: "required" },
   { key: "h1_present",      weight: 5, type: "required" },
   { key: "contacts",        weight: 3, type: "required" },
+  { key: "no_js",           weight: 3, type: "required" },
   { key: "meta_robots",     weight: 3, type: "required" },
   { key: "author",          weight: 3, type: "bonus" },
   { key: "faq",             weight: 3, type: "bonus" },
   { key: "tables",          weight: 2, type: "bonus" },
   { key: "https",           weight: 2, type: "required" },
   { key: "sitemap_xml",     weight: 2, type: "required" },
-  { key: "alt_attributes",  weight: 2, type: "bonus" },
+  { key: "alt_attributes",  weight: 1, type: "bonus" },
   { key: "social",          weight: 2, type: "bonus" },
-  { key: "site_language",   weight: 2, type: "required" },
-  { key: "services",        weight: 2, type: "bonus" },
+  { key: "site_language",   weight: 1, type: "required" },
+  { key: "services",        weight: 1, type: "bonus" },
   { key: "page_speed",      weight: 1, type: "required" },
   { key: "mobile_friendly", weight: 1, type: "bonus" },
   { key: "canonical",       weight: 1, type: "bonus" },
@@ -115,8 +117,9 @@ export function scorePart(
   let got = 0;
   for (const row of table) {
     if (row.weight === 0) continue;
-    // бонусный неприменимый фактор не входит в знаменатель
-    if (row.type === "bonus" && notApplicable.has(row.key)) continue;
+    // неприменимый/неопределённый фактор (passed === null) не входит в знаменатель —
+    // не штрафуем за отсутствие тега, которое является нормой, или за то, что не смогли определить
+    if (notApplicable.has(row.key)) continue;
     need += row.weight;
     if (present.has(row.key)) got += row.weight;
   }
