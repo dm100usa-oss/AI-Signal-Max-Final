@@ -30,6 +30,7 @@ export interface AnalyzeResult {
   results: Record<string, "Good" | "Moderate" | "Poor">;
   factors: Record<string, { status: "Good" | "Moderate" | "Poor" }>;
   aiScores?: AiScores;
+  pageLang?: string;
 }
 
 const DEFAULT_UA =
@@ -115,6 +116,10 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
   }
   const aiScores = computeAiScores(present);
 
+  // язык проверяемой страницы (из <html lang="...">) — на нём будет отчёт
+  const langRaw = (html || "").match(/<html[^>]+lang=["']([^"']+)["']/i)?.[1] || "";
+  const pageLang = langRaw.split("-")[0].toLowerCase() === "ru" ? "ru" : "en";
+
   const resultData = {
     url,
     mode,
@@ -125,6 +130,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     results,
     factors,
     aiScores,
+    pageLang,
   };
 
   const sessionKey = `${mode}:${url}`;

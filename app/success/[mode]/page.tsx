@@ -24,7 +24,9 @@ interface CheckItem {
 
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
-  const lang = useLang();
+  const interfaceLang = useLang();
+  const [pageLang, setPageLang] = useState<"ru" | "en" | null>(null);
+  const lang = pageLang || interfaceLang;
   const t = lang === "ru" ? ru.success : en.success;
   const tf = lang === "ru" ? ru.footer : en.footer;
 
@@ -54,7 +56,12 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
-        const allFactors = t.factors;
+        // язык отчёта = язык проверенной страницы
+        const resultLang: "ru" | "en" = data.pageLang === "ru" ? "ru" : "en";
+        setPageLang(resultLang);
+        const langT = resultLang === "ru" ? ru.success : en.success;
+
+        const allFactors = langT.factors;
 
         const scoreStatus: "Good" | "Moderate" | "Poor" =
           data.score >= 75 ? "Good" : data.score >= 40 ? "Moderate" : "Poor";

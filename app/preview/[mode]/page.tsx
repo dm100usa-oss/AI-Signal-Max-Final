@@ -65,7 +65,7 @@ export default function PreviewPage({
       const resp = await fetch("/api/pay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, url, email }),
+        body: JSON.stringify({ mode, url, email, lang }),
       });
       json = await resp.json();
     } catch (e) {

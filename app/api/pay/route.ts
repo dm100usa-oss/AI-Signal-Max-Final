@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     // анализ сайта
     const analysis = await analyze(url, mode);
-    const { score, results, factors, items, allItems, aiScores } = analysis;
+    const { score, results, factors, items, allItems, aiScores, pageLang } = analysis;
 
     // временное сохранение результата (до оплаты)
     const tempKey = `pending:${url}`;
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         url
       )}&status=ok&paid=1`,
       cancel_url: `${base}/`,
-      metadata: { url, mode, lang },
+      metadata: { url, mode, lang: pageLang || lang },
     });
 
     // сохранение данных
@@ -85,9 +85,10 @@ export async function POST(req: NextRequest) {
       items,
       allItems,
       aiScores,
+      pageLang,
     });
 
-    await saveData(url, { url, mode, score, results, factors, items, allItems, aiScores });
+    await saveData(url, { url, mode, score, results, factors, items, allItems, aiScores, pageLang });
 
     return NextResponse.json({ url: session.url });
   } catch (e: any) {
