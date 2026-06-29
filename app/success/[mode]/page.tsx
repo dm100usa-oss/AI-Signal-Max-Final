@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Donut from "../../../components/Donut";
+import PartScores, { AiScores } from "../../../components/PartScores";
 import { useLang } from "@/hooks/useTranslation";
 import en from "@/locales/en";
 import ru from "@/locales/ru";
@@ -29,6 +30,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
   const [loading, setLoading] = useState(true);
   const [score, setScore] = useState(0);
+  const [aiScores, setAiScores] = useState<AiScores | null>(null);
   const [factors, setFactors] = useState<Factor[]>([]);
   const [items, setItems] = useState<CheckItem[]>([]);
   const [allItems, setAllItems] = useState<CheckItem[]>([]);
@@ -48,6 +50,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
         if (!data || !data.score) throw new Error("No valid data");
         setScore(data.score);
+        if (data.aiScores) setAiScores(data.aiScores);
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
@@ -135,6 +138,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           </>
         )}
       </div>
+
+      {aiScores && showSummary && (
+        <PartScores scores={aiScores} t={t.aiScores} />
+      )}
 
       <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-4">
         {t.materialsTitle}

@@ -200,6 +200,21 @@ const en = {
     statusGood: "Good",
     statusModerate: "Average",
     statusPoor: "Poor",
+    aiScores: {
+      explainTitle: "What makes a site appear in AI answers",
+      explainIntro:
+        "For AI to find, understand and recommend your site, four things matter. Below is how your site scores on each of them.",
+      partsTitle: "Score across four areas",
+      home: "Homepage",
+      tech: "Technical",
+      content: "Content",
+      authority: "Authority signals",
+      homeHint: "Does AI understand who you are and how you help",
+      techHint: "Can AI read your site",
+      contentHint: "Is there anything to cite on your site",
+      authorityHint: "Does AI see signals of trust in your site",
+      weakNote: "This area is worth strengthening first.",
+    },
     labels: {
       title_tag: "Title",
       h1_present: "H1",

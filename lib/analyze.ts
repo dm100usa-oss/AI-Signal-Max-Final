@@ -9,6 +9,7 @@ import {
   Mode,
 } from "./score";
 import { saveData } from "./storage";
+import { computeAiScores, FactorKey, AiScores } from "./partScores";
 
 export interface CheckItem {
   key: CheckKey;
@@ -28,6 +29,7 @@ export interface AnalyzeResult {
   interpretation: ReturnType<typeof interpret>;
   results: Record<string, "Good" | "Moderate" | "Poor">;
   factors: Record<string, { status: "Good" | "Moderate" | "Poor" }>;
+  aiScores?: AiScores;
 }
 
 const DEFAULT_UA =
@@ -67,6 +69,19 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     site_language: checkLanguage(html),
   };
 
+  // --- 9 новых факторов (20-28) для AI Scores ---
+  const newFacts = {
+    theme:      checkTheme(html),
+    services:   checkServices(html),
+    prices:     checkPrices(html),
+    faq:        checkFAQ(html),
+    tables:     checkTables(html),
+    reviews:    checkReviews(html),
+    org_schema: checkOrgSchema(html),
+    author:     checkAuthor(html),
+    social:     checkSocial(html),
+  };
+
   const score = calcWeightedScore(all);
   const keysToShow = mode === "quick" ? QUICK_KEYS : PRO_KEYS;
   const items = keysToShow.map((k) => all[k]);
@@ -82,6 +97,16 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     factors[key] = { status };
   }
 
+  // --- AI Scores: собираем факторы, которые ЕСТЬ на сайте ---
+  const present = new Set<FactorKey>();
+  for (const [key, it] of Object.entries(all)) {
+    if (it.passed === true) present.add(key as FactorKey);
+  }
+  for (const [key, it] of Object.entries(newFacts)) {
+    if (it.passed === true) present.add(key as FactorKey);
+  }
+  const aiScores = computeAiScores(present);
+
   const resultData = {
     url,
     mode,
@@ -91,6 +116,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     interpretation: interpret(score),
     results,
     factors,
+    aiScores,
   };
 
   const sessionKey = `${mode}:${url}`;
@@ -442,4 +468,71 @@ async function check404(origin: string): Promise<CheckItem> {
   } catch {
     return item("page_404", null, "404 check inconclusive");
   }
+}
+
+// ===== 9 новых проверок для AI Scores (20-28) =====
+// Все читают только из кода страницы, без браузера.
+// Бонусные факторы проверяются грубо (есть блок / нет) — этого достаточно для скора.
+
+function checkTheme(html: string | null): CheckItem {
+  // Тема видна, если ИИ есть из чего её понять: title + H1 + description (или тип JSON-LD)
+  if (!html) return item("theme" as CheckKey, false, "No HTML to detect theme", "Not detected");
+  const hasTitle = /<title[^>]*>[^<]+<\/title>/i.test(html);
+  const hasH1 = /<h1[^>]*>[\s\S]*?<\/h1>/i.test(html);
+  const hasDesc = /<meta[^>]+name=["']description["'][^>]+content=["'][^"']+["']/i.test(html);
+  const ok = hasTitle && hasH1 && hasDesc;
+  return item("theme" as CheckKey, ok ? true : false, ok ? "Theme is clear" : "Theme unclear", ok ? "Clear" : "Unclear");
+}
+
+function checkServices(html: string | null): CheckItem {
+  if (!html) return item("services" as CheckKey, null, "No HTML", "Not detected");
+  const ok = /(services|услуг|our services|what we do|наши услуги|сервис)/i.test(html);
+  return item("services" as CheckKey, ok ? true : null, ok ? "Services block found" : "No services block", ok ? "Yes" : "No");
+}
+
+function checkPrices(html: string | null): CheckItem {
+  if (!html) return item("prices" as CheckKey, null, "No HTML", "Not detected");
+  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
+  const ok = /"price"/i.test(ld) || /[\$€₽£]\s?\d|\d+\s?(usd|eur|руб|\$)/i.test(html);
+  return item("prices" as CheckKey, ok ? true : null, ok ? "Prices found" : "No prices", ok ? "Yes" : "No");
+}
+
+function checkFAQ(html: string | null): CheckItem {
+  if (!html) return item("faq" as CheckKey, null, "No HTML", "Not detected");
+  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
+  const ok = /"FAQPage"/i.test(ld) || /(faq|часто задаваемые|frequently asked|вопрос[\s-]*ответ)/i.test(html);
+  return item("faq" as CheckKey, ok ? true : null, ok ? "FAQ found" : "No FAQ", ok ? "Yes" : "No");
+}
+
+function checkTables(html: string | null): CheckItem {
+  if (!html) return item("tables" as CheckKey, null, "No HTML", "Not detected");
+  const ok = /<table[\s\S]*?<\/table>/i.test(html);
+  return item("tables" as CheckKey, ok ? true : null, ok ? "Table found" : "No tables", ok ? "Yes" : "No");
+}
+
+function checkReviews(html: string | null): CheckItem {
+  if (!html) return item("reviews" as CheckKey, null, "No HTML", "Not detected");
+  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
+  const ok = /"(aggregateRating|review|Review)"/i.test(ld) || /(rating|review|отзыв|звёзд|stars|★)/i.test(html);
+  return item("reviews" as CheckKey, ok ? true : null, ok ? "Reviews/rating found" : "No reviews", ok ? "Yes" : "No");
+}
+
+function checkOrgSchema(html: string | null): CheckItem {
+  if (!html) return item("org_schema" as CheckKey, false, "No HTML", "Not detected");
+  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
+  const ok = /"@type"\s*:\s*"(Organization|LocalBusiness|Corporation|[A-Za-z]*Business)"/i.test(ld);
+  return item("org_schema" as CheckKey, ok ? true : false, ok ? "Organization schema found" : "No organization schema", ok ? "Yes" : "No");
+}
+
+function checkAuthor(html: string | null): CheckItem {
+  if (!html) return item("author" as CheckKey, null, "No HTML", "Not detected");
+  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
+  const ok = /"author"/i.test(ld) || /rel=["']author["']/i.test(html) || /(автор|author)[\s:]/i.test(html);
+  return item("author" as CheckKey, ok ? true : null, ok ? "Author found" : "No author", ok ? "Yes" : "No");
+}
+
+function checkSocial(html: string | null): CheckItem {
+  if (!html) return item("social" as CheckKey, null, "No HTML", "Not detected");
+  const ok = /(facebook\.com|instagram\.com|twitter\.com|x\.com|linkedin\.com|youtube\.com|t\.me|vk\.com)/i.test(html);
+  return item("social" as CheckKey, ok ? true : null, ok ? "Social links found" : "No social links", ok ? "Yes" : "No");
 }
