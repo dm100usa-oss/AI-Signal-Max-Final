@@ -1,101 +1,100 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
-import { analyze } from "@/lib/analyze";
-import { saveData } from "@/lib/storage";
+import Stripe from "stripe";
+import { analyze } from "../../../lib/analyze";
+import { saveData } from "../../../lib/storage";
 
-export const runtime = "nodejs";
-
-const redis = new Redis({
-  url: process.env.KV_new_KV_REST_API_URL!,
-  token: process.env.KV_new_KV_REST_API_TOKEN!,
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: "2023-10-16",
 });
 
-const FREE_QUICK_LIMIT = 3;
-
-function getClientIp(req: NextRequest): string {
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim();
-  return req.headers.get("x-real-ip") || "unknown";
+function getBaseUrl(req: NextRequest) {
+  const host =
+    req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
+  const proto = req.headers.get("x-forwarded-proto") || "https";
+  return `${proto}://${host}`;
 }
 
-function secondsUntilMidnightUTC(): number {
-  const now = new Date();
-  const next = new Date(now);
-  next.setUTCHours(24, 0, 0, 0);
-  return Math.max(60, Math.ceil((next.getTime() - now.getTime()) / 1000));
+// строгая проверка URL на сервере
+function isValidUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => ({}));
-    const raw = (body?.url as string | undefined)?.trim();
-    const mode = (body?.mode as "quick" | "pro" | undefined) ?? "quick";
-    const peek = body?.peek === true;
+    const { mode, url, lang = "en" } = await req.json();
 
-    if (!raw) return NextResponse.json({ error: "URL is required" }, { status: 400 });
-    if (!/^https?:\/\/[\w.-]+\.[a-z]{2,}/i.test(raw))
-      return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
-    if (mode !== "quick" && mode !== "pro")
+    // проверка режима
+    if (mode !== "quick" && mode !== "pro") {
       return NextResponse.json({ error: "Invalid mode" }, { status: 400 });
-
-    // Дневной лимит бесплатных быстрых проверок по IP
-    if (mode === "quick") {
-      const ip = getClientIp(req);
-      const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
-      const limitKey = `freeq:${ip}:${day}`;
-
-      // peek — только проверяем счётчик, не увеличивая его (до анимации)
-      if (peek) {
-        let used = 0;
-        try {
-          used = Number((await redis.get(limitKey)) ?? 0);
-        } catch (e) {
-          console.error("rate-limit peek error:", e);
-          used = 0;
-        }
-        if (used >= FREE_QUICK_LIMIT) {
-          return NextResponse.json(
-            { error: "limit_reached", limit: FREE_QUICK_LIMIT },
-            { status: 429 }
-          );
-        }
-        return NextResponse.json({ ok: true });
-      }
-
-      let count = 0;
-      try {
-        count = await redis.incr(limitKey);
-        if (count === 1) {
-          await redis.expire(limitKey, secondsUntilMidnightUTC());
-        }
-      } catch (e) {
-        // если счётчик недоступен — не блокируем пользователя
-        console.error("rate-limit error:", e);
-        count = 0;
-      }
-      if (count > FREE_QUICK_LIMIT) {
-        return NextResponse.json(
-          { error: "limit_reached", limit: FREE_QUICK_LIMIT },
-          { status: 429 }
-        );
-      }
     }
 
-    const data = await analyze(raw, mode);
+    // проверка URL
+    if (!url || typeof url !== "string" || !isValidUrl(url)) {
+      return NextResponse.json(
+        { error: "Invalid URL format" },
+        { status: 400 }
+      );
+    }
 
-    // Сохраняем результат туда же, откуда его читает /api/result (ключ = url)
-    const { score, results, factors, items, allItems } = data;
-    await saveData(raw, { url: raw, mode, score, results, factors, items, allItems });
+    // цены Stripe
+    const priceId =
+      mode === "quick"
+        ? "price_1SaTZaFEP1IRb3Hwea5vrLgL"
+        : process.env.STRIPE_PRICE_FULL;
 
-    return NextResponse.json(data);
+    if (!priceId) {
+      return NextResponse.json(
+        { error: "Stripe price ID not configured" },
+        { status: 500 }
+      );
+    }
+
+    const base = getBaseUrl(req);
+
+    // анализ сайта
+    const analysis = await analyze(url, mode);
+    const { score, results, factors, items, allItems, aiScores } = analysis;
+
+    // временное сохранение результата (до оплаты)
+    const tempKey = `pending:${url}`;
+    await saveData(tempKey, { score, results, factors });
+
+    // создание Stripe сессии
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${base}/success/${mode}?url=${encodeURIComponent(
+        url
+      )}&status=ok&paid=1`,
+      cancel_url: `${base}/`,
+      metadata: { url, mode, lang },
+    });
+
+    // сохранение данных
+    await saveData(`session:${session.id}`, {
+      url,
+      mode,
+      score,
+      results,
+      factors,
+      items,
+      allItems,
+      aiScores,
+    });
+
+    await saveData(url, { url, mode, score, results, factors, items, allItems, aiScores });
+
+    return NextResponse.json({ url: session.url });
   } catch (e: any) {
+    console.error("Error in /api/pay:", e);
     return NextResponse.json(
-      { error: "Analysis failed", detail: String(e?.message ?? e ?? "unknown error") },
+      { error: e?.message ?? "Stripe payment error" },
       { status: 500 }
     );
   }
-}
-
-export function GET() {
-  return NextResponse.json({ ok: true });
 }
