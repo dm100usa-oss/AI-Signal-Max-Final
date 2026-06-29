@@ -81,6 +81,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     org_schema: checkOrgSchema(html),
     author:     checkAuthor(html),
     social:     checkSocial(html),
+    no_js:      checkNoJs(html),
   };
 
   const score = calcWeightedScore(all);
@@ -549,4 +550,24 @@ function checkSocial(html: string | null): CheckItem {
   if (!html) return item("social" as CheckKey, null, "No HTML", "Not detected");
   const ok = /(facebook\.com|instagram\.com|twitter\.com|x\.com|linkedin\.com|youtube\.com|t\.me|vk\.com)/i.test(html);
   return item("social" as CheckKey, ok ? true : null, ok ? "Social links found" : "No social links", ok ? "Yes" : "No");
+}
+
+// Виден ли контент в сыром HTML без JavaScript.
+// Краулер ИИ читает сырой HTML. Если текста почти нет (контент рисуется JS) — это минус.
+function checkNoJs(html: string | null): CheckItem {
+  if (!html) return item("no_js" as CheckKey, false, "No HTML", "No");
+  // убираем script/style/noscript, считаем видимый текст
+  const cleaned = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ");
+  const text = stripTags(cleaned).replace(/\s+/g, " ").trim();
+  // порог: меньше ~400 знаков видимого текста — вероятно контент за JS
+  const ok = text.length >= 400;
+  return item(
+    "no_js" as CheckKey,
+    ok ? true : false,
+    `Visible text length: ${text.length}`,
+    ok ? "Yes" : "No"
+  );
 }
