@@ -97,6 +97,14 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     factors[key] = { status };
   }
 
+  // статусы новых факторов (theme и др.) тоже кладём в results для показа
+  for (const [key, item] of Object.entries(newFacts)) {
+    const status =
+      item.passed === true ? "Good" : item.passed === false ? "Poor" : "Moderate";
+    results[key] = status;
+    factors[key] = { status };
+  }
+
   // --- AI Scores: собираем факторы, которые ЕСТЬ на сайте ---
   const present = new Set<FactorKey>();
   for (const [key, it] of Object.entries(all)) {
