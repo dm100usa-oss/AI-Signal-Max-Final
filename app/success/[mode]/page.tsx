@@ -138,7 +138,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         {showSummary && (
           <>
             <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
-              {score >= 75 ? t.highReadiness : score >= 40 ? t.mediumReadiness : t.lowReadiness}
+              {score >= 75 ? t.highReadiness : score >= 35 ? t.mediumReadiness : t.lowReadiness}
             </p>
             <p
               className="text-base text-gray-700 leading-relaxed"
