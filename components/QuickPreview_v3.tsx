@@ -154,7 +154,7 @@ export default function QuickPreview_v3() {
       )}
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Signal Max. All rights reserved.
+        © 2026 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
           Visibility scores are estimated and based on publicly available data.

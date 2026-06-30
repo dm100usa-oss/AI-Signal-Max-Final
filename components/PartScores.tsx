@@ -26,10 +26,10 @@ interface PartTexts {
 }
 
 function colorFor(value: number): string {
-  // та же логика порогов, что на экране: 75 / 40
-  if (value >= 75) return "#10b981"; // зелёный
-  if (value >= 40) return "#f59e0b"; // жёлтый
-  return "#ef4444"; // красный
+  // пороги методики AI Scores (5 ступеней): 85 / 75 / 55 / 35
+  if (value >= 75) return "#10b981"; // зелёный — хорошая / высокая готовность
+  if (value >= 55) return "#f59e0b"; // жёлтый — частичная готовность
+  return "#ef4444"; // красный — базовая / низкая
 }
 
 function SmallDonut({ score, label, hint, weak }: { score: number; label: string; hint: string; weak: boolean }) {

@@ -1,6 +1,6 @@
 const ru = {
   footer: {
-    copyright: "© 2025 AI Signal Max. All rights reserved.",
+    copyright: "© 2026 AI Signal Max. All rights reserved.",
     disclaimer:
       "Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической консультацией.",
   },

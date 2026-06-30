@@ -1,6 +1,6 @@
 const en = {
   footer: {
-    copyright: "© 2025 AI Signal Max. All rights reserved.",
+    copyright: "© 2026 AI Signal Max. All rights reserved.",
     disclaimer:
       "Visibility scores are estimated and based on publicly available data. Not legal advice.",
   },

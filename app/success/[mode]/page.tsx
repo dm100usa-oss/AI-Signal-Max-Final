@@ -25,8 +25,10 @@ interface CheckItem {
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
   const interfaceLang = useLang();
+  // язык отчёта = язык интерфейса/пользователя (вариант Б).
+  // язык самого сайта показываем отдельным параметром в Check Details.
   const [pageLang, setPageLang] = useState<"ru" | "en" | null>(null);
-  const lang = pageLang || interfaceLang;
+  const lang = interfaceLang;
   const t = lang === "ru" ? ru.success : en.success;
   const tf = lang === "ru" ? ru.footer : en.footer;
 
@@ -58,10 +60,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
-        // язык отчёта = язык проверенной страницы
+        // язык проверенной страницы сохраняем только для показа как параметр,
+        // тексты отчёта берём по языку интерфейса (вариант Б)
         const resultLang: "ru" | "en" = data.pageLang === "ru" ? "ru" : "en";
         setPageLang(resultLang);
-        const langT = resultLang === "ru" ? ru.success : en.success;
+        const langT = interfaceLang === "ru" ? ru.success : en.success;
 
         const allFactors = langT.factors;
 
