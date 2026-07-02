@@ -148,7 +148,7 @@ export default function Home() {
       </div>
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-2">
-        AI Signal Max
+        AI Answers Score
       </h1>
       <p className="text-center text-base text-neutral-700 mb-8 lowercase font-medium tracking-tight">
         {t.home.tagline}

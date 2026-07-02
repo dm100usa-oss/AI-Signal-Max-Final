@@ -93,7 +93,7 @@ export default function QuickPreview_v3() {
   return (
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 bg-gray-50 min-h-screen flex flex-col items-center justify-start">
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-800">
-        AI Signal Max
+        AI Answers Score
       </h1>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed font-semibold">
         Быстрая проверка сайта
@@ -154,7 +154,7 @@ export default function QuickPreview_v3() {
       )}
 
       <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2026 AI Signal Max. All rights reserved.
+        © 2026 AI Answers Score. All rights reserved.
         <br />
         <span className="opacity-60">
           Visibility scores are estimated and based on publicly available data.

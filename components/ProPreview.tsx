@@ -149,7 +149,7 @@ export default function FullPreview() {
       <TopLights active={fadeHeader && !finished} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Signal Max
+        AI Answers Score
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">
