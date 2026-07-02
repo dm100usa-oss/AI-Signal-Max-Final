@@ -25,10 +25,8 @@ interface CheckItem {
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
   const interfaceLang = useLang();
-  // язык отчёта = язык интерфейса/пользователя (вариант Б).
-  // язык самого сайта показываем отдельным параметром в Check Details.
   const [pageLang, setPageLang] = useState<"ru" | "en" | null>(null);
-  const lang = interfaceLang;
+  const lang = pageLang || interfaceLang;
   const t = lang === "ru" ? ru.success : en.success;
   const tf = lang === "ru" ? ru.footer : en.footer;
 
@@ -60,11 +58,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
-        // язык проверенной страницы сохраняем только для показа как параметр,
-        // тексты отчёта берём по языку интерфейса (вариант Б)
+        // язык отчёта = язык проверенной страницы
         const resultLang: "ru" | "en" = data.pageLang === "ru" ? "ru" : "en";
         setPageLang(resultLang);
-        const langT = interfaceLang === "ru" ? ru.success : en.success;
+        const langT = resultLang === "ru" ? ru.success : en.success;
 
         const allFactors = langT.factors;
 
@@ -141,7 +138,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         {showSummary && (
           <>
             <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
-              {score >= 75 ? t.highReadiness : score >= 35 ? t.mediumReadiness : t.lowReadiness}
+              {score >= 75 ? t.highReadiness : score >= 40 ? t.mediumReadiness : t.lowReadiness}
             </p>
             <p
               className="text-base text-gray-700 leading-relaxed"
