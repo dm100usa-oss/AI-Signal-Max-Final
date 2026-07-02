@@ -15,14 +15,14 @@ type SendReportEmailParams = {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendReportEmail(params: SendReportEmailParams) {
-  const from = "AI Answers Score <reports@aivcheck.com>";
+  const from = "AI Signal Max <reports@aivcheck.com>";
   const { to, url, mode, lang = "en", ownerBuffer, developerBuffer, score, results } = params;
 
   const isEn = lang === "en";
 
   const subject = isEn
-    ? "Your AI Answers Score report is ready"
-    : "Ваш отчёт AI Answers Score готов";
+    ? "Your AI Signal Max report is ready"
+    : "Ваш отчёт AI Signal Max готов";
 
   const html = isEn ? `
     <div style="font-family:Helvetica,Arial,sans-serif;color:#0F172A;line-height:1.7;max-width:600px">
@@ -39,7 +39,7 @@ export async function sendReportEmail(params: SendReportEmailParams) {
       </ol>
       <p style="margin:0 0 24px">If you don't have a developer or need help finding one — just reply to this email and we'll help you find a solution.</p>
       <p style="margin:0 0 4px">Best regards,</p>
-      <p style="margin:0 0 24px"><strong>AI Answers Score</strong></p>
+      <p style="margin:0 0 24px"><strong>AI Signal Max</strong></p>
       <p style="font-size:11px;color:#9CA3AF;margin-top:16px;border-top:1px solid #E5E7EB;padding-top:12px">
         Visibility scores are estimated and based on publicly available data. Not legal or technical advice.
       </p>
@@ -59,7 +59,7 @@ export async function sendReportEmail(params: SendReportEmailParams) {
       </ol>
       <p style="margin:0 0 24px">Если по каким-либо причинам у Вас нет разработчика или связь с ним утрачена — просто ответьте на это письмо, поможем найти решение.</p>
       <p style="margin:0 0 4px">С уважением,</p>
-      <p style="margin:0 0 24px"><strong>AI Answers Score</strong></p>
+      <p style="margin:0 0 24px"><strong>AI Signal Max</strong></p>
       <p style="font-size:11px;color:#9CA3AF;margin-top:16px;border-top:1px solid #E5E7EB;padding-top:12px">
         Показатели готовности рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической или технической консультацией.
       </p>
@@ -72,8 +72,8 @@ export async function sendReportEmail(params: SendReportEmailParams) {
     subject,
     html,
     attachments: [
-      { filename: isEn ? "AI_Answers_Score_Owner_Report.pdf" : "AI_Answers_Score_Otchet_Vladeltsa.pdf", content: ownerBuffer },
-      { filename: isEn ? "AI_Answers_Score_Developer_Brief.pdf" : "AI_Answers_Score_TZ_Razrabotchika.pdf", content: developerBuffer },
+      { filename: isEn ? "AI_Signal_Max_Owner_Report.pdf" : "AI_Signal_Max_Otchet_Vladeltsa.pdf", content: ownerBuffer },
+      { filename: isEn ? "AI_Signal_Max_Developer_Brief.pdf" : "AI_Signal_Max_TZ_Razrabotchika.pdf", content: developerBuffer },
     ],
   });
 

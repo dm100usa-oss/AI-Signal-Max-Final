@@ -153,7 +153,7 @@ export default function QuickPreview() {
     return (
       <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
         <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
-          AI Answers Score
+          AI Signal Max
         </h1>
       </main>
     );
@@ -163,7 +163,7 @@ export default function QuickPreview() {
     return (
       <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
         <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
-          AI Answers Score
+          AI Signal Max
         </h1>
         <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
           <p className="text-xl font-semibold text-neutral-900 mb-3">
@@ -194,7 +194,7 @@ export default function QuickPreview() {
       <TopLights active={showDots} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
-        AI Answers Score
+        AI Signal Max
       </h1>
 
       <p className="text-base text-neutral-400 mt-1 mb-2">

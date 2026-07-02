@@ -1,361 +1,409 @@
 const en = {
-  // (структура словаря; русский словарь повторяет её же)
-  // --- Общие элементы интерфейса ---
-  common: {
-    skipToContent: "Skip to content",
-    backToHome: "Back to home",
-    back: "Back",
-  },
-
-  // --- Подвал ---
   footer: {
-    tagline: "Help your website appear in AI answers",
-    updated: "Updated",
-    copyright: "© {year} AI Answers Rank. All rights reserved.",
+    copyright: "© 2026 AI Signal Max. All rights reserved.",
     disclaimer:
-      "Educational resource. Information is reviewed and updated regularly.",
-    independence:
-      "This website is an independent editorial resource. Where any compensation exists, it does not constitute an endorsement of a specific provider.",
+      "Visibility scores are estimated and based on publicly available data. Not legal advice.",
   },
 
-  // --- Главная страница ---
   home: {
-    step3Time: "In 10 minutes",
-    step3Intro: "If you don't have time to:",
-    step3Items: [
-      "figure out the algorithms of appearing in AI answers and recommendations yourself",
-      "or you've lost contact with your developer",
-    ],
-    step3Outro:
-      "Our team will implement the necessary changes and bring your site to the top of AI answers",
-    visitorsLabel: { one: "visitor", few: "visitors", many: "visitors" },
-    visitorsPeriod: "in the last 7 days",
-    nav: {
-      about: "ABOUT",
-      services: "SERVICES",
-      contacts: "CONTACTS",
-      articles: "ARTICLES",
-      method: "METHOD",
-      faq: "FAQ",
-    },
-    // Первый экран
-    h1: "Get your business to the top of AI answers",
-    heroLead: "Win customers directly from ChatGPT and other AI platforms",
-    subhead1: "Just 3 simple steps",
-    subhead1b: "get featured in AI answers and recommendations",
-    sub1note: "a simple explanation in one minute",
-    subhead2: "in\u00A030 seconds",
-    subhead2b: "check your site's readiness score",
-    sub2note: "Free|No commitment",
-    quickCheckCard: {
-      bold: [
-        "Why the quick check gives an objective assessment of your site's readiness?",
-      ],
-      intro:
-        "Based on an analysis of **28 key parameters** from our own methodology, AI Ready Score (AIRS), which keeps evolving as AI develops",
-      bullets: [],
-      fieldLabel: "Website address",
-      placeholder: "https://example.com",
-      button: "Check the readiness score",
-      subnote: "Free • No sign-up • No commitment",
-      footnote:
-        "You get 3 free checks every month\nUse their results to track your site's readiness score over time or compare it with competitors",
-      tailIntro: "If you need:",
-      tailItems: [
-        "specific Recommendations",
-        "a step-by-step Action plan",
-        "a developer spec",
-        "Answers to the key questions",
-      ],
-      tailOutro: "move on to the",
-      tailBig: "Detailed check",
-      errorInvalidUrl: "Please enter a valid URL including https://",
-      errorCannotCheck: "We can't analyze this website. Please try a different one.",
-    },
-    subhead3: "in 3 minutes",
-    subhead3b: "get a ready-to-use action plan",
-    sub3note: "and a developer spec",
-    proCheckCard: {
-      bold: [
-        "Want to understand what's happening to your website in the AI era?",
-        "Do results, time, and money matter to you?",
-        "Do you need a real action plan without complex terms, technical reports, or information noise?",
-      ],
-      intro: "Take a look at this detailed check.",
-      bullets: [
-        "It answers the key questions about your website.",
-        "It gives you a ready spec for your developer that you can send straight to work with no extra explanations.",
-      ],
-      price: "Total only $19.99",
-      placeholder: "https://example.com",
-      button: "Run the detailed check",
-      errorInvalidUrl: "Please enter a valid URL including https://",
-      errorCannotCheck: "We can't analyze this website. Please try a different one.",
-    },
-    directAnswer:
-      "A service that helps businesses appear in the answers and recommendations of ChatGPT and other AI platforms.",
-
-    stepsAccordion: {
-      lead: "Customer growth starts with your site's readiness for AI",
-      flow: "Site readiness → AI answers →\n→ Customer growth → Sales",
-      stepsIntro: "So it makes sense to take 3 steps",
-      steps: [
-        "Step 1.|Find out your site's readiness score",
-        "Step 2.|See what needs improving",
-        "Step 3.|Make the changes yourself or send a ready-to-use spec to your developer",
-      ],
-      methodProof: "This is how you get customers from AI",
-      quickCheck: {
-        title: "Check your website's readiness score",
-        subtitleLeft: "Free",
-        subtitleRight: "No commitment",
-        placeholder: "https://example.com",
-        button: "Run a quick check",
-        errorInvalidUrl: "Please enter a valid URL including https://",
-        errorCannotCheck: "We can't analyze this website. Please try a different one.",
-      },
-      proCheck: {
-        title: "Get answers to the key questions about your site in just 3 minutes",
-        placeholder: "https://example.com",
-        button: "Run the detailed check",
-        errorInvalidUrl: "Please enter a valid URL including https://",
-        errorCannotCheck: "We can't analyze this website. Please try a different one.",
-      },
-      blocks: [
-        {
-          heading: "Start with a free check",
-          lead: "Find out how ready your site is to appear in AI answers and recommendations",
-          items: [],
-          notes: [
-            "**If the score is above** 80% — major changes aren't\u00A0needed",
-            "**If it's below** 80% — we recommend running **a detailed check**",
-          ],
-        },
-      ],
-    },
-
-    whatToDoSteps: [
-      {
-        num: "1",
-        color: "#2563EB",
-        stepLabel: "Step one",
-        heading: "Run a quick\nfree check",
-        body: "Find out your site's readiness score for AI recommendations, check 10 key factors and get your first recommendations right on your phone screen.",
-        ctaText: "Check your website for free",
-        ctaVariant: "primary",
-        notes: [
-          "If the readiness score is above 75%, your site is already well prepared for AI recommendations and needs no major work.",
-          "If the readiness score is below 75%, we recommend moving on to the next step — the detailed check.",
-        ],
-        groups: [],
-      },
-      {
-        num: "2",
-        color: "#16A34A",
-        stepLabel: "Step two",
-        heading: "Run a detailed site check",
-        body: "Much larger and more thorough than the quick one. Find out exactly which problems prevent your site from appearing in the answers and recommendations of ChatGPT and other AI platforms.",
-        ctaText: "Run an extended check",
-        ctaVariant: "success",
-        notes: [
-          "All of this significantly saves your time, helps make the needed changes quickly and at a perfectly reasonable price.",
-        ],
-        groups: [
-          {
-            title: "Right after the check you will see on screen",
-            items: [
-              "Your site's overall AI readiness score",
-              "A check of 15 key factors",
-              "Detailed results for each metric",
-              "Explanations and recommendations to improve the site",
-            ],
-          },
-          {
-            title: "The PDF for the site owner contains",
-            items: [
-              "Your site's overall AI readiness score",
-              "A check of 15 key factors",
-              "Clear explanations of each metric",
-              "Recommendations to improve the site in plain language",
-              "A step-by-step action plan, much of which you can do yourself",
-            ],
-          },
-          {
-            title: "The PDF for the developer contains",
-            items: [
-              "A ready professional technical brief",
-              "A list of required improvements",
-              "A detailed description of each task",
-              "Priorities and goals for implementing the changes",
-            ],
-          },
-        ],
-        intro2:
-          "In addition, you will receive two ready PDF documents by email: a detailed report for the site owner written in plain, clear language, and a professional technical brief for the developer that you can send to them right away to improve the site's visibility without extra explanations.",
-      },
-      {
-        num: "3",
-        color: "#1a4a7a",
-        stepLabel: "Step three",
-        heading: "Let us handle the changes,\nso you don't spend time and effort",
-        body: "If you don't have time to figure out the nuances and algorithms of appearing in AI answers and recommendations yourself, or if you have lost contact with your site's developer, our team will help implement the necessary changes. We will take care of the technical work and help your site appear more often in AI answers and recommendations.",
-        ctaText: "View our services from $99",
-        ctaVariant: "navy",
-        notes: [],
-        groups: [],
-      },
-    ],
-
-    // Разделы
-    sectionsTitle: "Knowledge sections",
-
-    // FAQ
-    faqTitle: "Frequently asked questions",
-    faq: [
-      {
-        q: "What does it mean to appear in AI answers?",
-        a: "It means that when someone asks an AI assistant like ChatGPT, Gemini, Perplexity or Claude for a recommendation, your website is named or cited as a source. This is different from ranking in Google: AI assistants read and trust sources differently, so a site can rank well in search yet be absent from AI answers.",
-      },
-      {
-        q: "Why doesn't my website appear in AI answers?",
-        a: "The most common reasons are that AI crawlers cannot read your content (for example, it is rendered only by JavaScript), the pages have no direct, self-contained answers to cite, or the site lacks structured data and trust signals. Each of these can keep a site invisible to AI even when it works fine for human visitors.",
-      },
-      {
-        q: "Is appearing in AI answers different from SEO?",
-        a: "Yes. Traditional SEO optimizes for ranking links in a search results page. Appearing in AI answers means being readable, quotable and trustworthy to an AI assistant that synthesizes one answer from several sources. The two overlap but are not the same, and a site can do well at one and poorly at the other.",
-      },
-      {
-        q: "How do I check if my site is ready for AI?",
-        a: "You can run an external readiness scan that checks whether AI crawlers can read your site, whether your pages contain citable answers, and whether the right signals are in place. The scan shows concrete issues so you know what to fix before doing anything else.",
-      },
-      {
-        q: "Which AI assistants matter for being recommended?",
-        a: "The main ones today are ChatGPT, Google's Gemini and AI Overviews, Perplexity, Claude and Copilot. Each reads the web slightly differently, so the goal is a site that all of them can read, understand and trust — not one tuned to a single assistant.",
-      },
-    ],
-
-    // Лента последних обновлений
-    updatesTitle: "Latest updates",
-    updatesEmpty: "New material is published regularly. Check back soon.",
-
-    // Доверенная среда
-    trustTitle: "About this resource",
-    trustText:
-      "How we work, where our information comes from, and how we keep it accurate.",
-    pageUpdated: "Page updated",
+    tagline: "the new competitive edge",
+    description:
+      "Check how ready your website is to appear in AI assistant recommendations: ChatGPT · Copilot · Gemini · Claude · Perplexity · Grok and more",
+    placeholder: "https://example.com",
+    errorInvalidUrl: "Please enter a valid URL including https://",
+    errorCannotCheck: "We can't analyze this website. Please try a different one.",
+    errorNotAccessible:
+      "We can't reach this website. Make sure it's publicly accessible.",
+    quickButton: "Quick Check $5.99",
+    quickChecking: "Checking",
+    quickDesc:
+      "Your site's readiness score, 10 key factors, and quick recommendations on screen",
+    proButton: "Full Audit $19.99",
+    proChecking: "Checking",
+    proDesc:
+      "15 factors, results on screen and by email, detailed recommendations for the owner and a ready-to-use brief for your developer",
   },
 
-  services: {
-    title: "Our services",
-    intro:
-      "Let us handle the changes so you don't spend time and effort. Choose the services you need, click \u201CSubmit a request\u201D, and your selection will be added to the form automatically.",
-    selectHint: "Tap \u201CDetails\u201D to learn more, and \u201CChoose\u201D to add to your request",
-    selectedLabel: "Services selected",
-    moreLabel: "Details",
-    lessLabel: "Collapse",
-    chooseLabel: "Choose",
-    chosenLabel: "Selected",
-    buyLayoutLabel: "Buy",
-    buyConsultLabel: "Book and pay",
-    items: [
-      {
-        title: "Page layout for appearing in AI answers",
-        price: "from $99",
-        priceNote: "$99 for the homepage, $79 per additional page",
-        color: "rgba(59,130,246,0.185)",
-        buyType: "layout",
-        summary: "A page that AI understands and shows to your clients.",
-        details: [
-          "Page structure clear to ChatGPT, Perplexity and Gemini",
-          "A clear offer and an answer to the client's question",
-          "Blocks built for citation in AI answers",
-          "Ready layout: implement it yourself or hand it to your developer",
-        ],
-      },
-      {
-        title: "Individual consultation based on the detailed check",
-        price: "$299",
-        priceNote: "",
-        color: "rgba(16,185,129,0.185)",
-        buyType: "consultation",
-        summary: "We review your site and explain in plain words what keeps you out of AI answers.",
-        details: [
-          "Live review of your site's check results",
-          "Plain language, no technical jargon",
-          "Recommendations for your niche and your clients",
-          "We answer all your questions",
-        ],
-      },
-      {
-        title: "Full expert site analysis with a step-by-step guide",
-        price: "from $399",
-        priceNote: "",
-        color: "rgba(139,92,246,0.185)",
-        buyType: "",
-        summary: "A ready plan: what to change and in what order so AI starts recommending you.",
-        details: [
-          "Deep analysis of the whole site, not a single page",
-          "Step-by-step guide with priorities: where to start",
-          "Specific fixes for each page",
-          "A document clear to you and your developer",
-        ],
-      },
-      {
-        title: "Technical site improvements",
-        price: "from $590",
-        priceNote: "",
-        color: "rgba(251,146,60,0.185)",
-        buyType: "",
-        summary: "We open your site for reading and citation by AI assistants.",
-        details: [
-          "We add markup that AI understands",
-          "We open the site for AI assistants to read",
-          "We remove technical barriers to appearing in answers",
-          "Purely technical work: we don't touch the content",
-        ],
-      },
-      {
-        title: "Comprehensive site improvements",
-        price: "from $2,990",
-        priceNote: "",
-        color: "rgba(250,204,21,0.21)",
-        buyType: "",
-        summary: "We make your site AI-ready turnkey: content and technical together.",
-        details: [
-          "We repackage content for AI answers",
-          "Full technical work for citability",
-          "We build the site's authority structure",
-          "We bring it to readiness: from strategy to publishing",
-        ],
-      },
-      {
-        title: "Ongoing site growth and maintenance",
-        price: "from $900/month",
-        priceNote: "",
-        color: "rgba(6,182,212,0.185)",
-        buyType: "",
-        summary: "We keep your site at the top of AI answers month after month.",
-        details: [
-          "Regular improvements and fresh content every month",
-          "We track AI algorithm changes and adapt",
-          "Reports: where you appear in answers and how you grow",
-          "Ongoing support and development",
-        ],
-      },
+  quickPreview: {
+    dateLabel: "Date",
+    started: "We started checking",
+    factors: [
+      "Is your site open to AI",
+      "Does AI understand what your site is about",
+      "Can AI see your site name",
+      "Does AI understand your site's category",
+      "Is your site structure clear to AI",
+      "Does AI consider your site safe",
+      "Is your site fast enough for AI",
+      "Can AI see your site's data markup",
+      "Can AI read your pages",
+      "Will AI recommend your site",
     ],
-    cta: "Submit a request",
-    ctaDisabledHint: "Select at least one service",
+    analyzing: "Analyzing 10 key factors",
+    timerText: (sec: number) => `Check completes in ${sec} sec`,
+    checkComplete: "Check complete",
+    getResult: "Get your result",
+    limitTitle: "Daily limit reached",
+    limitText: "You've used your 3 free quick checks for today. Please try again tomorrow.",
+    backHome: "Back to home",
   },
 
-  // --- Страница-тема (подписи блоков) ---
-  topic: {
-    keyFacts: "Key facts",
-    actions: "What to do",
-    faq: "FAQ",
-    sources: "Sources",
-    nextStep: "Next",
+  proPreview: {
+    dateLabel: "Date",
+    started: "We started the full audit",
+    factors: [
+      "Is your site open to AI",
+      "Does AI understand what your site is about",
+      "Can AI see your site name",
+      "Can AI navigate the page",
+      "Is your site structure clear to AI",
+      "Does AI consider your site safe",
+      "Is your site fast enough for AI",
+      "Can AI see your site's data markup",
+      "Does AI understand your site's category",
+      "Can AI read your pages",
+      "Does your site work correctly for AI",
+      "Does AI understand page priority",
+      "Is your site mobile-friendly",
+      "Can AI understand images on your site",
+      "Will AI recommend your site",
+    ],
+    auditLabel: "Auditing 15 key factors",
+    ownerReport: "Building owner report",
+    devReport: "Creating developer brief",
+    finalReport: "Owner report • Developer brief",
+    auditDone: "Audit complete",
+    reportsDone: "Reports ready",
+    timerText: (sec: number) => `Full audit completes in ${sec} sec`,
+    getResult: "Get your result",
+  },
+
+  preview: {
+    resultReady: "Your result is ready",
+    websiteLabel: "Website",
+    dateLabel: "Date",
+    quickFactorsIntro:
+      "We checked 5 key factors for your website's AI visibility:",
+    proFactorsIntro:
+      "We checked all 15 key factors for your website's visibility in AI results:",
+    emailLabel: "Your email to receive the PDF after payment",
+    emailPlaceholder: "you@example.com",
+    emailError: "Please enter a valid email.",
+    getResultsButton: "Get Results",
+    getFullReportButton: "Get Full Report",
+    paidQuick:
+      "Payment confirmed. Thank you for checking your website's AI visibility with us.",
+    paidPro:
+      "Payment confirmed. Your PDF report will be sent to your email.",
+    factorsQuick: [
+      {
+        name: "Robots.txt",
+        text: "Controls whether AI platforms can see your site. If misconfigured and blocking access, your website may disappear from AI answers.",
+      },
+      {
+        name: "Sitemap.xml",
+        text: "Tells AI which pages exist and should be indexed. If missing or set up incorrectly, important parts of your site remain invisible.",
+      },
+      {
+        name: "X-Robots-Tag",
+        text: "A server-side setting that tells AI whether your pages can appear in results. If disallowed, those pages will not show up in AI answers.",
+      },
+      {
+        name: "Meta Robots",
+        text: "A tag inside the page that controls whether AI can display it. If misconfigured with a block, the page disappears from AI results.",
+      },
+      {
+        name: "Canonical",
+        text: "Tells AI which page is the main version. Without it, duplicate pages compete, and AI may show the wrong one.",
+      },
+    ],
+    factorsPro: [
+      {
+        name: "Robots.txt",
+        text: "Controls whether AI platforms can see your site. If misconfigured and blocking access, your website may disappear from AI answers.",
+      },
+      {
+        name: "Sitemap.xml",
+        text: "Tells AI which pages exist and should be indexed. If missing or set up incorrectly, important parts of your site remain invisible.",
+      },
+      {
+        name: "X-Robots-Tag",
+        text: "A server-side setting that tells AI whether your pages can appear in results. If disallowed, those pages will not show up in AI answers.",
+      },
+      {
+        name: "Meta Robots",
+        text: "A tag inside the page that controls whether AI can display it. If misconfigured with a block, the page disappears from AI results.",
+      },
+      {
+        name: "Canonical",
+        text: "Tells AI which page is the main version. Without it, duplicate pages compete, and AI may show the wrong one.",
+      },
+      {
+        name: "Title Tag",
+        text: "The title is the first thing users see in results. If missing or too generic, AI may show random text.",
+      },
+      {
+        name: "Meta Description",
+        text: "A short description under the title that explains why users should click. If missing or vague, AI inserts random text.",
+      },
+      {
+        name: "Open Graph",
+        text: "Special tags that make your site links look good in AI answers and social media. Without them, users see random text or cropped images.",
+      },
+      {
+        name: "H1 Headings",
+        text: "The main heading of a page tells AI and visitors what it's about. If missing or duplicated, AI cannot clearly understand the content.",
+      },
+      {
+        name: "Structured Data (Schema Markup)",
+        text: "Special markup (JSON-LD) that explains what's on your site: product, service, article, or company. Without it, AI doesn't fully understand your content.",
+      },
+      {
+        name: "Mobile Friendly",
+        text: "If the design breaks on mobile or buttons don't work, AI considers it inconvenient.",
+      },
+      {
+        name: "HTTPS",
+        text: "A secure protocol that ensures safe connections. Sites without HTTPS are flagged as unsafe.",
+      },
+      {
+        name: "Alt Attributes",
+        text: "Captions for images that help AI interpret visuals. Without alt texts, images remain invisible.",
+      },
+      {
+        name: "Favicon",
+        text: "A small site icon shown in browsers and AI previews. Without it, your site looks unfinished.",
+      },
+      {
+        name: "404 Page",
+        text: "An error page that tells AI a resource doesn't exist. If misconfigured, AI may treat broken links as valid.",
+      },
+    ],
+  },
+
+  success: {
+    quickTitle: "Quick Check Results",
+    proTitle: "Full Audit Results",
+    siteLabel: "Website",
+    dateLabel: "Date",
+    loading: "Loading results...",
+    highReadiness: "High AI Readiness",
+    mediumReadiness: "Medium AI Readiness",
+    lowReadiness: "Low AI Readiness",
+    materialsTitle: "Check Details",
+    factorsTitle: "Checked Parameters",
+    backHome: "Back to Home",
+    leaveReview: "Leave a Review",
+    pdfSent:
+      "Full owner report and developer brief have been sent to your email.",
+    andMore: "and more...",
+    statusGood: "Good",
+    statusModerate: "Average",
+    statusPoor: "Poor",
+    aiScores: {
+      explainTitle: "What makes a site appear in AI answers",
+      explainIntro:
+        "For AI to find, understand and recommend your site, four things matter. Below is how your site scores on each of them.",
+      partsTitle: "Score across four areas",
+      home: "Homepage",
+      tech: "Technical",
+      content: "Content",
+      authority: "Authority signals",
+      homeHint: "Does AI understand who you are and how you help",
+      techHint: "Can AI read your site",
+      contentHint: "Is there anything to cite on your site",
+      authorityHint: "Does AI see signals of trust in your site",
+      weakNote: "This area is worth strengthening first.",
+    },
+    labels: {
+      title_tag: "Title",
+      h1_present: "H1",
+      h2_present: "Currently on site",
+      meta_description: "Description",
+      site_language: "Language",
+      mobile_friendly: "Mobile version",
+      contacts: "Contact",
+      robots_txt: "AI access",
+      sitemap_xml: "Pages",
+      sitemap_lastmod: "Updated",
+      https: "Protocol",
+      page_speed: "Response",
+      structured_data: "JSON-LD",
+      open_graph: "Open Graph",
+      canonical: "Canonical",
+      x_robots_tag: "X-Robots",
+      meta_robots: "Meta robots",
+      alt_attributes: "ALT attributes",
+      page_404: "404 page",
+    },
+    factors: [
+      {
+        key: "robots_txt",
+        name: "Is your site open to AI",
+        desc: "Checks whether AI platforms are allowed to access your site.",
+      },
+      {
+        key: "meta_description",
+        name: "Does AI understand what your site is about",
+        desc: "Checks the meta description that helps AI understand your site's topic and content.",
+      },
+      {
+        key: "title_tag",
+        name: "Can AI see your site name",
+        desc: "Checks the presence and correctness of the Title tag.",
+      },
+      {
+        key: "h2_present",
+        name: "Can AI navigate the page",
+        desc: "Checks for H2 subheadings that help AI navigate the page content.",
+      },
+      {
+        key: "sitemap_xml",
+        name: "Is your site structure clear to AI",
+        desc: "Checks for a sitemap.xml so AI knows all your pages.",
+      },
+      {
+        key: "https",
+        name: "Does AI consider your site safe",
+        desc: "Checks whether a secure HTTPS connection is used.",
+      },
+      {
+        key: "page_speed",
+        name: "Is your site fast enough for AI",
+        desc: "Checks server response time — a slow site may be skipped by AI crawlers.",
+      },
+      {
+        key: "structured_data",
+        name: "Can AI see your site's data markup",
+        desc: "Checks for JSON-LD structured data that helps AI understand your content.",
+      },
+      {
+        key: "theme",
+        name: "Does AI understand your site's category",
+        desc: "Determines whether your site's category is clear to AI from the title, description and markup.",
+      },
+      {
+        key: "meta_robots",
+        name: "Can AI read your pages",
+        desc: "Checks for restrictions on reading pages — in the page code (meta robots) and in the server response (x-robots-tag).",
+      },
+      {
+        key: "page_404",
+        name: "Does your site work correctly for AI",
+        desc: "Checks error handling — your site should correctly report missing pages.",
+      },
+      {
+        key: "canonical",
+        name: "Does AI understand page priority",
+        desc: "Checks canonical links so AI understands which pages take priority.",
+      },
+      {
+        key: "mobile_friendly",
+        name: "Is your site mobile-friendly",
+        desc: "Checks for the viewport meta tag for correct display on mobile devices.",
+      },
+      {
+        key: "alt_attributes",
+        name: "Can AI understand images on your site",
+        desc: "Checks for alt attributes on images.",
+      },
+      {
+        key: "score",
+        name: "Will AI recommend your site",
+        desc: "Overall readiness score for AI system recommendations.",
+      },
+    ],
+    summaries: {
+      highQuick: `Your website is well prepared for AI recommendations. <strong>It can already appear in AI answers and attract visitors</strong> thanks to its correct structure and settings.<br/><br/>In this quick check we show the <strong>key parameters</strong> that are already working correctly and supporting your readiness.<br/><br/>Best regards, the AI Signal Max team.`,
+      highPro: `Your website is well prepared for AI recommendations. <strong>It can already appear in AI answers and attract visitors</strong> thanks to its correct structure and settings.<br/><br/>The main parameters are configured correctly and AI systems see your site as a clear and reliable source. <strong>Further targeted improvements will strengthen your position and increase inquiries.</strong><br/><br/>We sent you two PDF files by email: <strong>a detailed report with explanations for the owner and a technical brief for your developer</strong>. This will help you lock in results and improve your site's performance.<br/><br/>Best regards, the AI Signal Max team.`,
+      mediumQuick: `Your website is partially ready for AI recommendations. <strong>You're close to a good result</strong> — a few fixes will make your structure clearer to AI. Then your site will appear in answers more often and bring more visitors.<br/><br/>In this quick check we show the <strong>main parameters</strong> that need attention.<br/><br/>Best regards, the AI Signal Max team.`,
+      mediumPro: `Your website is partially ready for AI recommendations. <strong>You're close to a good result</strong> — a few fixes will make your structure clearer to AI. Then your site will appear in answers more often and bring more visitors.<br/><br/>Some parameters are not fully configured, which is why your site doesn't always appear in AI answers. <strong>Targeted fixes will increase your readiness and help you show up more often.</strong><br/><br/>We sent you two PDF files by email: <strong>a detailed report with explanations for the owner and a technical brief for your developer</strong>. It's a ready action plan you can hand off immediately and check the results later.<br/><br/>Best regards, the AI Signal Max team.`,
+      lowQuick: `Your website is not yet ready for AI recommendations. <strong>In its current state it does not appear in AI answers</strong>, which means you are missing potential visitors and inquiries.<br/><br/>In this quick check we show the <strong>main parameters</strong> that need urgent attention.<br/><br/>Best regards, the AI Signal Max team.`,
+      lowPro: `Your website is not yet ready for AI recommendations. <strong>In its current state it does not appear in AI answers</strong>, which means you are missing potential visitors and inquiries.<br/><br/>Critically important parameters are misconfigured or missing. <strong>Without fixing them, your site will not be recommended by AI systems.</strong><br/><br/>We sent you two PDF files by email: <strong>a detailed report with explanations for the owner and a technical brief for your developer</strong>. It's a step-by-step plan to fix the issues and prepare your site for AI traffic.<br/><br/>Best regards, the AI Signal Max team.`,
+    },
+  },
+
+  scanFailed: {
+    message:
+      "We couldn't complete the scan for this website. Please check the address and try again.",
+    backButton: "Back to Home",
+  },
+
+  notFound: {
+    title: "Website not found",
+    message:
+      "We couldn't scan this website. Please check the address and try again.",
+    backButton: "Back to Home",
+  },
+
+  reviews: {
+    whatUsersNote: "what users highlight",
+    tags: [
+      "useful",
+      "easy to understand",
+      "convenient",
+      "saves time and money",
+      "shareable with developer",
+      "great for everyday use",
+    ],
+    namePlaceholder: "Your name",
+    ratingLabel: "Your rating:",
+    reviewPlaceholder: "Your review...",
+    submitButton: "Submit",
+    submitting: "Submitting",
+    successMessage: "Thank you! Your review has been submitted for moderation.",
+    errorMessage: "Something went wrong. Please try again.",
+    shareText:
+      "Share your experience, tell us about yourself or your company — your story will be seen by thousands of users worldwide",
+    backHome: "Home",
+  },
+
+  addReview: {
+    title: "Leave a Review",
+    namePlaceholder: "Your name",
+    reviewPlaceholder: "Your review...",
+    submitButton: "Submit",
+    submitting: "Submitting...",
+    successTitle: "Thank you!",
+    successMessage: "Your review has been submitted for moderation.",
+    errorMessage: "Something went wrong. Please try again.",
+  },
+
+  quickPreviewV2: {
+    steps: [
+      "Is your site open to AI",
+      "Does AI understand what your site is about",
+      "Can AI read your page content",
+      "Can AI see your titles and descriptions",
+      "Does AI understand your site structure",
+      "Can AI see images on your site",
+      "Does AI consider your site safe and trustworthy",
+      "Does AI include your site in search results",
+      "Can AI find your site among competitors",
+      "How does AI rate your site",
+    ],
+    timerText: (sec: number) => `Check completes in ${sec} sec`,
+    checkComplete: "Check complete",
+    getResult: "Get your result",
+  },
+
+  quickPreviewV3: {
+    steps: [
+      "Is your site open to AI",
+      "Does AI understand what your site is about",
+      "Can AI read your page content",
+      "Can AI see your titles and descriptions",
+      "Does AI understand your site structure",
+      "Can AI see images on your site",
+      "Does AI consider your site safe and trustworthy",
+      "Does AI include your site in search results",
+      "Can AI find your site among competitors",
+      "How does AI rate your site",
+    ],
+    timerText: (sec: number) => `Check completes in ${sec} sec`,
+    checkComplete: "Check complete",
+    getResult: "Get your result",
   },
 };
 
-export type Dictionary = typeof en;
 export default en;

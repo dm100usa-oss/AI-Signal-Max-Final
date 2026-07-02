@@ -104,7 +104,7 @@ export default function QuickPreview_v2() {
     <main className="mx-auto max-w-2xl px-6 pt-20 pb-16">
       {/* Заголовок как на главной */}
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-800">
-        AI Answers Score
+        AI Signal Max
       </h1>
       <p className="text-center text-neutral-600 mb-8 leading-relaxed font-semibold">
         Быстрая проверка сайта
@@ -152,7 +152,7 @@ export default function QuickPreview_v2() {
 
       {/* Нижний дисклеймер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2026 AI Answers Score. All rights reserved.
+        © 2026 AI Signal Max. All rights reserved.
         <br />
         <span className="opacity-60">
           Visibility scores are estimated and based on publicly available data. Not legal advice.
