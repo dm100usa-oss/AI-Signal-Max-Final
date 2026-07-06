@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Donut from "../../../components/Donut";
-import PartScores, { AiScores } from "../../../components/PartScores";
-import { getChatgptBlock } from "@/lib/chatgptBlock";
+import { AiScores } from "../../../components/PartScores";
 import { useLang } from "@/hooks/useTranslation";
 import en from "@/locales/en";
 import ru from "@/locales/ru";
@@ -23,13 +22,23 @@ interface CheckItem {
   value?: string;
 }
 
+// пороги: сильная сторона >= 75, слабая < 50
+const STRONG = 75;
+const WEAK = 50;
+// сколько сильных сторон максимум показываем по уровню
+function maxStrengths(score: number): number {
+  if (score >= 81) return 5;
+  if (score >= 61) return 4;
+  if (score >= 41) return 3;
+  if (score >= 21) return 2;
+  return 1;
+}
+
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
   const interfaceLang = useLang();
-  // язык отчёта = язык интерфейса/пользователя (вариант Б).
-  // язык самого сайта показываем отдельным параметром в Check Details.
   const [pageLang, setPageLang] = useState<"ru" | "en" | null>(null);
-  const lang = interfaceLang;
+  const lang = pageLang || interfaceLang;
   const t = lang === "ru" ? ru.success : en.success;
   const tf = lang === "ru" ? ru.footer : en.footer;
 
@@ -40,8 +49,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const [items, setItems] = useState<CheckItem[]>([]);
   const [allItems, setAllItems] = useState<CheckItem[]>([]);
   const [url, setUrl] = useState("");
-  const [summary, setSummary] = useState("");
   const [showSummary, setShowSummary] = useState(false);
+  const [showParams, setShowParams] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,29 +63,23 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const data = await res.json();
 
         if (!data || !data.score) throw new Error("No valid data");
-        // общий скор = новый aiScores.overall (старый data.score как запасной)
         const overallScore = data.aiScores?.overall ?? data.score;
         setScore(overallScore);
         if (data.aiScores) setAiScores(data.aiScores);
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
-        // язык проверенной страницы сохраняем только для показа как параметр,
-        // тексты отчёта берём по языку интерфейса (вариант Б)
         const resultLang: "ru" | "en" = data.pageLang === "ru" ? "ru" : "en";
         setPageLang(resultLang);
-        const langT = interfaceLang === "ru" ? ru.success : en.success;
+        const langT = resultLang === "ru" ? ru.success : en.success;
 
         const allFactors = langT.factors;
-
         const scoreStatus: "Good" | "Moderate" | "Poor" =
           overallScore >= 75 ? "Good" : overallScore >= 40 ? "Moderate" : "Poor";
 
         const mappedFactors = allFactors.map((f) => ({
           ...f,
-          status: f.key === "score"
-            ? scoreStatus
-            : data.results[f.key] || "Moderate",
+          status: f.key === "score" ? scoreStatus : data.results[f.key] || "Moderate",
         }));
 
         const QUICK_FACTOR_KEYS = [
@@ -85,31 +88,52 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         ];
         const quickFactors = mappedFactors.filter(f => QUICK_FACTOR_KEYS.includes(f.key));
         setFactors(mode === "quick" ? quickFactors : mappedFactors);
-
-        const s = t.summaries;
-        if (overallScore >= 75) {
-          setSummary(mode === "pro" ? s.highPro : s.highQuick);
-        } else if (overallScore >= 40) {
-          setSummary(mode === "pro" ? s.mediumPro : s.mediumQuick);
-        } else {
-          setSummary(mode === "pro" ? s.lowPro : s.lowQuick);
-        }
       } catch (err) {
         console.error("Failed to load analysis:", err);
       } finally {
         setLoading(false);
-        setTimeout(() => setShowSummary(true), 2000);
+        setTimeout(() => setShowSummary(true), 1500);
       }
     };
-
     fetchData();
   }, [mode, lang]);
 
   const date = new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+    year: "numeric", month: "long", day: "numeric",
   });
+
+  // выбор уровня по баллу
+  const level =
+    score >= 81 ? t.levels.excellent
+    : score >= 61 ? t.levels.good
+    : score >= 41 ? t.levels.medium
+    : score >= 21 ? t.levels.low
+    : t.levels.veryLow;
+
+  // сильные и слабые стороны из реальных баллов направлений
+  const dims = aiScores
+    ? [
+        { key: "home", val: aiScores.home },
+        { key: "tech", val: aiScores.tech },
+        { key: "content", val: aiScores.content },
+        { key: "authority", val: aiScores.authority },
+      ]
+    : [];
+
+  const strongList = dims
+    .filter((d) => d.val >= STRONG)
+    .sort((a, b) => b.val - a.val)
+    .map((d) => (t.strengths as Record<string, string>)[d.key]);
+  // добавляем общий плюс, если сайт в целом неплох
+  if (score >= 61) strongList.push(t.strengths.overall);
+  const strengths = strongList.slice(0, maxStrengths(score));
+
+  const weakList = dims
+    .filter((d) => d.val < WEAK)
+    .sort((a, b) => a.val - b.val)
+    .map((d) => (t.weaknesses as Record<string, string>)[d.key]);
+  if (score < 61 && weakList.length === 0) weakList.push(t.weaknesses.overall);
+  const weaknesses = weakList;
 
   if (loading) {
     return (
@@ -136,59 +160,111 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       </div>
 
       <div
-        className="max-w-xl mx-auto rounded-2xl p-6 mb-10 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 text-justify transition-all duration-1000 ease-in-out"
-        style={{ minHeight: "180px", opacity: showSummary ? 1 : 0 }}
+        className="max-w-xl mx-auto rounded-2xl p-6 mb-8 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 transition-all duration-1000 ease-in-out"
+        style={{ opacity: showSummary ? 1 : 0 }}
       >
         {showSummary && (
           <>
-            <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
-              {score >= 75 ? t.highReadiness : score >= 35 ? t.mediumReadiness : t.lowReadiness}
+            <p className="text-lg font-semibold text-gray-800 mb-3 text-center">
+              {level.title}
             </p>
-            <p
-              className="text-base text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: summary }}
-            />
+            <p className="text-base text-gray-700 leading-relaxed">{level.text}</p>
           </>
         )}
       </div>
 
-      {aiScores && showSummary && (
-        <PartScores scores={aiScores} t={t.aiScores} />
+      {/* Сильные и слабые стороны */}
+      {showSummary && (strengths.length > 0 || weaknesses.length > 0) && (
+        <div className="max-w-xl mx-auto mb-8 space-y-4">
+          {strengths.length > 0 && (
+            <div>
+              <p className="font-semibold text-gray-800 mb-2">{t.strengthsTitle}</p>
+              <ul className="space-y-2">
+                {strengths.map((s, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="mt-1 w-4 h-4 flex-shrink-0 rounded-full border-2 border-green-500" />
+                    <span className="text-gray-700">{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {weaknesses.length > 0 && (
+            <div>
+              <p className="font-semibold text-gray-800 mb-2">{t.weaknessesTitle}</p>
+              <ul className="space-y-2">
+                {weaknesses.map((w, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="mt-1 w-4 h-4 flex-shrink-0 rounded-full border-2 border-red-500" />
+                    <span className="text-gray-700">{w}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
 
+      {/* Блок ChatGPT */}
+      {showSummary && (
+        <div className="max-w-xl mx-auto mb-8 rounded-2xl border border-gray-200 bg-gray-50 p-6">
+          <p className="text-sm text-gray-600 mb-1">{t.chatgpt.lead}</p>
+          <p className="font-medium text-gray-800 mb-4">«{t.chatgpt.question}»</p>
+          <p className="font-semibold text-gray-800 mb-2">{t.chatgpt.answerTitle}</p>
+          <ol className="list-decimal list-inside space-y-1 mb-4 text-gray-700">
+            {t.chatgpt.items.map((it, i) => (
+              <li key={i}>{it}</li>
+            ))}
+          </ol>
+          <p className="font-semibold text-gray-800 mb-1">{t.chatgpt.explanationTitle}</p>
+          <p className="text-gray-700 mb-4">{t.chatgpt.explanation}</p>
+          <p className="text-xs text-gray-500 leading-relaxed border-t border-gray-200 pt-3">
+            {t.chatgpt.note}
+          </p>
+        </div>
+      )}
+
+      {/* PDF отправлены */}
       {mode === "pro" && showSummary && (
-        <ChatgptBlockView url={url} />
+        <p className="text-sm text-gray-600 text-center mb-8">{t.pdfSent}</p>
       )}
 
-      <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-4">
-        {t.materialsTitle}
-      </h2>
+      {/* Разворачиваемые параметры */}
+      {showSummary && (
+        <div className="max-w-xl mx-auto mb-8">
+          <button
+            onClick={() => setShowParams((v) => !v)}
+            className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-white border border-gray-200 shadow-sm font-medium text-gray-800"
+          >
+            <span>{t.paramsToggle}</span>
+            <span className="text-gray-400">{showParams ? "▲" : "▼"}</span>
+          </button>
+          {showParams && (
+            <div className="mt-4 space-y-3">
+              <MaterialsBlock url={url} mode={mode} items={items} allItems={allItems} lang={lang} />
+              {factors.map((f, i) => (
+                <FactorItem key={i} factor={f} lang={lang} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
-      <MaterialsBlock url={url} mode={mode} items={items} allItems={allItems} lang={lang} />
+      {/* Кнопка заявки */}
+      {showSummary && (
+        <div className="max-w-xl mx-auto mb-6">
+          <p className="text-sm text-gray-600 text-center mb-3">{t.requestLead}</p>
+          <button
+            onClick={() => (window.location.href = "/?request=1")}
+            className="w-full px-6 py-3 rounded-2xl text-white font-medium text-base"
+            style={{ background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)" }}
+          >
+            {t.requestButton}
+          </button>
+        </div>
+      )}
 
-      <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-6">
-        {t.factorsTitle}
-      </h2>
-
-      <div className="space-y-4">
-        {factors.map((f, i) => (
-          <FactorItem key={i} factor={f} lang={lang} />
-        ))}
-      </div>
-
-      <div className="mt-10 flex flex-col items-center space-y-3">
-        <button
-          onClick={() => (window.location.href = "/")}
-          className="w-full max-w-xs px-6 py-3 rounded-2xl text-white font-medium text-base"
-          style={{
-            background: mode === "quick"
-              ? "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)"
-              : "linear-gradient(90deg, #059669 0%, #10b981 100%)",
-          }}
-        >
-          {t.backHome}
-        </button>
-
+      <div className="max-w-xl mx-auto flex flex-col items-center space-y-3">
         <button
           onClick={() => (window.location.href = "/reviews?add=true")}
           className="w-full max-w-xs px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-colors flex items-center justify-center space-x-2"
@@ -198,43 +274,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </button>
       </div>
 
-      {mode === "pro" && (
-        <p className="text-sm text-gray-600 text-center mt-4">{t.pdfSent}</p>
-      )}
-
       <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
         <p>{tf.copyright}</p>
         <p className="opacity-60">{tf.disclaimer}</p>
       </footer>
     </main>
-  );
-}
-
-function ChatgptBlockView({ url }: { url: string }) {
-  const b = getChatgptBlock(url);
-  return (
-    <div className="max-w-xl mx-auto rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 mb-10">
-      <p className="text-base font-semibold text-gray-800 mb-3 text-center">
-        Кого ChatGPT рекомендует в вашей нише
-      </p>
-      <div className="text-sm text-gray-700 leading-relaxed space-y-1">
-        <p><span className="font-semibold">Категория бизнеса:</span> {b.category}</p>
-        <p><span className="font-semibold">Рынок:</span> {b.market}</p>
-        <p className="font-semibold mt-2">Наиболее вероятный вопрос пользователя к ChatGPT:</p>
-        <p className="italic text-gray-600">«{b.question}»</p>
-        <p className="font-semibold mt-2">Я рекомендую:</p>
-        <ol className="list-none pl-0 space-y-0.5">
-          {b.companies.map((c, i) => (
-            <li key={i}>{i + 1}. <span className="font-semibold">{c.name}</span> — {c.place}</li>
-          ))}
-        </ol>
-        <p className="font-semibold mt-2">Почему именно они?</p>
-        <p className="italic text-gray-600">{b.reason}</p>
-      </div>
-      <p className="mt-3 text-xs text-gray-400">
-        Пример ответа ChatGPT. Проверка выполняется только по информации на самом сайте; ответы модели у разных пользователей могут различаться.
-      </p>
-    </div>
   );
 }
 
@@ -306,7 +350,7 @@ function MaterialsBlock({ url, mode, items, allItems, lang }: { url: string; mod
   const siteLabel = lang === "ru" ? "Сайт" : "Site";
 
   return (
-    <div className="max-w-xl mx-auto rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 mb-10 text-xs sm:text-sm text-gray-700 leading-relaxed">
+    <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-700 leading-relaxed">
       <MaterialRow label={siteLabel} value={hostname} withQuotes={false} lang={lang} />
       {primaryKeys.map((key) => {
         const value = lookup.get(key);

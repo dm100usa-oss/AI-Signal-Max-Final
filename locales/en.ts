@@ -321,6 +321,61 @@ const en = {
       lowQuick: `Your website is not yet ready for AI recommendations. <strong>In its current state it does not appear in AI answers</strong>, which means you are missing potential visitors and inquiries.<br/><br/>In this quick check we show the <strong>main parameters</strong> that need urgent attention.<br/><br/>Best regards, the AI Answers Score team.`,
       lowPro: `Your website is not yet ready for AI recommendations. <strong>In its current state it does not appear in AI answers</strong>, which means you are missing potential visitors and inquiries.<br/><br/>Critically important parameters are misconfigured or missing. <strong>Without fixing them, your site will not be recommended by AI systems.</strong><br/><br/>We sent you two PDF files by email: <strong>a detailed report with explanations for the owner and a technical brief for your developer</strong>. It's a step-by-step plan to fix the issues and prepare your site for AI traffic.<br/><br/>Best regards, the AI Answers Score team.`,
     },
+    // --- Five result levels (detailed check) ---
+    levels: {
+      veryLow: {
+        title: "Right now your site is nearly invisible to AI — but that's fixable",
+        text: "For now it's hard for AI to understand your site, and it rarely appears in answers. This is a normal starting point — we've already seen exactly what needs to be done. Don't worry: we'll help and bring your site up to a solid result step by step. We've collected all the needed improvements and sent them to your email as two documents.",
+      },
+      low: {
+        title: "Your site is taking its first steps toward AI recommendations",
+        text: "You already have a foundation, but AI still sees your site only partially. That's okay — it's solvable. We've identified what to strengthen first and prepared a clear plan. With these improvements your site will become noticeably clearer to AI.",
+      },
+      medium: {
+        title: "Your site is already halfway ready for AI recommendations",
+        text: "Good news: half the journey is done. Some important things are already in place; a few strong signals are still missing. We've found them all and put them into a plan for you — acting on it will noticeably raise your site's chances of appearing in AI answers.",
+      },
+      good: {
+        title: "Good result — your site already competes for AI recommendations",
+        text: "This is a good result. Your site already competes with category leaders for a place in AI recommendations. Nothing needs to be rebuilt — you just need to strengthen a few elements that help AI choose and recommend sites today. We've identified them and sent them to you.",
+      },
+      excellent: {
+        title: "Excellent result — your site is well prepared for AI recommendations",
+        text: "Your site already meets most of the factors modern AI uses when choosing sources of information. This is a high level of readiness. Small targeted improvements will help you keep your competitive edge as AI evolves.",
+      },
+    },
+    strengthsTitle: "Strengths",
+    weaknessesTitle: "Weaknesses",
+    strengths: {
+      home: "AI clearly understands what you do and who you help",
+      tech: "Your site is easy for AI to read and analyze",
+      content: "Your site has content AI can cite in an answer",
+      authority: "AI sees signals of trust and reliability in your company",
+      overall: "Your site already has a foundation to compete for a place in AI recommendations",
+    },
+    weaknesses: {
+      home: "From the first screen AI doesn't fully understand what you do and in which region",
+      tech: "AI still can't read everything on your site",
+      content: "Your site lacks content that AI could cite",
+      authority: "AI sees few proofs of your company's expertise and reliability",
+      overall: "Your site still trails category leaders on several important indicators",
+    },
+    chatgpt: {
+      lead: "For example, here's what ChatGPT currently recommends for the query",
+      question: "What's a good Italian restaurant you'd recommend in Miami?",
+      answerTitle: "ChatGPT's answer",
+      items: [
+        "Carbone — South Beach",
+        "Boia De — Little Haiti",
+        "Macchialina — South Beach",
+      ],
+      explanationTitle: "Explanation",
+      explanation: "I recommend these because I consider them the most reliable and useful for the user. Their sites better confirm expertise, reputation, and relevance to this query.",
+      note: "The check evaluates only the site itself. Brand fame, press coverage, and other external signals are not part of the score. So a well-known company may already be recommended by AI thanks to its reputation, even if its site is only mediocre.",
+    },
+    paramsToggle: "Main check parameters",
+    requestLead: "If you don't have a developer or don't know who to assign this to — we can help. Leave a request and we'll get in touch.",
+    requestButton: "Leave a request",
   },
 
   scanFailed: {
