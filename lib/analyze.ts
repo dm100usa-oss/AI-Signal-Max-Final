@@ -112,7 +112,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     }
   }
 
-  const aiScores = computeAiScores(factorScores, notApplicable);
+  const aiScores = computeAiScores(factorScores, notApplicable as Set<FactorKey>);
 
   const resultData = {
     url,
