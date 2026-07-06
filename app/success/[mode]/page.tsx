@@ -27,7 +27,8 @@ const STRONG = 75;
 const WEAK = 50;
 // сколько сильных/слабых сторон показываем по уровню [сильных, слабых]
 function sideCounts(score: number): [number, number] {
-  if (score >= 81) return [5, 2];
+  if (score >= 85) return [5, 2];
+  if (score >= 75) return [5, 2];
   if (score >= 61) return [4, 3];
   if (score >= 41) return [3, 3];
   if (score >= 21) return [2, 4];
@@ -107,9 +108,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
     year: "numeric", month: "long", day: "numeric",
   });
 
-  // выбор уровня по баллу
+  // выбор уровня по баллу (6 уровней)
   const level =
-    score >= 81 ? t.levels.excellent
+    score >= 85 ? t.levels.excellent
+    : score >= 75 ? t.levels.veryGood
     : score >= 61 ? t.levels.good
     : score >= 41 ? t.levels.medium
     : score >= 21 ? t.levels.low
@@ -247,6 +249,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           <p className="font-semibold text-gray-800 mb-2">{t.meaningTitle}</p>
           <p className="text-gray-700 leading-relaxed mb-3">
             {score >= 85 ? t.meaningIntro.excellent
+              : score >= 75 ? t.meaningIntro.veryGood
               : score >= 61 ? t.meaningIntro.good
               : score >= 41 ? t.meaningIntro.medium
               : score >= 21 ? t.meaningIntro.low

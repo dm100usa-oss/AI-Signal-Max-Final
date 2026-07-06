@@ -324,23 +324,27 @@ const en = {
     // --- Five result levels (detailed check) ---
     levels: {
       veryLow: {
-        title: "Right now your site is nearly invisible to AI — but that's fixable",
-        text: "For now it's hard for AI to understand your site, and it rarely appears in answers. This is a normal starting point — we've already seen exactly what needs to be done. Don't worry: we'll help and bring your site up to a solid result step by step. We've collected all the needed improvements and sent them to your email as two documents.",
+        title: "Right now your site is nearly invisible to AI, but that's fixable",
+        text: "For now it's hard for AI to understand what your site does, so it rarely recommends it to users. It's best to start with the basic improvements.",
       },
       low: {
         title: "Your site is taking its first steps toward AI recommendations",
-        text: "You already have a foundation, but AI still sees your site only partially. That's okay — it's solvable. We've identified what to strengthen first and prepared a clear plan. With these improvements your site will become noticeably clearer to AI.",
+        text: "AI already sees part of the information about your site, but doesn't yet fully understand it. Right now it's important to strengthen the basic elements so your site becomes much clearer to AI.",
       },
       medium: {
-        title: "Your site is already halfway ready for AI recommendations",
-        text: "Good news: half the journey is done. Some important things are already in place; a few strong signals are still missing. We've found them all and put them into a plan for you — acting on it will noticeably raise your site's chances of appearing in AI answers.",
+        title: "Good progress. Your site is already halfway ready for AI recommendations",
+        text: "Your site already has a solid foundation. Many important elements are present, but some signals are still not strong enough. After improvements, your site can significantly raise its chances of appearing in AI recommendations.",
       },
       good: {
-        title: "Good result — your site already competes for AI recommendations",
-        text: "This is a good result. Your site already competes with category leaders for a place in AI recommendations. Nothing needs to be rebuilt — you just need to strengthen a few elements that help AI choose and recommend sites today. We've identified them and sent them to you.",
+        title: "Good result. Your site is confidently moving toward AI recommendations",
+        text: "Your site already has a good foundation, and many important elements work correctly. After improving a few factors, your site can significantly strengthen its position and appear in AI recommendations more often.",
+      },
+      veryGood: {
+        title: "Very good result. Your site is already very close to AI recommendations",
+        text: "Your site already has a strong foundation and confidently competes for a place in AI recommendations. A few important elements remain to be strengthened, which will help AI choose your site even more often.",
       },
       excellent: {
-        title: "Excellent result — your site is well prepared for AI recommendations",
+        title: "Excellent result. Your site is well prepared for AI recommendations",
         text: "Your site already meets most of the factors modern AI uses when choosing sources of information. This is a high level of readiness. Small targeted improvements will help you keep your competitive edge as AI evolves.",
       },
     },
@@ -408,11 +412,12 @@ const en = {
     paramsToggle: "Main check parameters",
     meaningTitle: "What this means",
     meaningIntro: {
-      excellent: "You've done excellent work. Based on the check, your site is already very well prepared for AI to choose and recommend it. Nothing needs to be rebuilt.",
-      good: "You've already done a lot of work. The check shows your site has a solid foundation and already competes for a place in AI recommendations. It doesn't need to be rebuilt. You just need to improve the elements that help AI choose and recommend sites today.",
-      medium: "You've already done good work — your site has a solid foundation. It's already halfway ready for AI recommendations. It just needs a little strengthening of a few elements that help AI choose and recommend sites today.",
-      low: "You've already taken important steps, and your site has a foundation. Now it needs a few elements strengthened so AI understands your site better. It's not hard — we've identified where to start.",
-      veryLow: "Your site already has something to build on. For now AI doesn't fully understand it, but that's fixable. We'll show you what to strengthen first and help step by step.",
+      excellent: "You've done excellent work. The check shows that most of the important signals are already present on your site. We carefully reviewed the remaining growth points and prepared recommendations that will help your site maintain its high level of readiness in the future.",
+      veryGood: "You've already done a lot of work. Right now your site is very close to an excellent result. We've identified a few elements that are still slightly holding back growth and prepared recommendations that will help take your site to the next level.",
+      good: "You've already built a good foundation. Now it's important to consistently strengthen the missing elements so AI understands your site better and recommends it to users more confidently. Our main recommendations focus exactly on these improvements.",
+      medium: "You've already taken an important step forward. The main task now is to consistently strengthen the missing elements that help AI understand your site's topic, level of trust, and value of information for users.",
+      low: "The good news is that the foundation is already there. Now it's important to gradually strengthen the key signals that help AI understand what the company does and why it can be recommended to users. We've already identified where it's best to start.",
+      veryLow: "This is a normal starting point for many sites. The most important thing now is to make the site clearer to AI and strengthen the core signals it uses to determine your topic, services, and level of trust. We've already found the main reasons and prepared a step-by-step improvement plan.",
     },
     meaningBody: "We've already identified all the needed improvements and sent you two PDF documents by email. They'll help you improve the site step by step without unnecessary changes. The documents are structured so you can make some changes yourself and hand the ready technical brief straight to a developer, saving time. If you'd like to review all 15 check parameters and see the result for each, open the \"Main parameters\" section below.",
     requestLead: "If you don't have a developer or don't know who to assign this to — we can help. Leave a request and we'll get in touch.",
