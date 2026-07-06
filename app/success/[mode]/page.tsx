@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Donut from "../../../components/Donut";
 import PartScores, { AiScores } from "../../../components/PartScores";
+import { getChatgptBlock } from "@/lib/chatgptBlock";
 import { useLang } from "@/hooks/useTranslation";
 import en from "@/locales/en";
 import ru from "@/locales/ru";
@@ -25,8 +26,10 @@ interface CheckItem {
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
   const interfaceLang = useLang();
+  // язык отчёта = язык интерфейса/пользователя (вариант Б).
+  // язык самого сайта показываем отдельным параметром в Check Details.
   const [pageLang, setPageLang] = useState<"ru" | "en" | null>(null);
-  const lang = pageLang || interfaceLang;
+  const lang = interfaceLang;
   const t = lang === "ru" ? ru.success : en.success;
   const tf = lang === "ru" ? ru.footer : en.footer;
 
@@ -58,10 +61,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
-        // язык отчёта = язык проверенной страницы
+        // язык проверенной страницы сохраняем только для показа как параметр,
+        // тексты отчёта берём по языку интерфейса (вариант Б)
         const resultLang: "ru" | "en" = data.pageLang === "ru" ? "ru" : "en";
         setPageLang(resultLang);
-        const langT = resultLang === "ru" ? ru.success : en.success;
+        const langT = interfaceLang === "ru" ? ru.success : en.success;
 
         const allFactors = langT.factors;
 
@@ -138,7 +142,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         {showSummary && (
           <>
             <p className="text-lg font-semibold text-gray-800 mb-2 text-center">
-              {score >= 75 ? t.highReadiness : score >= 40 ? t.mediumReadiness : t.lowReadiness}
+              {score >= 75 ? t.highReadiness : score >= 35 ? t.mediumReadiness : t.lowReadiness}
             </p>
             <p
               className="text-base text-gray-700 leading-relaxed"
@@ -150,6 +154,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
       {aiScores && showSummary && (
         <PartScores scores={aiScores} t={t.aiScores} />
+      )}
+
+      {mode === "pro" && showSummary && (
+        <ChatgptBlockView url={url} />
       )}
 
       <h2 className="text-lg font-semibold text-gray-800 text-center mt-8 mb-4">
@@ -199,6 +207,34 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <p className="opacity-60">{tf.disclaimer}</p>
       </footer>
     </main>
+  );
+}
+
+function ChatgptBlockView({ url }: { url: string }) {
+  const b = getChatgptBlock(url);
+  return (
+    <div className="max-w-xl mx-auto rounded-2xl border border-gray-200 bg-gray-50 px-5 py-5 mb-10">
+      <p className="text-base font-semibold text-gray-800 mb-3 text-center">
+        Кого ChatGPT рекомендует в вашей нише
+      </p>
+      <div className="text-sm text-gray-700 leading-relaxed space-y-1">
+        <p><span className="font-semibold">Категория бизнеса:</span> {b.category}</p>
+        <p><span className="font-semibold">Рынок:</span> {b.market}</p>
+        <p className="font-semibold mt-2">Наиболее вероятный вопрос пользователя к ChatGPT:</p>
+        <p className="italic text-gray-600">«{b.question}»</p>
+        <p className="font-semibold mt-2">Я рекомендую:</p>
+        <ol className="list-none pl-0 space-y-0.5">
+          {b.companies.map((c, i) => (
+            <li key={i}>{i + 1}. <span className="font-semibold">{c.name}</span> — {c.place}</li>
+          ))}
+        </ol>
+        <p className="font-semibold mt-2">Почему именно они?</p>
+        <p className="italic text-gray-600">{b.reason}</p>
+      </div>
+      <p className="mt-3 text-xs text-gray-400">
+        Пример ответа ChatGPT. Проверка выполняется только по информации на самом сайте; ответы модели у разных пользователей могут различаться.
+      </p>
+    </div>
   );
 }
 

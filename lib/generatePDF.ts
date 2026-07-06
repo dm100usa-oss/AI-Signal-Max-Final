@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { getChatgptBlockHtml } from "./chatgptBlock";
 
 type GeneratePDFParams = {
   type: "owner" | "developer";
@@ -55,6 +56,8 @@ export async function generatePDF({
     assessment_p2: getAssessmentText2(scoreValue),
     verdict_conclusion: getVerdictConclusion(scoreValue),
     score_factor_card: getScoreFactorCard(scoreValue),
+    // блок ChatGPT только в отчёте владельца (в developer плейсхолдера нет)
+    chatgpt_block: type === "owner" ? getChatgptBlockHtml(data.website) : "",
   };
 
   const filledHtml = fillPlaceholders(template, placeholders);
