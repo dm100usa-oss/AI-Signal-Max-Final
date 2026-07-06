@@ -1,130 +1,130 @@
 // lib/partScores.ts
-// Методика AI Scores: 4 части + общий скор.
-// Формула: набрал / сумма весов применимых факторов * 100.
-// Применимость по типу сайта (заголовок). Бонусный неприменимый фактор выпадает из расчёта.
+// Методика AI Scores: 4 направления + общий скор.
+//
+// Каждое направление считается отдельно по своей таблице весов.
+// Общий скор — взвешенная сумма четырёх направлений (НЕ плоская таблица):
+//   overall = authority*0.35 + content*0.30 + home*0.20 + tech*0.15
+//
+// Формула направления: earned / applicable * 100, где
+//   earned     = сумма (вес фактора * доля выполнения 0..1)
+//   applicable = сумма весов факторов, применимых к сайту
+//
+// Доля выполнения (factorScores): 0 = нет, 1 = есть, 0.25/0.5/0.75 = частично.
+//   - обычные факторы: 0 или 1
+//   - составные ("реальный бизнес"): дробная шкала по полноте признаков
+//   - связки: доля уже уменьшена движком до передачи сюда
+// notApplicable: фактор нельзя применить к нише — выпадает из знаменателя.
 
 export type FactorKey =
-  // 19 фактов, которые движок уже достаёт
-  | "robots_txt" | "meta_robots" | "x_robots_tag" | "sitemap_xml" | "sitemap_lastmod"
-  | "canonical" | "https" | "page_speed" | "page_404" | "mobile_friendly"
-  | "title_tag" | "h1_present" | "h2_present" | "meta_description" | "open_graph"
-  | "structured_data" | "alt_attributes" | "contacts" | "site_language"
-  // 9 новых факторов (20-28)
-  | "theme" | "services" | "prices" | "faq" | "tables"
-  | "reviews" | "org_schema" | "author" | "social" | "no_js";
-
-export type FactorType = "required" | "bonus";
+  // --- Техника ---
+  | "no_js" | "robots_txt" | "meta_robots" | "sitemap_xml" | "https"
+  | "x_robots_tag" | "page_speed" | "mobile_friendly" | "canonical" | "page_404"
+  // --- Главная ---
+  | "specialization" | "services" | "title_tag" | "meta_description" | "h1_present"
+  | "contacts" | "site_language" | "offer" | "region" | "open_graph" | "faq"
+  // --- Контент ---
+  | "facts" | "topic_coverage" | "structured_content" | "direct_answers"
+  | "structured_data" | "tables_lists" | "topic_volume" | "freshness" | "alt_attributes"
+  // --- Авторитет ---
+  | "real_business" | "org_schema" | "reviews" | "experience"
+  | "trust_signals" | "authorship" | "social";
 
 export interface WeightRow {
   key: FactorKey;
   weight: number;
-  type: FactorType;
 }
 
-// --- Часть 1: Техника ---
+// ================== ТАБЛИЦЫ ВЕСОВ НАПРАВЛЕНИЙ (сумма = 100) ==================
+
+// --- Техника (вес направления в общем скоре: 15%) ---
 export const TECH: WeightRow[] = [
-  { key: "robots_txt",     weight: 18, type: "required" },
-  { key: "meta_robots",    weight: 13, type: "required" },
-  { key: "no_js",          weight: 12, type: "required" },
-  { key: "x_robots_tag",   weight: 10, type: "required" },
-  { key: "https",          weight: 10, type: "required" },
-  { key: "sitemap_xml",    weight: 10, type: "required" },
-  { key: "page_speed",     weight: 8,  type: "required" },
-  { key: "canonical",      weight: 8,  type: "bonus" },
-  { key: "mobile_friendly",weight: 6,  type: "bonus" },
-  { key: "page_404",       weight: 5,  type: "bonus" },
+  { key: "no_js",           weight: 22 },
+  { key: "robots_txt",      weight: 16 },
+  { key: "meta_robots",     weight: 12 },
+  { key: "sitemap_xml",     weight: 12 },
+  { key: "https",           weight: 10 },
+  { key: "x_robots_tag",    weight: 8 },
+  { key: "page_speed",      weight: 8 },
+  { key: "mobile_friendly", weight: 6 },
+  { key: "canonical",       weight: 4 },
+  { key: "page_404",        weight: 2 },
 ];
 
-// --- Часть 2: Главная ---
+// --- Главная (вес направления: 20%) ---
 export const HOME: WeightRow[] = [
-  { key: "meta_description", weight: 18, type: "required" },
-  { key: "title_tag",        weight: 16, type: "required" },
-  { key: "h1_present",       weight: 14, type: "required" },
-  { key: "contacts",         weight: 12, type: "required" },
-  { key: "open_graph",       weight: 10, type: "bonus" },
-  { key: "services",         weight: 10, type: "bonus" },
-  { key: "prices",           weight: 8,  type: "bonus" },
-  { key: "faq",              weight: 7,  type: "bonus" },
-  { key: "site_language",    weight: 5,  type: "required" },
+  { key: "specialization",   weight: 18 },
+  { key: "services",         weight: 16 },
+  { key: "title_tag",        weight: 12 },
+  { key: "meta_description", weight: 12 },
+  { key: "h1_present",       weight: 10 },
+  { key: "contacts",         weight: 10 },
+  { key: "site_language",    weight: 5 },
+  { key: "offer",            weight: 8 },
+  { key: "region",           weight: 4 },
+  { key: "open_graph",       weight: 3 },
+  { key: "faq",              weight: 2 },
 ];
 
-// --- Часть 3: Контент ---
+// --- Контент (вес направления: 30%) ---
 export const CONTENT: WeightRow[] = [
-  { key: "theme",           weight: 20, type: "required" },
-  { key: "structured_data", weight: 18, type: "required" },
-  { key: "h2_present",      weight: 12, type: "required" },
-  { key: "tables",          weight: 12, type: "bonus" },
-  { key: "page_speed",      weight: 0,  type: "bonus" }, // placeholder, не используется
-  { key: "h1_present",      weight: 8,  type: "required" },
-  { key: "faq",             weight: 8,  type: "bonus" },
-  { key: "reviews",         weight: 7,  type: "bonus" },
-  { key: "alt_attributes",  weight: 5,  type: "bonus" },
+  { key: "facts",              weight: 25 },
+  { key: "topic_coverage",     weight: 23 },
+  { key: "structured_content", weight: 17 },
+  { key: "direct_answers",     weight: 14 },
+  { key: "structured_data",    weight: 9 },
+  { key: "tables_lists",       weight: 5 },
+  { key: "topic_volume",       weight: 4 },
+  { key: "freshness",          weight: 2 },
+  { key: "alt_attributes",     weight: 1 },
 ];
 
-// объём текста как отдельный фактор пока не считается движком — добавим на доработке
-// (в CONTENT зарезервировано 10 на "textvol", временно распределено)
-
-// --- Часть 4: Признаки авторитета для ИИ на сайте ---
+// --- Авторитет (вес направления: 35%) ---
 export const AUTHORITY: WeightRow[] = [
-  { key: "reviews",     weight: 30, type: "bonus" },
-  { key: "org_schema",  weight: 28, type: "required" },
-  { key: "author",      weight: 20, type: "bonus" },
-  { key: "social",      weight: 12, type: "bonus" },
-  { key: "contacts",    weight: 10, type: "required" },
+  { key: "real_business",  weight: 35 },
+  { key: "reviews",        weight: 18 },
+  { key: "org_schema",     weight: 15 },
+  { key: "experience",     weight: 12 },
+  { key: "trust_signals",  weight: 8 },
+  { key: "authorship",     weight: 6 },
+  { key: "social",         weight: 4 },
+  { key: "freshness",      weight: 2 },
 ];
 
-// --- Общий скор (свои веса, НЕ среднее частей) ---
-export const OVERALL: WeightRow[] = [
-  { key: "structured_data", weight: 9, type: "required" },
-  { key: "robots_txt",      weight: 9, type: "required" },
-  { key: "meta_description",weight: 8, type: "required" },
-  { key: "reviews",         weight: 8, type: "bonus" },
-  { key: "org_schema",      weight: 8, type: "required" },
-  { key: "theme",           weight: 7, type: "required" },
-  { key: "title_tag",       weight: 7, type: "required" },
-  { key: "h2_present",      weight: 5, type: "required" },
-  { key: "h1_present",      weight: 5, type: "required" },
-  { key: "contacts",        weight: 3, type: "required" },
-  { key: "no_js",           weight: 3, type: "required" },
-  { key: "meta_robots",     weight: 3, type: "required" },
-  { key: "author",          weight: 3, type: "bonus" },
-  { key: "faq",             weight: 3, type: "bonus" },
-  { key: "tables",          weight: 2, type: "bonus" },
-  { key: "https",           weight: 2, type: "required" },
-  { key: "sitemap_xml",     weight: 2, type: "required" },
-  { key: "alt_attributes",  weight: 1, type: "bonus" },
-  { key: "social",          weight: 2, type: "bonus" },
-  { key: "site_language",   weight: 1, type: "required" },
-  { key: "services",        weight: 1, type: "bonus" },
-  { key: "page_speed",      weight: 1, type: "required" },
-  { key: "mobile_friendly", weight: 1, type: "bonus" },
-  { key: "canonical",       weight: 1, type: "bonus" },
-  { key: "page_404",        weight: 1, type: "bonus" },
-  { key: "x_robots_tag",    weight: 1, type: "required" },
-  { key: "sitemap_lastmod", weight: 1, type: "bonus" },
-  { key: "prices",          weight: 1, type: "bonus" },
-  { key: "open_graph",      weight: 1, type: "bonus" },
-];
+// ================== ВЕСА НАПРАВЛЕНИЙ В ОБЩЕМ СКОРЕ ==================
+export const DIRECTION_WEIGHTS = {
+  authority: 0.35,
+  content: 0.30,
+  home: 0.20,
+  tech: 0.15,
+} as const;
 
-// present: набор факторов, которые ЕСТЬ на сайте (passed === true)
-// notApplicable: бонусные факторы, неприменимые к этому сайту по типу (выпадают из расчёта)
+// ================== РАСЧЁТ ==================
+
+// factorScores: доля выполнения каждого фактора (0..1)
+// notApplicable: факторы, не применимые к нише — выпадают из знаменателя
 export function scorePart(
   table: WeightRow[],
-  present: Set<FactorKey>,
+  factorScores: Partial<Record<FactorKey, number>>,
   notApplicable: Set<FactorKey> = new Set()
 ): number {
-  let need = 0;
-  let got = 0;
+  let applicable = 0;
+  let earned = 0;
   for (const row of table) {
     if (row.weight === 0) continue;
-    // неприменимый/неопределённый фактор (passed === null) не входит в знаменатель —
-    // не штрафуем за отсутствие тега, которое является нормой, или за то, что не смогли определить
     if (notApplicable.has(row.key)) continue;
-    need += row.weight;
-    if (present.has(row.key)) got += row.weight;
+    applicable += row.weight;
+    const share = clamp01(factorScores[row.key] ?? 0);
+    earned += row.weight * share;
   }
-  if (need === 0) return 0;
-  return Math.round((got / need) * 100);
+  if (applicable === 0) return 0;
+  return Math.round((earned / applicable) * 100);
+}
+
+function clamp01(n: number): number {
+  if (Number.isNaN(n)) return 0;
+  if (n < 0) return 0;
+  if (n > 1) return 1;
+  return n;
 }
 
 export interface AiScores {
@@ -136,14 +136,30 @@ export interface AiScores {
 }
 
 export function computeAiScores(
-  present: Set<FactorKey>,
+  factorScores: Partial<Record<FactorKey, number>>,
   notApplicable: Set<FactorKey> = new Set()
 ): AiScores {
-  return {
-    overall:   scorePart(OVERALL,   present, notApplicable),
-    tech:      scorePart(TECH,      present, notApplicable),
-    home:      scorePart(HOME,      present, notApplicable),
-    content:   scorePart(CONTENT,   present, notApplicable),
-    authority: scorePart(AUTHORITY, present, notApplicable),
-  };
+  const tech      = scorePart(TECH,      factorScores, notApplicable);
+  const home      = scorePart(HOME,      factorScores, notApplicable);
+  const content   = scorePart(CONTENT,   factorScores, notApplicable);
+  const authority = scorePart(AUTHORITY, factorScores, notApplicable);
+
+  const overall = Math.round(
+    authority * DIRECTION_WEIGHTS.authority +
+    content   * DIRECTION_WEIGHTS.content +
+    home      * DIRECTION_WEIGHTS.home +
+    tech      * DIRECTION_WEIGHTS.tech
+  );
+
+  return { overall, tech, home, content, authority };
+}
+
+// Пороги готовности (предварительные, до калибровки)
+export function gradeOf(score: number):
+  "high" | "good" | "partial" | "basic" | "low" {
+  if (score >= 85) return "high";
+  if (score >= 75) return "good";
+  if (score >= 55) return "partial";
+  if (score >= 35) return "basic";
+  return "low";
 }
