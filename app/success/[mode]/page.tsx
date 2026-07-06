@@ -241,6 +241,21 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <p className="text-sm text-gray-600 text-center mb-8">{t.pdfSent}</p>
       )}
 
+      {/* Что это значит */}
+      {showSummary && (
+        <div className="max-w-xl mx-auto mb-8">
+          <p className="font-semibold text-gray-800 mb-2">{t.meaningTitle}</p>
+          <p className="text-gray-700 leading-relaxed mb-3">
+            {score >= 85 ? t.meaningIntro.excellent
+              : score >= 61 ? t.meaningIntro.good
+              : score >= 41 ? t.meaningIntro.medium
+              : score >= 21 ? t.meaningIntro.low
+              : t.meaningIntro.veryLow}
+          </p>
+          <p className="text-gray-700 leading-relaxed">{t.meaningBody}</p>
+        </div>
+      )}
+
       {/* Разворачиваемые параметры */}
       {showSummary && (
         <div className="max-w-xl mx-auto mb-8">
