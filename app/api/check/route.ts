@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         url
       )}&status=ok&paid=1`,
       cancel_url: `${base}/`,
-      metadata: { url, mode, lang: pageLang || lang },
+      metadata: { url, mode, lang },
     });
 
     // сохранение данных

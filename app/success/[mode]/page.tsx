@@ -25,20 +25,25 @@ interface CheckItem {
 // пороги: сильная сторона >= 75, слабая < 50
 const STRONG = 75;
 const WEAK = 50;
-// сколько сильных сторон максимум показываем по уровню
-function maxStrengths(score: number): number {
-  if (score >= 81) return 5;
-  if (score >= 61) return 4;
-  if (score >= 41) return 3;
-  if (score >= 21) return 2;
-  return 1;
+// сколько сильных/слабых сторон показываем по уровню [сильных, слабых]
+function sideCounts(score: number): [number, number] {
+  if (score >= 81) return [5, 2];
+  if (score >= 61) return [4, 3];
+  if (score >= 41) return [3, 3];
+  if (score >= 21) return [2, 4];
+  return [2, 5];
 }
+// порядок важности параметров для отбора сторон
+const PARAM_PRIORITY = [
+  "robots_txt", "meta_description", "theme", "title_tag", "structured_data",
+  "sitemap_xml", "h2_present", "page_speed", "https", "meta_robots",
+  "canonical", "mobile_friendly", "alt_attributes", "page_404",
+];
 
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
   const interfaceLang = useLang();
-  const [pageLang, setPageLang] = useState<"ru" | "en" | null>(null);
-  const lang = pageLang || interfaceLang;
+  const lang = interfaceLang;
   const t = lang === "ru" ? ru.success : en.success;
   const tf = lang === "ru" ? ru.footer : en.footer;
 
@@ -69,8 +74,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
-        const resultLang: "ru" | "en" = data.pageLang === "ru" ? "ru" : "en";
-        setPageLang(resultLang);
+        // язык отчёта = язык интерфейса (с которого запускали проверку), НЕ язык сайта
+        const resultLang: "ru" | "en" = interfaceLang === "ru" ? "ru" : "en";
         const langT = resultLang === "ru" ? ru.success : en.success;
 
         const allFactors = langT.factors;
@@ -110,30 +115,37 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
     : score >= 21 ? t.levels.low
     : t.levels.veryLow;
 
-  // сильные и слабые стороны из реальных баллов направлений
-  const dims = aiScores
-    ? [
-        { key: "home", val: aiScores.home },
-        { key: "tech", val: aiScores.tech },
-        { key: "content", val: aiScores.content },
-        { key: "authority", val: aiScores.authority },
-      ]
-    : [];
+  // сильные и слабые стороны из проверенных параметров (по статусу)
+  const [nStrong, nWeak] = sideCounts(score);
+  const statusByKey = new Map(factors.map((f) => [f.key, f.status]));
 
-  const strongList = dims
-    .filter((d) => d.val >= STRONG)
-    .sort((a, b) => b.val - a.val)
-    .map((d) => (t.strengths as Record<string, string>)[d.key]);
-  // добавляем общий плюс, если сайт в целом неплох
-  if (score >= 61) strongList.push(t.strengths.overall);
-  const strengths = strongList.slice(0, maxStrengths(score));
+  // сортируем ключи по важности
+  const orderedKeys = PARAM_PRIORITY.filter((k) => statusByKey.has(k));
 
-  const weakList = dims
-    .filter((d) => d.val < WEAK)
-    .sort((a, b) => a.val - b.val)
-    .map((d) => (t.weaknesses as Record<string, string>)[d.key]);
-  if (score < 61 && weakList.length === 0) weakList.push(t.weaknesses.overall);
-  const weaknesses = weakList;
+  const strongList = orderedKeys
+    .filter((k) => statusByKey.get(k) === "Good")
+    .map((k) => (t.paramStrengths as Record<string, string>)[k])
+    .filter(Boolean);
+
+  const weakList = orderedKeys
+    .filter((k) => statusByKey.get(k) === "Poor")
+    .map((k) => (t.paramWeaknesses as Record<string, string>)[k])
+    .filter(Boolean);
+
+  // добираем слабыми "Moderate", если явных Poor не хватает до нужного числа
+  if (weakList.length < nWeak) {
+    const extra = orderedKeys
+      .filter((k) => statusByKey.get(k) === "Moderate")
+      .map((k) => (t.paramWeaknesses as Record<string, string>)[k])
+      .filter(Boolean);
+    for (const w of extra) {
+      if (weakList.length >= nWeak) break;
+      weakList.push(w);
+    }
+  }
+
+  const strengths = strongList.slice(0, nStrong);
+  const weaknesses = weakList.slice(0, nWeak);
 
   if (loading) {
     return (
