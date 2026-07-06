@@ -183,7 +183,7 @@ const en = {
 
   success: {
     quickTitle: "Quick Check Results",
-    proTitle: "Full Audit Results",
+    proTitle: "Detailed check result",
     siteLabel: "Website",
     dateLabel: "Date",
     loading: "Loading results...",
@@ -419,7 +419,12 @@ const en = {
       low: "The good news is that the foundation is already there. Now it's important to gradually strengthen the key signals that help AI understand what the company does and why it can be recommended to users. We've already identified where it's best to start.",
       veryLow: "This is a normal starting point for many sites. The most important thing now is to make the site clearer to AI and strengthen the core signals it uses to determine your topic, services, and level of trust. We've already found the main reasons and prepared a step-by-step improvement plan.",
     },
-    meaningBody: "We've already identified all the needed improvements and sent you two PDF documents by email. They'll help you improve the site step by step without unnecessary changes. The documents are structured so you can make some changes yourself and hand the ready technical brief straight to a developer, saving time. If you'd like to review all 15 check parameters and see the result for each, open the \"Main parameters\" section below.",
+    meaningBody: [
+      "We've already identified all the needed improvements and sent you two PDF documents by email.",
+      "They'll help you improve the site step by step without unnecessary changes.",
+      "The documents are structured so you can make some changes yourself and hand the ready technical brief straight to a developer, saving time.",
+      "If you'd like to review all 15 check parameters and see the result for each, open the \"Main parameters\" section below.",
+    ],
     requestLead: "If you don't have a developer or don't know who to assign this to — we can help. Leave a request and we'll get in touch.",
     requestButton: "Leave a request",
   },

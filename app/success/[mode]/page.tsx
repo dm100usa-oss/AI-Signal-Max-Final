@@ -177,40 +177,52 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         className="max-w-xl mx-auto rounded-2xl p-6 mb-8 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 transition-all duration-1000 ease-in-out"
         style={{ opacity: showSummary ? 1 : 0 }}
       >
-        {showSummary && (
-          <>
-            <p className="text-lg font-semibold text-gray-800 mb-3 text-center">
-              {level.title}
-            </p>
-            <p className="text-base text-gray-700 leading-relaxed">{level.text}</p>
-          </>
-        )}
+        {showSummary && (() => {
+          const dotIdx = level.title.indexOf(".");
+          const firstPart = dotIdx > -1 ? level.title.slice(0, dotIdx) : level.title;
+          const restPart = dotIdx > -1 ? level.title.slice(dotIdx + 1).trim() : "";
+          return (
+            <>
+              <p className="mb-3 text-center">
+                <span className="block sm:inline text-2xl sm:text-lg font-bold text-gray-800">
+                  {firstPart}{restPart ? "." : ""}
+                </span>
+                {restPart && (
+                  <span className="block sm:inline text-lg font-semibold text-gray-800 sm:ml-1">
+                    {restPart}
+                  </span>
+                )}
+              </p>
+              <p className="text-base text-gray-700 leading-relaxed text-justify">{level.text}</p>
+            </>
+          );
+        })()}
       </div>
 
       {/* Сильные и слабые стороны */}
       {showSummary && (strengths.length > 0 || weaknesses.length > 0) && (
-        <div className="max-w-xl mx-auto mb-8 space-y-4">
+        <div className="max-w-xl mx-auto mb-8 space-y-8 mt-10">
           {strengths.length > 0 && (
             <div>
-              <p className="font-semibold text-gray-800 mb-2">{t.strengthsTitle}</p>
+              <p className="text-lg font-semibold text-gray-800 mb-3">{t.strengthsTitle}</p>
               <ul className="space-y-2">
                 {strengths.map((s, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="mt-1 w-4 h-4 flex-shrink-0 rounded-full border-2 border-green-500" />
-                    <span className="text-gray-700">{s}</span>
+                    <span className="mt-1.5 w-4 h-4 flex-shrink-0 rounded-full border-2 border-green-500" />
+                    <span className="text-lg text-gray-700">{s}</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
           {weaknesses.length > 0 && (
-            <div>
-              <p className="font-semibold text-gray-800 mb-2">{t.weaknessesTitle}</p>
+            <div className="mt-8">
+              <p className="text-lg font-semibold text-gray-800 mb-3">{t.weaknessesTitle}</p>
               <ul className="space-y-2">
                 {weaknesses.map((w, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="mt-1 w-4 h-4 flex-shrink-0 rounded-full border-2 border-red-500" />
-                    <span className="text-gray-700">{w}</span>
+                    <span className="mt-1.5 w-4 h-4 flex-shrink-0 rounded-full border-2 border-red-500" />
+                    <span className="text-lg text-gray-700">{w}</span>
                   </li>
                 ))}
               </ul>
@@ -247,7 +259,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       {showSummary && (
         <div className="max-w-xl mx-auto mb-8">
           <p className="font-semibold text-gray-800 mb-2">{t.meaningTitle}</p>
-          <p className="text-gray-700 leading-relaxed mb-3">
+          <p className="text-lg text-gray-700 leading-relaxed mb-4">
             {score >= 85 ? t.meaningIntro.excellent
               : score >= 75 ? t.meaningIntro.veryGood
               : score >= 61 ? t.meaningIntro.good
@@ -255,7 +267,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
               : score >= 21 ? t.meaningIntro.low
               : t.meaningIntro.veryLow}
           </p>
-          <p className="text-gray-700 leading-relaxed">{t.meaningBody}</p>
+          {t.meaningBody.map((para, i) => (
+            <p key={i} className="text-lg text-gray-700 leading-relaxed mb-4">
+              {para}
+            </p>
+          ))}
         </div>
       )}
 
@@ -264,10 +280,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-8">
           <button
             onClick={() => setShowParams((v) => !v)}
-            className="w-full flex items-center justify-between px-5 py-3 rounded-xl bg-white border border-gray-200 shadow-sm font-medium text-gray-800"
+            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-amber-200 shadow-sm font-medium text-gray-800"
+            style={{ backgroundColor: "#FBF3E0" }}
           >
             <span>{t.paramsToggle}</span>
-            <span className="text-gray-400">{showParams ? "▲" : "▼"}</span>
+            <span className="text-gray-600 text-xl font-bold leading-none">{showParams ? "▲" : "▼"}</span>
           </button>
           {showParams && (
             <div className="mt-4 space-y-3">
@@ -283,7 +300,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       {/* Кнопка заявки */}
       {showSummary && (
         <div className="max-w-xl mx-auto mb-6">
-          <p className="text-sm text-gray-600 text-center mb-3">{t.requestLead}</p>
+          <p className="text-lg text-gray-600 text-center mb-3">{t.requestLead}</p>
           <button
             onClick={() => (window.location.href = "/?request=1")}
             className="w-full px-6 py-3 rounded-2xl text-white font-medium text-base"
@@ -294,20 +311,24 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </div>
       )}
 
-      <div className="max-w-xl mx-auto flex flex-col items-center space-y-3">
-        <button
-          onClick={() => (window.location.href = "/reviews?add=true")}
-          className="w-full max-w-xs px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-colors flex items-center justify-center space-x-2"
-        >
-          <span style={{ color: "#facc15", WebkitTextStroke: "0.8px #eab308", fontSize: "20px", lineHeight: "20px" }}>★</span>
-          <span>{t.leaveReview}</span>
-        </button>
-      </div>
+      {showSummary && (
+        <div className="max-w-xl mx-auto mb-6">
+          <button
+            onClick={() => (window.location.href = "/reviews?add=true")}
+            className="w-full px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-colors flex items-center justify-center space-x-2"
+          >
+            <span style={{ color: "#facc15", WebkitTextStroke: "0.8px #eab308", fontSize: "20px", lineHeight: "20px" }}>★</span>
+            <span>{t.leaveReview}</span>
+          </button>
+        </div>
+      )}
 
-      <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
-        <p>{tf.copyright}</p>
-        <p className="opacity-60">{tf.disclaimer}</p>
-      </footer>
+      {showSummary && (
+        <footer className="mt-12 text-center text-xs text-neutral-500 leading-relaxed">
+          <p>{tf.copyright}</p>
+          <p className="opacity-60">{tf.disclaimer}</p>
+        </footer>
+      )}
     </main>
   );
 }
