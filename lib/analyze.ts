@@ -1,4 +1,14 @@
 // lib/analyze.ts
+//
+// ПРИНЦИП ПРОВЕРКИ AIRS:
+// Оцениваем только то, что сам сайт показывает искусственному интеллекту в
+// своём коде. Внешние источники, поисковые системы, каталоги, СМИ и сторонние
+// отзывы не проверяются. Если признак есть на сайте — он может влиять на оценку.
+// Если признак существует только вне сайта — он не влияет на AIRS.
+//
+// Каждый фактор оценивает не факт наличия элемента, а СИЛУ сигнала, который
+// сайт показывает ИИ. Присутствие слова даёт мало, доказательство даёт много.
+//
 import {
   QUICK_KEYS,
   PRO_KEYS,
@@ -42,6 +52,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
 
   const sitemapResult = await checkSitemap(origin, html, headers);
 
+  // ----- старый слой проверок (для показа списка на экране, не трогаем) -----
   const all: Record<CheckKey, CheckItem> = {
     robots_txt: await checkRobotsTxt(origin),
     sitemap_xml: sitemapResult.pageCount,
@@ -70,20 +81,6 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     site_language: checkLanguage(html),
   };
 
-  // --- 9 новых факторов (20-28) для AI Scores ---
-  const newFacts = {
-    theme:      checkTheme(html),
-    services:   checkServices(html),
-    prices:     checkPrices(html),
-    faq:        checkFAQ(html),
-    tables:     checkTables(html),
-    reviews:    checkReviews(html),
-    org_schema: checkOrgSchema(html),
-    author:     checkAuthor(html),
-    social:     checkSocial(html),
-    no_js:      checkNoJs(html),
-  };
-
   const score = calcWeightedScore(all);
   const keysToShow = mode === "quick" ? QUICK_KEYS : PRO_KEYS;
   const items = keysToShow.map((k) => all[k]);
@@ -91,7 +88,6 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
 
   const results: Record<string, "Good" | "Moderate" | "Poor"> = {};
   const factors: Record<string, { status: "Good" | "Moderate" | "Poor" }> = {};
-
   for (const [key, item] of Object.entries(all)) {
     const status =
       item.passed === true ? "Good" : item.passed === false ? "Poor" : "Moderate";
@@ -99,33 +95,24 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     factors[key] = { status };
   }
 
-  // статусы новых факторов (theme и др.) тоже кладём в results для показа
-  for (const [key, item] of Object.entries(newFacts)) {
-    const status =
-      item.passed === true ? "Good" : item.passed === false ? "Poor" : "Moderate";
-    results[key] = status;
-    factors[key] = { status };
-  }
-
-  // --- AI Scores ---
-  // present: фактор есть (passed === true)
-  // notApplicable: фактор не определён/не применим (passed === null) — выпадает из расчёта
-  // passed === false — реальный провал, остаётся в знаменателе и снижает скор
-  const present = new Set<FactorKey>();
-  const notApplicable = new Set<FactorKey>();
-  for (const [key, it] of Object.entries(all)) {
-    if (it.passed === true) present.add(key as FactorKey);
-    else if (it.passed === null) notApplicable.add(key as FactorKey);
-  }
-  for (const [key, it] of Object.entries(newFacts)) {
-    if (it.passed === true) present.add(key as FactorKey);
-    else if (it.passed === null) notApplicable.add(key as FactorKey);
-  }
-  const aiScores = computeAiScores(present, notApplicable);
-
   // язык проверяемой страницы (из <html lang="...">) — на нём будет отчёт
   const langRaw = (html || "").match(/<html[^>]+lang=["']([^"']+)["']/i)?.[1] || "";
   const pageLang = langRaw.split("-")[0].toLowerCase() === "ru" ? "ru" : "en";
+
+  // ================== НОВЫЙ СЛОЙ: AI Scores (доли 0..1) ==================
+  const { factorScores, notApplicable, aiFactorStatuses } =
+    buildFactorScores(html, headers, all, sitemapResult);
+
+  // статусы новых факторов кладём в results для показа (Good/Moderate/Poor)
+  for (const [key, share] of Object.entries(aiFactorStatuses)) {
+    const status = share >= 0.75 ? "Good" : share >= 0.35 ? "Moderate" : "Poor";
+    if (!(key in results)) {
+      results[key] = status;
+      factors[key] = { status };
+    }
+  }
+
+  const aiScores = computeAiScores(factorScores, notApplicable);
 
   const resultData = {
     url,
@@ -146,6 +133,102 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
   return resultData;
 }
 
+// ============================================================================
+//  ПОСТРОЕНИЕ factorScores ДЛЯ AI SCORES
+//  Каждый фактор — доля 0..1. Обычные = 0/1, составные = шкала, связки = умножение.
+// ============================================================================
+function buildFactorScores(
+  html: string | null,
+  headers: Headers,
+  all: Record<CheckKey, CheckItem>,
+  sitemap: { pageCount: CheckItem; lastmod: CheckItem }
+): {
+  factorScores: Partial<Record<FactorKey, number>>;
+  notApplicable: Set<FactorKey>;
+  aiFactorStatuses: Record<string, number>;
+} {
+  const f: Partial<Record<FactorKey, number>> = {};
+  const na = new Set<FactorKey>();
+  const bin = (cond: boolean) => (cond ? 1 : 0);
+
+  // helper: статус старого слоя -> доля
+  const passedShare = (key: CheckKey): number =>
+    all[key].passed === true ? 1 : 0;
+
+  // ---------- ТЕХНИКА ----------
+  f.no_js          = checkNoJsShare(html);
+  f.robots_txt     = passedShare("robots_txt");
+  // неизвестно не значит хорошо: null не даёт полный балл
+  f.meta_robots    = all.meta_robots.passed === false ? 0 : all.meta_robots.passed === true ? 1 : 0.6;
+  f.sitemap_xml    = passedShare("sitemap_xml");
+  f.https          = passedShare("https");
+  f.x_robots_tag   = all.x_robots_tag.passed === false ? 0 : all.x_robots_tag.passed === true ? 1 : 0.6;
+  f.page_speed     = all.page_speed.passed === true ? 1 : all.page_speed.passed === null ? 0.5 : 0;
+  f.mobile_friendly= all.mobile_friendly.passed === true ? 1 : all.mobile_friendly.passed === null ? 0.5 : 0;
+  f.canonical      = all.canonical.passed === false ? 0 : all.canonical.passed === true ? 1 : 0.3;
+  f.page_404       = all.page_404.passed === true ? 1 : all.page_404.passed === null ? 0.3 : 0;
+
+  // ---------- ГЛАВНАЯ ----------
+  const titleOk = titleShare(html);
+  const descOk  = descShare(html);
+  const h1Ok    = bin(hasH1(html));
+  f.title_tag        = titleOk;
+  f.meta_description = descOk;
+  f.h1_present       = h1Ok;
+  f.specialization   = specializationShare(html);
+  f.services         = servicesShare(html);
+  f.contacts         = realBusinessShare(html); // та же шкала, что и реальный бизнес (контакты)
+  f.site_language    = bin(hasLang(html));
+  f.offer            = offerShare(html);
+  f.region           = regionShare(html);
+  f.open_graph       = all.open_graph.passed === true ? 1 : all.open_graph.passed === null ? 0.5 : 0;
+  f.faq              = faqShare(html);
+
+  // ---------- КОНТЕНТ ----------
+  const coverage = topicCoverageShare(html);
+  const contentBase = contentDepthShare(html); // насколько вообще есть тематический контент
+  f.facts              = factsShare(html);
+  f.topic_coverage     = coverage;
+  f.structured_content = structuredContentShare(html);
+  // связка: прямые ответы не дают полный балл без полноценного контента
+  f.direct_answers     = faqShare(html) * contentBase;
+  f.structured_data    = passedShare("structured_data");
+  f.tables_lists       = tablesListsShare(html);
+  f.topic_volume       = topicVolumeShare(sitemap.pageCount);
+  f.freshness          = sitemap.lastmod.passed === true ? 1 : 0;
+  f.alt_attributes     = all.alt_attributes.passed === true ? 1 : all.alt_attributes.passed === null ? 0 : 0.3;
+  // alt не применим, если картинок нет
+  if (all.alt_attributes.passed === null && /No images/i.test(all.alt_attributes.description)) {
+    na.add("alt_attributes");
+  }
+
+  // ---------- АВТОРИТЕТ ----------
+  const realBiz = realBusinessShare(html);
+  f.real_business = realBiz;
+  // связка: org-схема даёт полный балл только при подтверждении реального бизнеса
+  const orgPresent = bin(hasOrgSchema(html));
+  f.org_schema    = orgPresent * (0.4 + 0.6 * realBiz); // без бизнеса максимум 0.4
+  f.reviews       = reviewsShare(html);
+  f.experience    = experienceShare(html);
+  f.trust_signals = trustShare(html);
+  f.authorship    = transparencyShare(html); // прозрачность компании и команды
+  f.social        = socialShare(html);
+  // freshness уже задан выше (общий для контента и авторитета)
+
+  // статусы для показа (берём ключевые новые факторы)
+  const aiFactorStatuses: Record<string, number> = {
+    specialization: f.specialization ?? 0,
+    offer: f.offer ?? 0,
+    facts: f.facts ?? 0,
+    topic_coverage: f.topic_coverage ?? 0,
+    real_business: f.real_business ?? 0,
+    experience: f.experience ?? 0,
+    trust_signals: f.trust_signals ?? 0,
+  };
+
+  return { factorScores: f, notApplicable: na, aiFactorStatuses };
+}
+
 function calcWeightedScore(all: Record<CheckKey, CheckItem>): number {
   const total = PRO_KEYS.reduce((a, k) => a + weightOf(k), 0);
   const pass = PRO_KEYS.reduce(
@@ -154,6 +237,326 @@ function calcWeightedScore(all: Record<CheckKey, CheckItem>): number {
   );
   return Math.round((pass / total) * 100);
 }
+
+// ============================================================================
+//  ПРОВЕРКИ-ДОЛИ ДЛЯ AI SCORES
+// ============================================================================
+
+function cleanText(html: string | null): string {
+  if (!html) return "";
+  const cleaned = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ");
+  return stripTags(cleaned).replace(/\s+/g, " ").trim();
+}
+
+function ldBlob(html: string | null): string {
+  if (!html) return "";
+  return (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
+}
+
+// --- Техника: контент без JS (доля по объёму видимого текста) ---
+function checkNoJsShare(html: string | null): number {
+  const len = cleanText(html).length;
+  if (len >= 1200) return 1;
+  if (len >= 600) return 0.7;
+  if (len >= 300) return 0.4;
+  if (len >= 120) return 0.2;
+  return 0;
+}
+
+// Признак «понятно, чем занимается бизнес»: есть слова ниши/услуги/действия.
+// Регион — плюс, но не обязателен для всех бизнесов.
+function meaningSignal(s: string): boolean {
+  const t = s.toLowerCase();
+  const doesWhat = /(услуг|сервис|service|ремонт|repair|строит|construct|доставк|deliver|производств|manufact|консалт|consult|clinic|клиник|студи|studio|агентств|agency|магазин|shop|store|обучен|курс|course|юрист|law|бухгалт|account|дизайн|design|разработ|develop|marketing|маркетинг|roof|кровл|плитк|мебел|аренд|rental|отел|hotel|ресторан|restaurant|кафе|cafe|салон|salon|клиника|стоматолог|dental)/i.test(t);
+  return doesWhat;
+}
+
+// --- Главная: title (длина + понятность, что делает бизнес) ---
+function titleShare(html: string | null): number {
+  const t = stripTags(textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || "");
+  if (!t.length) return 0;
+  if (t.length < 10) return 0.4;
+  // длина в норме — базовый балл, полный только при понятности сути
+  return meaningSignal(t) ? 1 : 0.7;
+}
+
+// --- Главная: description (длина + понятность) ---
+function descShare(html: string | null): number {
+  const d = textMatch(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["'][^>]*>/i) || "";
+  const len = d.trim().length;
+  if (!len) return 0;
+  if (len < 30) return 0.4;
+  return meaningSignal(d) ? 1 : 0.7;
+}
+
+function hasH1(html: string | null): boolean {
+  return !!stripTags(textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || "").length;
+}
+
+function hasLang(html: string | null): boolean {
+  return !!textMatch(html, /<html[^>]+lang=["']([^"']+)["']/i);
+}
+
+// --- Главная: специализация (одна тема в title+h1+description) ---
+function specializationShare(html: string | null): number {
+  if (!html) return 0;
+  const title = (stripTags(textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || "")).toLowerCase();
+  const h1 = (stripTags(textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || "")).toLowerCase();
+  const desc = (textMatch(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i) || "").toLowerCase();
+  if (!title || !h1) return 0;
+  // общие значимые слова между title и h1 — признак единой темы
+  const words = (s: string) =>
+    s.split(/[^a-zа-яё0-9]+/i).filter((w) => w.length >= 4);
+  const tW = new Set(words(title));
+  const hW = words(h1);
+  const overlap = hW.filter((w) => tW.has(w)).length;
+  let share = 0;
+  if (overlap >= 2) share = 1;
+  else if (overlap === 1) share = 0.7;
+  else share = 0.4;
+  if (desc && words(desc).some((w) => tW.has(w))) share = Math.min(1, share + 0.1);
+  return share;
+}
+
+// Услуги: реальный перечень или разметка = 1, одиночное упоминание = 0.4.
+function servicesShare(html: string | null): number {
+  if (!html) return 0;
+  const ld = ldBlob(html);
+  if (/"(Service|Offer|OfferCatalog)"/i.test(ld)) return 1;
+  // список из нескольких пунктов рядом со словом услуг/services — признак перечня
+  const listItems = (html.match(/<li[\s>]/gi) || []).length;
+  const hasWord = /(услуг|services|our services|what we do|наши услуги|сервис|тариф|pricing|product)/i.test(html);
+  if (hasWord && listItems >= 3) return 1;
+  if (hasWord) return 0.4;
+  return 0;
+}
+
+// FAQ: разметка FAQPage/Question = 1, обычный текстовый блок = 0.5.
+function faqShare(html: string | null): number {
+  if (!html) return 0;
+  const ld = ldBlob(html);
+  if (/"FAQPage"|"Question"/i.test(ld)) return 1;
+  if (/(faq|часто задаваемые|frequently asked|вопрос[\s\-—]*ответ|q&a|вопросы и ответы)/i.test(html)) return 0.5;
+  return 0;
+}
+
+// Регион: адресная разметка, телефон или конкретный город/регион в тексте = 1;
+// только общее слово «адрес/город» без конкретики = 0.5.
+function regionShare(html: string | null): number {
+  if (!html) return 0;
+  const ld = ldBlob(html);
+  if (/"(address|areaServed|addressLocality|addressRegion|addressCountry)"/i.test(ld)) return 1;
+  if (/href=["']tel:\+?\d/i.test(html)) return 1;
+  // конкретный город/регион в тексте — тоже полный балл
+  if (/(chicago|new york|los angeles|москва|санкт[\s\-]?петербург|киев|минск|almaty|астана|\bг\.\s?[А-ЯA-Z]|город[е]?\s+[А-ЯA-Z]|зона обслуживания|serving\s+[A-Z]|located in\s+[A-Z]|обслуживаем\s+[А-ЯA-Z])/i.test(html)) return 1;
+  // общий след адреса без конкретики
+  if (/(город|регион|область|street|улиц|city|district|adres|адрес)/i.test(html)) return 0.5;
+  return 0;
+}
+
+// --- Главная: оффер (что и кому) ---
+function offerShare(html: string | null): number {
+  const text = cleanText(html).toLowerCase();
+  if (!text) return 0;
+  const head = text.slice(0, 600);
+  const action = /(помога|делаем|предлага|создаём|создаем|разрабат|оказыва|provide|help|build|create|offer|deliver|we make|we build|do you|для вас|для бизнеса|for your|for businesses)/i.test(head);
+  const audience = /(для |for |бизнес|клиент|компани|business|client|customer|owner|стартап|предприят)/i.test(head);
+  if (action && audience) return 1;
+  if (action || audience) return 0.5;
+  return 0;
+}
+
+// --- Контент: факты и конкретика (числа, цены, сроки, проценты) ---
+function factsShare(html: string | null): number {
+  const text = cleanText(html);
+  if (!text) return 0;
+  const numbers = (text.match(/\b\d{1,4}([.,]\d+)?\b/g) || []).length;
+  const money = (text.match(/[\$€₽£]\s?\d|\d+\s?(usd|eur|руб|долл|\$|€|₽)/gi) || []).length;
+  const units = (text.match(/\d+\s?(%|год|лет|years?|дн|days?|час|hours?|кг|kg|см|cm|мм|mm|м²|sq|ft|тыс|млн|k\b)/gi) || []).length;
+  const signal = money * 3 + units * 2 + numbers;
+  let share: number;
+  if (signal >= 40) share = 1;
+  else if (signal >= 20) share = 0.75;
+  else if (signal >= 8) share = 0.5;
+  else if (signal >= 3) share = 0.25;
+  else share = 0;
+  // цифры на почти пустой странице не должны давать высокий балл
+  if (text.length < 600) share = Math.min(share, 0.5);
+  return share;
+}
+
+// --- Контент: раскрытие темы (несколько H2/H3) ---
+function topicCoverageShare(html: string | null): number {
+  if (!html) return 0;
+  const h2 = (html.match(/<h2[\s>]/gi) || []).length;
+  const h3 = (html.match(/<h3[\s>]/gi) || []).length;
+  const headings = h2 + h3;
+  if (headings >= 6) return 1;
+  if (headings >= 4) return 0.75;
+  if (headings >= 2) return 0.5;
+  if (headings >= 1) return 0.25;
+  return 0;
+}
+
+// общий уровень "есть ли вообще тематический контент" (для связки direct_answers)
+function contentDepthShare(html: string | null): number {
+  const len = cleanText(html).length;
+  if (len >= 1500) return 1;
+  if (len >= 700) return 0.7;
+  if (len >= 300) return 0.4;
+  return 0.1;
+}
+
+// --- Контент: структурированность (заголовки, абзацы, разделы) ---
+function structuredContentShare(html: string | null): number {
+  if (!html) return 0;
+  const headings = (html.match(/<h[1-4][\s>]/gi) || []).length;
+  const paras = (html.match(/<p[\s>]/gi) || []).length;
+  const lists = (html.match(/<(ul|ol)[\s>]/gi) || []).length;
+  let s = 0;
+  if (headings >= 2) s += 0.4; else if (headings >= 1) s += 0.2;
+  if (paras >= 5) s += 0.4; else if (paras >= 2) s += 0.2;
+  if (lists >= 1) s += 0.2;
+  return Math.min(1, s);
+}
+
+// --- Контент: таблицы и списки ---
+function tablesListsShare(html: string | null): number {
+  if (!html) return 0;
+  const hasTable = /<table[\s>]/i.test(html);
+  const lists = (html.match(/<(ul|ol)[\s>]/gi) || []).length;
+  if (hasTable && lists >= 1) return 1;
+  if (hasTable || lists >= 2) return 0.6;
+  if (lists >= 1) return 0.3;
+  return 0;
+}
+
+// --- Контент: объём тематического контента (страницы по sitemap) ---
+function topicVolumeShare(pageCount: CheckItem): number {
+  const v = pageCount.value || "";
+  const n = parseInt(v.replace(/[^0-9]/g, ""), 10);
+  if (!n || Number.isNaN(n)) return 0;
+  if (n >= 100) return 1;
+  if (n >= 30) return 0.75;
+  if (n >= 10) return 0.5;
+  if (n >= 4) return 0.3;
+  return 0.1;
+}
+
+// ============================================================================
+//  АВТОРИТЕТ — проверки
+// ============================================================================
+
+// составной "реальный бизнес": телефон/email — надёжная основа, адрес/часы — бонус
+function realBusinessShare(html: string | null): number {
+  if (!html) return 0;
+  const phone = /href=["']tel:[^"']+["']/i.test(html);
+  const email = /href=["']mailto:[^"']+["']/i.test(html);
+  const ld = ldBlob(html);
+  const address =
+    /"(address|streetAddress|addressLocality|postalCode)"/i.test(ld) ||
+    /(улиц|street|адрес|address|просп|avenue|д\.\s?\d|,\s?\d{5})/i.test(html);
+  const hours =
+    /"openingHours"/i.test(ld) ||
+    /(час[ыов]\s+работы|opening hours|пн[\s\-—].*вс|mon[\s\-—].*(fri|sun)|режим работы|working hours)/i.test(html);
+
+  let share = 0;
+  if (phone) share += 0.35;
+  if (email) share += 0.20;
+  if (address) share += 0.25;
+  if (hours) share += 0.20;
+  // если есть только один контакт — не выше 0.35
+  return Math.min(1, share);
+}
+
+function hasOrgSchema(html: string | null): boolean {
+  const ld = ldBlob(html);
+  return /"@type"\s*:\s*"(Organization|LocalBusiness|Corporation|[A-Za-z]*Business|ProfessionalService)"/i.test(ld);
+}
+
+// Отзывы по силе сигнала:
+//   рейтинг в разметке (aggregateRating / ratingValue) = 1
+//   отдельные отзывы в разметке (review / Review) = 0.6
+//   только слова/звёзды в тексте = 0.3
+function reviewsShare(html: string | null): number {
+  if (!html) return 0;
+  const ld = ldBlob(html);
+  if (/"(aggregateRating|ratingValue)"/i.test(ld)) return 1;
+  if (/"(review|Review)"/i.test(ld)) return 0.6;
+  if (/(отзыв|review|рейтинг|rating|звёзд|звезд|stars|★|☆|testimonial)/i.test(html)) return 0.3;
+  return 0;
+}
+
+// доказательства опыта: годы работы, число клиентов/проектов, кейсы
+function experienceShare(html: string | null): number {
+  const text = cleanText(html).toLowerCase();
+  if (!text) return 0;
+  let s = 0;
+  if (/(с \d{4}|since \d{4}|\d+\s?(лет|год|years?)\s?(опыт|на рынке|in business|experience))/i.test(text)) s += 0.4;
+  if (/(\d+[\s,]*(клиент|client|customer|проект|project|объект))/i.test(text)) s += 0.3;
+  if (/(кейс|case stud|портфолио|portfolio|выполненны|completed project|наши работы|our work)/i.test(text)) s += 0.3;
+  return Math.min(1, s);
+}
+
+// trust-сигналы: лицензии, сертификаты, гарантии, политика, ассоциации/членство
+function trustShare(html: string | null): number {
+  const text = cleanText(html).toLowerCase();
+  if (!text) return 0;
+  let s = 0;
+  if (/(лиценз|licens|сертификат|certif|аккредит|accredit)/i.test(text)) s += 0.3;
+  if (/(гаранти|warrant|guarantee|страхов|insur)/i.test(text)) s += 0.3;
+  if (/(политик[а]? конфиденц|privacy policy|условия|terms|публичн[ая]? оферт)/i.test(text)) s += 0.2;
+  if (/(член[\s\-]*(ассоциаци|организаци)|ассоциаци|associat|member of|аккредитован в|отраслев[аяых]+ (организаци|союз)|guild|chamber of commerce|торгов[ао][йя] палат)/i.test(text)) s += 0.2;
+  return Math.min(1, s);
+}
+
+// Прозрачность компании и команды: реальные люди за бизнесом.
+// Полный балл только при 2-3 признаках (имена, должности, фото, раздел
+// About/Team, специалисты, владельцы), а не за одно слово «команда».
+function transparencyShare(html: string | null): number {
+  if (!html) return 0;
+  const ld = ldBlob(html);
+  const text = cleanText(html).toLowerCase();
+  let s = 0;
+
+  // раздел о команде / о нас
+  if (/(<a[^>]+href=["'][^"']*(about|team|command|o-nas|о-нас|our-team|komanda)[^"']*["'])/i.test(html) ||
+      /(о нас|about us|наша команда|our team|о компании|meet the team|кто мы)/i.test(text)) {
+    s += 0.35;
+  }
+  // роли / должности реальных людей
+  if (/(основател|владел|founder|owner|ceo|директор|руководител|врач|доктор|мастер|специалист|инженер|эксперт|консультант|manager|specialist|engineer|doctor)/i.test(text)) {
+    s += 0.35;
+  }
+  // разметка автора/персоны или фото людей в разметке
+  if (/"(author|Person)"/i.test(ld)) s += 0.2;
+  // фото/аватары сотрудников
+  if (/(team-member|team_member|staff|employee|our-people|team-photo|avatar)/i.test(html)) s += 0.2;
+  // слабый текстовый след автора — минимальный вклад
+  if (s === 0 && /rel=["']author["']|(автор|author)[\s:]/i.test(html)) s = 0.2;
+
+  return Math.min(1, s);
+}
+
+// Соцсети: одна площадка = 0.5, две и больше = 1.
+function socialShare(html: string | null): number {
+  if (!html) return 0;
+  const nets = [
+    /facebook\.com/i, /instagram\.com/i, /twitter\.com/i, /x\.com/i,
+    /linkedin\.com/i, /youtube\.com/i, /t\.me/i, /vk\.com/i,
+  ];
+  const count = nets.filter((re) => re.test(html)).length;
+  if (count >= 2) return 1;
+  if (count === 1) return 0.5;
+  return 0;
+}
+
+// ============================================================================
+//  ИНФРАСТРУКТУРА (без изменений) + старый слой проверок
+// ============================================================================
 
 function normalizeUrl(input: string): { origin: string; url: string } {
   let u = input.trim();
@@ -244,9 +647,7 @@ function formatDate(raw: string): string {
   try {
     const d = new Date(raw.trim());
     if (isNaN(d.getTime())) return raw.trim();
-    return d.toLocaleDateString("ru-RU", {
-      day: "numeric", month: "long", year: "numeric",
-    });
+    return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
   } catch {
     return raw.trim();
   }
@@ -276,8 +677,6 @@ async function checkSitemap(
       }
     } catch {}
   }
-
-  // Sitemap не найден — ищем дату в других местах
   const lastmodFormatted = getFallbackDate(html, headers);
   return {
     pageCount: item("sitemap_xml", false, "Sitemap not found", "Not found"),
@@ -286,24 +685,12 @@ async function checkSitemap(
 }
 
 function getFallbackDate(html: string | null, headers: Headers): string {
-  // 1. Мета-тег article:modified_time
-  const metaModified = textMatch(
-    html,
-    /<meta[^>]+property=["']article:modified_time["'][^>]+content=["']([^"']+)["'][^>]*>/i
-  );
+  const metaModified = textMatch(html, /<meta[^>]+property=["']article:modified_time["'][^>]+content=["']([^"']+)["'][^>]*>/i);
   if (metaModified) return formatDate(metaModified);
-
-  // 2. Мета-тег last-modified
-  const metaLastMod = textMatch(
-    html,
-    /<meta[^>]+name=["']last-modified["'][^>]+content=["']([^"']+)["'][^>]*>/i
-  );
+  const metaLastMod = textMatch(html, /<meta[^>]+name=["']last-modified["'][^>]+content=["']([^"']+)["'][^>]*>/i);
   if (metaLastMod) return formatDate(metaLastMod);
-
-  // 3. HTTP заголовок Last-Modified
   const headerDate = headers.get("last-modified");
   if (headerDate) return formatDate(headerDate);
-
   return "";
 }
 
@@ -315,22 +702,14 @@ function checkXRobots(headers: Headers): CheckItem {
 }
 
 function checkMetaRobots(html: string | null): CheckItem {
-  const content =
-    textMatch(
-      html,
-      /<meta[^>]+name=["']robots["'][^>]+content=["']([^"']*)["'][^>]*>/i
-    ) || "";
+  const content = textMatch(html, /<meta[^>]+name=["']robots["'][^>]+content=["']([^"']*)["'][^>]*>/i) || "";
   if (!content) return item("meta_robots", null, "No meta robots tag");
   const blocked = /\bnoindex\b|\bnone\b/i.test(content);
   return item("meta_robots", blocked ? false : true, `meta robots: ${content}`);
 }
 
 function checkCanonical(html: string | null, origin: string): CheckItem {
-  const href =
-    textMatch(
-      html,
-      /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i
-    ) || "";
+  const href = textMatch(html, /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i) || "";
   if (!href) return item("canonical", null, "No canonical link");
   const abs = /^https?:\/\//i.test(href);
   const sameOrigin = abs ? href.startsWith(origin) : true;
@@ -338,53 +717,30 @@ function checkCanonical(html: string | null, origin: string): CheckItem {
 }
 
 function checkTitle(html: string | null): CheckItem {
-  const t = stripTags(
-    textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || ""
-  );
+  const t = stripTags(textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || "");
   return item("title_tag", t.length ? true : false, t.length ? `Title: ${t}` : "Missing <title>", t || "Not found");
 }
 
 function checkMetaDescription(html: string | null): CheckItem {
-  const d =
-    textMatch(
-      html,
-      /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["'][^>]*>/i
-    ) || "";
-  return item(
-    "meta_description",
-    d.trim().length ? true : false,
-    d ? `Meta description: ${d}` : "Missing meta description",
-    d || "Not found"
-  );
+  const d = textMatch(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["'][^>]*>/i) || "";
+  return item("meta_description", d.trim().length ? true : false, d ? `Meta description: ${d}` : "Missing meta description", d || "Not found");
 }
 
 function checkOpenGraph(html: string | null): CheckItem {
-  const t =
-    textMatch(
-      html,
-      /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["'][^>]*>/i
-    ) || "";
-  const d =
-    textMatch(
-      html,
-      /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["'][^>]*>/i
-    ) || "";
+  const t = textMatch(html, /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["'][^>]*>/i) || "";
+  const d = textMatch(html, /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["'][^>]*>/i) || "";
   if (t && d) return item("open_graph", true, "OG tags found", t);
   if (!t && !d) return item("open_graph", false, "OG tags missing", "Not found");
   return item("open_graph", null, "OG tags partially found", t || "Partial");
 }
 
 function checkH1(html: string | null): CheckItem {
-  const h1 = stripTags(
-    textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || ""
-  );
+  const h1 = stripTags(textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || "");
   return item("h1_present", h1.length ? true : false, h1 ? `H1: ${h1}` : "Missing H1", h1 || "Not found");
 }
 
 function checkH2(html: string | null): CheckItem {
-  const h2 = decodeEntities(stripTags(
-    textMatch(html, /<h2[^>]*>([\s\S]*?)<\/h2>/i) || ""
-  ));
+  const h2 = decodeEntities(stripTags(textMatch(html, /<h2[^>]*>([\s\S]*?)<\/h2>/i) || ""));
   return item("h2_present", h2.length ? true : null, h2 ? `H2: ${h2}` : "Missing H2", h2 || "Not found");
 }
 
@@ -414,35 +770,21 @@ function checkLanguage(html: string | null): CheckItem {
 
 function checkJSONLD(html: string | null): CheckItem {
   if (!html) return item("structured_data", false, "No JSON-LD structured data", "Not detected");
-  const re =
-    /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  const re = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
   let ok = false;
   let schemaType = "";
   let m: RegExpExecArray | null;
   while ((m = re.exec(html)) !== null) {
     try {
       const json = JSON.parse(m[1]);
-      if (json) {
-        ok = true;
-        schemaType = json["@type"] || "";
-        break;
-      }
+      if (json) { ok = true; schemaType = json["@type"] || ""; break; }
     } catch {}
   }
-  return item(
-    "structured_data",
-    ok ? true : false,
-    ok ? "Valid JSON-LD present" : "No JSON-LD structured data",
-    ok ? (schemaType || "Found") : "Not detected"
-  );
+  return item("structured_data", ok ? true : false, ok ? "Valid JSON-LD present" : "No JSON-LD structured data", ok ? (schemaType || "Found") : "Not detected");
 }
 
 function checkViewport(html: string | null): CheckItem {
-  const v =
-    textMatch(
-      html,
-      /<meta[^>]+name=["']viewport["'][^>]+content=["']([^"']+)["'][^>]*>/i
-    ) || "";
+  const v = textMatch(html, /<meta[^>]+name=["']viewport["'][^>]+content=["']([^"']+)["'][^>]*>/i) || "";
   if (!v) return item("mobile_friendly", false, "Missing viewport meta", "No");
   const ok = /width\s*=\s*device-width/i.test(v);
   return item("mobile_friendly", ok ? true : null, `viewport: ${v}`, ok ? "Yes" : "No");
@@ -458,19 +800,15 @@ function checkAltAttributes(html: string | null): CheckItem {
     if (alt.length > 0) withAlt++;
   }
   const ratio = withAlt / imgTags.length;
-  if (ratio >= 0.8)
-    return item("alt_attributes", true, `Images with alt: ${withAlt}/${imgTags.length}`);
-  if (ratio >= 0.3)
-    return item("alt_attributes", null, `Partial alts: ${withAlt}/${imgTags.length}`);
+  if (ratio >= 0.8) return item("alt_attributes", true, `Images with alt: ${withAlt}/${imgTags.length}`);
+  if (ratio >= 0.3) return item("alt_attributes", null, `Partial alts: ${withAlt}/${imgTags.length}`);
   return item("alt_attributes", false, `Poor alts: ${withAlt}/${imgTags.length}`);
 }
 
 function checkPageSpeed(responseTimeMs: number): CheckItem {
   const valueStr = `${responseTimeMs} мс`;
-  if (responseTimeMs <= 1500)
-    return item("page_speed", true, `Response time: ${responseTimeMs}ms — fast`, valueStr);
-  if (responseTimeMs <= 3000)
-    return item("page_speed", null, `Response time: ${responseTimeMs}ms — moderate`, valueStr);
+  if (responseTimeMs <= 1500) return item("page_speed", true, `Response time: ${responseTimeMs}ms — fast`, valueStr);
+  if (responseTimeMs <= 3000) return item("page_speed", null, `Response time: ${responseTimeMs}ms — moderate`, valueStr);
   return item("page_speed", false, `Response time: ${responseTimeMs}ms — slow`, valueStr);
 }
 
@@ -481,99 +819,8 @@ async function check404(origin: string): Promise<CheckItem> {
     const text = await res.text();
     const hint = /404/i.test(text) || /not found/i.test(text);
     const ok = res.status === 404 || hint;
-    return item(
-      "page_404",
-      ok ? true : false,
-      ok ? "Proper 404 response" : `Unexpected status ${res.status}`
-    );
+    return item("page_404", ok ? true : false, ok ? "Proper 404 response" : `Unexpected status ${res.status}`);
   } catch {
     return item("page_404", null, "404 check inconclusive");
   }
-}
-
-// ===== 9 новых проверок для AI Scores (20-28) =====
-// Все читают только из кода страницы, без браузера.
-// Бонусные факторы проверяются грубо (есть блок / нет) — этого достаточно для скора.
-
-function checkTheme(html: string | null): CheckItem {
-  // Тема видна, если ИИ есть из чего её понять: title + H1 + description (или тип JSON-LD)
-  if (!html) return item("theme" as CheckKey, false, "No HTML to detect theme", "Not detected");
-  const hasTitle = /<title[^>]*>[^<]+<\/title>/i.test(html);
-  const hasH1 = /<h1[^>]*>[\s\S]*?<\/h1>/i.test(html);
-  const hasDesc = /<meta[^>]+name=["']description["'][^>]+content=["'][^"']+["']/i.test(html);
-  const ok = hasTitle && hasH1 && hasDesc;
-  return item("theme" as CheckKey, ok ? true : false, ok ? "Theme is clear" : "Theme unclear", ok ? "Clear" : "Unclear");
-}
-
-function checkServices(html: string | null): CheckItem {
-  if (!html) return item("services" as CheckKey, null, "No HTML", "Not detected");
-  const ok = /(services|услуг|our services|what we do|наши услуги|сервис)/i.test(html);
-  return item("services" as CheckKey, ok ? true : null, ok ? "Services block found" : "No services block", ok ? "Yes" : "No");
-}
-
-function checkPrices(html: string | null): CheckItem {
-  if (!html) return item("prices" as CheckKey, null, "No HTML", "Not detected");
-  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
-  const ok = /"price"/i.test(ld) || /[\$€₽£]\s?\d|\d+\s?(usd|eur|руб|\$)/i.test(html);
-  return item("prices" as CheckKey, ok ? true : null, ok ? "Prices found" : "No prices", ok ? "Yes" : "No");
-}
-
-function checkFAQ(html: string | null): CheckItem {
-  if (!html) return item("faq" as CheckKey, null, "No HTML", "Not detected");
-  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
-  const ok = /"FAQPage"/i.test(ld) || /(faq|часто задаваемые|frequently asked|вопрос[\s-]*ответ)/i.test(html);
-  return item("faq" as CheckKey, ok ? true : null, ok ? "FAQ found" : "No FAQ", ok ? "Yes" : "No");
-}
-
-function checkTables(html: string | null): CheckItem {
-  if (!html) return item("tables" as CheckKey, null, "No HTML", "Not detected");
-  const ok = /<table[\s\S]*?<\/table>/i.test(html);
-  return item("tables" as CheckKey, ok ? true : null, ok ? "Table found" : "No tables", ok ? "Yes" : "No");
-}
-
-function checkReviews(html: string | null): CheckItem {
-  if (!html) return item("reviews" as CheckKey, null, "No HTML", "Not detected");
-  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
-  const ok = /"(aggregateRating|review|Review)"/i.test(ld) || /(rating|review|отзыв|звёзд|stars|★)/i.test(html);
-  return item("reviews" as CheckKey, ok ? true : false, ok ? "Reviews/rating found" : "No reviews", ok ? "Yes" : "No");
-}
-
-function checkOrgSchema(html: string | null): CheckItem {
-  if (!html) return item("org_schema" as CheckKey, false, "No HTML", "Not detected");
-  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
-  const ok = /"@type"\s*:\s*"(Organization|LocalBusiness|Corporation|[A-Za-z]*Business)"/i.test(ld);
-  return item("org_schema" as CheckKey, ok ? true : false, ok ? "Organization schema found" : "No organization schema", ok ? "Yes" : "No");
-}
-
-function checkAuthor(html: string | null): CheckItem {
-  if (!html) return item("author" as CheckKey, null, "No HTML", "Not detected");
-  const ld = (html.match(/application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi) || []).join(" ");
-  const ok = /"author"/i.test(ld) || /rel=["']author["']/i.test(html) || /(автор|author)[\s:]/i.test(html);
-  return item("author" as CheckKey, ok ? true : false, ok ? "Author found" : "No author", ok ? "Yes" : "No");
-}
-
-function checkSocial(html: string | null): CheckItem {
-  if (!html) return item("social" as CheckKey, null, "No HTML", "Not detected");
-  const ok = /(facebook\.com|instagram\.com|twitter\.com|x\.com|linkedin\.com|youtube\.com|t\.me|vk\.com)/i.test(html);
-  return item("social" as CheckKey, ok ? true : false, ok ? "Social links found" : "No social links", ok ? "Yes" : "No");
-}
-
-// Виден ли контент в сыром HTML без JavaScript.
-// Краулер ИИ читает сырой HTML. Если текста почти нет (контент рисуется JS) — это минус.
-function checkNoJs(html: string | null): CheckItem {
-  if (!html) return item("no_js" as CheckKey, false, "No HTML", "No");
-  // убираем script/style/noscript, считаем видимый текст
-  const cleaned = html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ");
-  const text = stripTags(cleaned).replace(/\s+/g, " ").trim();
-  // порог: меньше ~400 знаков видимого текста — вероятно контент за JS
-  const ok = text.length >= 400;
-  return item(
-    "no_js" as CheckKey,
-    ok ? true : false,
-    `Visible text length: ${text.length}`,
-    ok ? "Yes" : "No"
-  );
 }
