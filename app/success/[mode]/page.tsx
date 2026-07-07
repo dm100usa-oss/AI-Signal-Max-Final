@@ -182,7 +182,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             <>
               <p className="mb-3 text-center">
                 <span className="block sm:inline text-2xl sm:text-lg font-bold text-gray-800">
-                  {firstPart}{restPart ? "." : ""}
+                  {firstPart}<span className="hidden sm:inline">{restPart ? "." : ""}</span>
                 </span>
                 {restPart && (
                   <span className="block sm:inline text-lg font-semibold text-gray-800 sm:ml-1">
@@ -201,7 +201,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-8 space-y-8 mt-10">
           {strengths.length > 0 && (
             <div>
-              <p className="text-lg font-semibold text-gray-800 mb-3">{t.strengthsTitle}</p>
+              <p className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                {t.strengthsTitle}
+                <span className="ml-2 inline-block w-0 h-0" style={{ borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderBottom: "10px solid #16a34a" }} />
+              </p>
               <ul className="space-y-2">
                 {strengths.map((s, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -214,7 +217,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           )}
           {weaknesses.length > 0 && (
             <div className="mt-8">
-              <p className="text-lg font-semibold text-gray-800 mb-3">{t.weaknessesTitle}</p>
+              <p className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                {t.weaknessesTitle}
+                <span className="ml-2 inline-block w-0 h-0" style={{ borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "10px solid #dc2626" }} />
+              </p>
               <ul className="space-y-2">
                 {weaknesses.map((w, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -231,19 +237,16 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       {/* Блок ChatGPT */}
       {showSummary && (
         <div className="max-w-xl mx-auto mb-8 rounded-2xl border border-gray-200 bg-gray-50 p-6">
-          <p className="text-sm text-gray-600 mb-1">{t.chatgpt.lead}</p>
-          <p className="font-medium text-gray-800 mb-4">«{t.chatgpt.question}»</p>
-          <p className="font-semibold text-gray-800 mb-2">{t.chatgpt.answerTitle}</p>
-          <ol className="list-decimal list-inside space-y-1 mb-4 text-gray-700">
+          <p className="text-base text-gray-600 mb-1">{t.chatgpt.lead}</p>
+          <p className="text-lg font-medium text-gray-800 mb-4">«{t.chatgpt.question}»</p>
+          <p className="text-lg font-semibold text-gray-800 mb-2">{t.chatgpt.answerTitle}</p>
+          <ol className="list-decimal list-inside space-y-1 mb-4 text-lg text-gray-700">
             {t.chatgpt.items.map((it, i) => (
               <li key={i}>{it}</li>
             ))}
           </ol>
-          <p className="font-semibold text-gray-800 mb-1">{t.chatgpt.explanationTitle}</p>
-          <p className="text-gray-700 mb-4">{t.chatgpt.explanation}</p>
-          <p className="text-xs text-gray-500 leading-relaxed border-t border-gray-200 pt-3">
-            {t.chatgpt.note}
-          </p>
+          <p className="text-lg font-semibold text-gray-800 mb-1">{t.chatgpt.explanationTitle}</p>
+          <p className="text-lg text-gray-700">{t.chatgpt.explanation}</p>
         </div>
       )}
 
@@ -277,11 +280,20 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-8">
           <button
             onClick={() => setShowParams((v) => !v)}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-amber-200 shadow-sm font-medium text-gray-800"
-            style={{ backgroundColor: "#FBF3E0" }}
+            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-teal-300 shadow-sm font-medium text-teal-900"
+            style={{ backgroundColor: "#CCF2EC" }}
           >
             <span>{t.paramsToggle}</span>
-            <span className="text-gray-600 text-xl font-bold leading-none">{showParams ? "▲" : "▼"}</span>
+            <span
+              className="inline-block w-0 h-0"
+              style={{
+                borderLeft: "6px solid transparent",
+                borderRight: "6px solid transparent",
+                ...(showParams
+                  ? { borderBottom: "9px solid #0F766E" }
+                  : { borderTop: "9px solid #0F766E" }),
+              }}
+            />
           </button>
           {showParams && (
             <div className="mt-4 space-y-3">
@@ -402,7 +414,7 @@ function MaterialsBlock({ url, mode, items, allItems, lang }: { url: string; mod
   const siteLabel = lang === "ru" ? "Сайт" : "Site";
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 text-xs sm:text-sm text-gray-700 leading-relaxed">
+    <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 text-sm sm:text-base text-gray-700 leading-relaxed">
       <MaterialRow label={siteLabel} value={hostname} withQuotes={false} lang={lang} />
       {primaryKeys.map((key) => {
         const value = lookup.get(key);
@@ -415,7 +427,7 @@ function MaterialsBlock({ url, mode, items, allItems, lang }: { url: string; mod
           </div>
         );
       })}
-      <div className="mt-2 text-gray-400 text-xs">{t.andMore}</div>
+      <div className="mt-2 text-gray-400 text-sm">{t.andMore}</div>
     </div>
   );
 }
