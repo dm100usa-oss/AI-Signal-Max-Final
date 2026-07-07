@@ -237,7 +237,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       {/* Блок ChatGPT */}
       {showSummary && (
         <div className="max-w-xl mx-auto mb-8 rounded-2xl border border-gray-200 bg-gray-50 p-6">
-          <p className="text-base text-gray-600 mb-1">{t.chatgpt.lead}</p>
+          <p className="text-lg text-gray-600 mb-1">{t.chatgpt.lead}</p>
           <p className="text-lg font-medium text-gray-800 mb-4">«{t.chatgpt.question}»</p>
           <p className="text-lg font-semibold text-gray-800 mb-2">{t.chatgpt.answerTitle}</p>
           <ol className="list-decimal list-inside space-y-1 mb-4 text-lg text-gray-700">
@@ -246,20 +246,15 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             ))}
           </ol>
           <p className="text-lg font-semibold text-gray-800 mb-1">{t.chatgpt.explanationTitle}</p>
-          <p className="text-lg text-gray-700">{t.chatgpt.explanation}</p>
+          <p className="text-lg text-gray-700 text-justify">{t.chatgpt.explanation}</p>
         </div>
-      )}
-
-      {/* PDF отправлены */}
-      {mode === "pro" && showSummary && (
-        <p className="text-sm text-gray-600 text-center mb-8">{t.pdfSent}</p>
       )}
 
       {/* Что это значит */}
       {showSummary && (
         <div className="max-w-xl mx-auto mb-8">
-          <p className="font-semibold text-gray-800 mb-2">{t.meaningTitle}</p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4">
+          <p className="text-lg font-semibold text-gray-800 mb-2">{t.meaningTitle}</p>
+          <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">
             {score >= 85 ? t.meaningIntro.excellent
               : score >= 75 ? t.meaningIntro.veryGood
               : score >= 61 ? t.meaningIntro.good
@@ -268,9 +263,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
               : t.meaningIntro.veryLow}
           </p>
           {t.meaningBody.map((para, i) => (
-            <p key={i} className="text-lg text-gray-700 leading-relaxed mb-4">
-              {para}
-            </p>
+            <p
+              key={i}
+              className="text-lg text-gray-700 leading-relaxed mb-4 text-justify"
+              dangerouslySetInnerHTML={{ __html: para }}
+            />
           ))}
         </div>
       )}

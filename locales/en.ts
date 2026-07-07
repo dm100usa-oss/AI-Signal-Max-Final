@@ -420,7 +420,7 @@ const en = {
       veryLow: "This is a normal starting point for many sites. The most important thing now is to make the site clearer to AI and strengthen the core signals it uses to determine your topic, services, and level of trust. We've already found the main reasons and prepared a step-by-step improvement plan.",
     },
     meaningBody: [
-      "We've already identified all the needed improvements and sent you two PDF documents by email.",
+      "<strong>We've already identified all the needed improvements and sent you two PDF documents by email.</strong>",
       "They'll help you improve the site step by step without unnecessary changes.",
       "The documents are structured so you can make some changes yourself and hand the ready technical brief straight to a developer, saving time.",
       "If you'd like to review all 15 check parameters and see the result for each, open the \"Main parameters\" section below.",
