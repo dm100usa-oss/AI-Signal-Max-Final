@@ -202,7 +202,7 @@ export default function QuickPreview() {
           AI Answers Score
         </h1>
         <div className="rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm text-left">
-          <p className="text-2xl font-semibold text-neutral-900 mb-3 text-center">
+          <p className="text-xl font-semibold text-neutral-900 mb-3 text-center">
             {t.limitTitle}
           </p>
           <p className="text-base text-neutral-600 mb-4 text-center">
