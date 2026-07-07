@@ -49,7 +49,7 @@ export async function deleteData(key: string) {
 // ===== Лимит бесплатных проверок по IP (адресу) за месяц =====
 
 // сколько бесплатных проверок в месяц
-export const FREE_LIMIT = 3;
+export const FREE_LIMIT = 50;
 
 // ключ вида: freelimit:1.2.3.4:2026-07
 function limitKey(ip: string): string {
