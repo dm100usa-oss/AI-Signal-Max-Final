@@ -63,7 +63,7 @@ export default function QuickPreview() {
   const runFactors = isExpress ? t.factorsExpress : t.factors;
   const runAnalyzing = isExpress ? t.analyzingExpress : t.analyzing;
   const barGradient = isExpress
-    ? "from-cyan-600 via-cyan-700 to-cyan-800"
+    ? "from-cyan-500 via-cyan-600 to-cyan-700"
     : "from-blue-500 via-blue-600 to-blue-700";
 
   const today = new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
@@ -275,7 +275,7 @@ export default function QuickPreview() {
 
           <button
             onClick={() => goLimit("express")}
-            style={{ backgroundColor: "#0891b2", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            style={{ backgroundColor: "#0aa5d1", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
             className="w-full rounded-md px-4 py-3 text-white text-base font-medium transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
           >
             {t.limitExpressButton}

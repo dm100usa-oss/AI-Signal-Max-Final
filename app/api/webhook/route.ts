@@ -69,9 +69,9 @@ export async function POST(req: Request) {
         results,
       };
 
-      if (mode === "quick") {
+      if (mode !== "pro") {
         console.log(
-          `Quick mode completed for ${url}. Skipping PDF generation and email.`
+          `${mode} mode completed for ${url}. Skipping PDF generation and email.`
         );
       } else {
         const ownerBuffer = await generatePDF({
