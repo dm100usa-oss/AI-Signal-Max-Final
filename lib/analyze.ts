@@ -218,6 +218,7 @@ function buildFactorScores(
   // статусы для показа (берём ключевые новые факторы)
   const aiFactorStatuses: Record<string, number> = {
     specialization: f.specialization ?? 0,
+    theme: f.specialization ?? 0, // пункт "категория" = специализация (учитывает Schema.org + согласованность заголовков)
     offer: f.offer ?? 0,
     facts: f.facts ?? 0,
     topic_coverage: f.topic_coverage ?? 0,
@@ -303,9 +304,16 @@ function hasLang(html: string | null): boolean {
 // --- Главная: специализация (одна тема в title+h1+description) ---
 function specializationShare(html: string | null): number {
   if (!html) return 0;
+  // Главный сигнал: явный тип бизнеса в разметке Schema.org — категория указана однозначно.
+  const ld = ldBlob(html);
+  const businessTypes = /"@type"\s*:\s*"(Organization|LocalBusiness|Corporation|Restaurant|Store|HomeAndConstructionBusiness|GeneralContractor|HomeBuilder|Dentist|MedicalBusiness|LegalService|ProfessionalService|FinancialService|RealEstateAgent|AutoRepair|BeautySalon|Hotel|SoftwareApplication|Product|Service|EducationalOrganization|SportsActivityLocation|FoodEstablishment|EntertainmentBusiness|TravelAgency|InsuranceAgency|Physician|Attorney|Electrician|Plumber|RoofingContractor|MovingCompany)"/i;
+  const hasBusinessType = businessTypes.test(ld);
+
   const title = (stripTags(textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || "")).toLowerCase();
   const h1 = (stripTags(textMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i) || "")).toLowerCase();
   const desc = (textMatch(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i) || "").toLowerCase();
+  // разметка с типом бизнеса даёт полный балл даже при "эмоциональных" заголовках
+  if (hasBusinessType) return 1;
   if (!title || !h1) return 0;
   // общие значимые слова между title и h1 — признак единой темы
   const words = (s: string) =>
@@ -318,6 +326,8 @@ function specializationShare(html: string | null): number {
   else if (overlap === 1) share = 0.7;
   else share = 0.4;
   if (desc && words(desc).some((w) => tW.has(w))) share = Math.min(1, share + 0.1);
+  // любая разметка Schema.org (без явного бизнес-типа) слегка усиливает ясность темы
+  if (/"@type"\s*:/i.test(ld)) share = Math.max(share, 0.6);
   return share;
 }
 
