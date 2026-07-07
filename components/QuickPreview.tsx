@@ -75,6 +75,42 @@ export default function QuickPreview() {
   const [limitReached, setLimitReached] = useState(false);
   const [checkingLimit, setCheckingLimit] = useState(true);
 
+  // поле ввода адреса на плашке лимита (редактируемое, по умолчанию — уже проверенный сайт)
+  const [limitUrl, setLimitUrl] = useState(url);
+  const [limitError, setLimitError] = useState("");
+
+  const normalizeLimitUrl = (v: string) =>
+    v.replace(/^\s*checked\s+website:\s*/i, "").trim();
+
+  const isValidLimitUrl = (u: string): boolean => {
+    try {
+      const parsed = new URL(u.trim());
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+      const hostname = parsed.hostname.toLowerCase();
+      if (!hostname.includes(".")) return false;
+      if (hostname === "localhost") return false;
+      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return false;
+      const parts = hostname.split(".");
+      const tld = parts[parts.length - 1];
+      if (!/^[a-z]{2,}$/.test(tld)) return false;
+      if (parts.some((p) => p.length === 0)) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const goLimit = (targetMode: "quick" | "pro") => {
+    let u = normalizeLimitUrl(limitUrl);
+    if (!/^https?:\/\//i.test(u) && u.length > 0) u = "https://" + u;
+    if (!isValidLimitUrl(u)) {
+      setLimitError(t.errorInvalidUrl || "Введите корректный URL, включая https://");
+      return;
+    }
+    setLimitError("");
+    router.push(`/preview/${targetMode}?url=${encodeURIComponent(u)}&status=ok`);
+  };
+
   // Проверка лимита ДО анимации (peek — не списывает)
   useEffect(() => {
     let cancelled = false;
@@ -169,33 +205,59 @@ export default function QuickPreview() {
           <p className="text-2xl font-semibold text-neutral-900 mb-3 text-center">
             {t.limitTitle}
           </p>
-          <p className="text-base text-neutral-600 mb-8 text-center">
+          <p className="text-base text-neutral-600 mb-4 text-center">
             {t.limitText}
           </p>
+          <p className="text-base text-neutral-600 mb-6 text-center">
+            {t.limitText2}
+          </p>
+
+          <div className="mb-2 relative">
+            <input
+              type="url"
+              inputMode="url"
+              placeholder={t.placeholder}
+              value={limitUrl}
+              onChange={(e) => setLimitUrl(normalizeLimitUrl(e.target.value))}
+              onPaste={(e) => {
+                const pasted = (e.clipboardData || (window as any).clipboardData).getData("text");
+                const cleaned = normalizeLimitUrl(pasted);
+                if (cleaned !== pasted) { e.preventDefault(); setLimitUrl(cleaned); }
+              }}
+              className={[
+                "w-full rounded-md border px-4 py-3 pr-12 text-base outline-none",
+                limitError ? "border-rose-400 focus:ring-2 focus:ring-rose-300" : "border-neutral-300 focus:ring-2 focus:ring-blue-500",
+              ].join(" ")}
+            />
+            {limitUrl && (
+              <button type="button" aria-label="Clear" onClick={() => setLimitUrl("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 cursor-pointer">
+                ×
+              </button>
+            )}
+          </div>
+
+          {limitError && <div className="mb-3 text-sm text-rose-600 text-center">{limitError}</div>}
 
           <button
-            onClick={() =>
-              router.push(`/preview/quick?url=${encodeURIComponent(url)}&status=ok`)
-            }
+            onClick={() => goLimit("quick")}
             style={{ backgroundColor: "#0891b2", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
             className="w-full rounded-md px-4 py-3 text-white text-base font-medium transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
           >
             {t.limitExpressButton}
           </button>
-          <p className="mt-2 mb-6 text-sm text-neutral-600 leading-relaxed">
+          <p className="mt-2 mb-6 text-sm text-neutral-600 leading-relaxed text-center">
             {t.limitExpressDesc}
           </p>
 
           <button
-            onClick={() =>
-              router.push(`/preview/pro?url=${encodeURIComponent(url)}&status=ok`)
-            }
+            onClick={() => goLimit("pro")}
             style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
             className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
           >
             {t.limitDetailedButton}
           </button>
-          <p className="mt-2 text-sm text-neutral-600 leading-relaxed">
+          <p className="mt-2 text-sm text-neutral-600 leading-relaxed text-center">
             {t.limitDetailedDesc}
           </p>
         </div>
