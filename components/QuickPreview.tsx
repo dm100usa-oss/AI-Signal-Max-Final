@@ -124,8 +124,13 @@ export default function QuickPreview() {
     }
   };
 
-  // Проверка лимита ДО анимации (peek — не списывает)
+  // Проверка лимита ДО анимации (peek — не списывает).
+  // В express-режиме лимит не проверяем: это платный поток.
   useEffect(() => {
+    if (isExpress) {
+      setCheckingLimit(false);
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
