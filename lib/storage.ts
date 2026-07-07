@@ -45,3 +45,47 @@ export async function deleteData(key: string) {
     console.error('Redis delete error:', error);
   }
 }
+
+// ===== Лимит бесплатных проверок по IP (адресу) за месяц =====
+
+// сколько бесплатных проверок в месяц
+export const FREE_LIMIT = 3;
+
+// ключ вида: freelimit:1.2.3.4:2026-07
+function limitKey(ip: string): string {
+  const now = new Date();
+  const ym = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+  return `freelimit:${ip}:${ym}`;
+}
+
+// сколько уже использовано в этом месяце (без списания)
+export async function getUsedChecks(ip: string): Promise<number> {
+  try {
+    const v = await redis.get<number>(limitKey(ip));
+    if (typeof v === 'number') return v;
+    if (v) return parseInt(String(v), 10) || 0;
+    return 0;
+  } catch (error) {
+    console.error('Redis limit get error:', error);
+    return 0;
+  }
+}
+
+// списать одну проверку, вернуть новое значение счётчика
+export async function incrChecks(ip: string): Promise<number> {
+  try {
+    const key = limitKey(ip);
+    const n = await redis.incr(key);
+    // при первом списании ставим срок жизни до конца месяца
+    if (n === 1) {
+      const now = new Date();
+      const endOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1);
+      const ttl = Math.ceil((endOfMonth - now.getTime()) / 1000);
+      await redis.expire(key, ttl);
+    }
+    return n;
+  } catch (error) {
+    console.error('Redis limit incr error:', error);
+    return 0;
+  }
+}

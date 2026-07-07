@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { analyze } from "../../../lib/analyze";
-import { saveData } from "../../../lib/storage";
+import { saveData, getUsedChecks, incrChecks, FREE_LIMIT } from "../../../lib/storage";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2023-10-16",
@@ -26,7 +26,7 @@ function isValidUrl(url: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    const { mode, url, lang = "en" } = await req.json();
+    const { mode, url, lang = "en", peek = false } = await req.json();
 
     // проверка режима
     if (mode !== "quick" && mode !== "pro") {
@@ -39,6 +39,28 @@ export async function POST(req: NextRequest) {
         { error: "Invalid URL format" },
         { status: 400 }
       );
+    }
+
+    // ===== Лимит бесплатных проверок (только быстрая) =====
+    const ip =
+      (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() ||
+      req.headers.get("x-real-ip") ||
+      "unknown";
+
+    if (mode === "quick") {
+      const used = await getUsedChecks(ip);
+      const remaining = Math.max(0, FREE_LIMIT - used);
+      // лимит исчерпан — фронт покажет плашку
+      if (used >= FREE_LIMIT) {
+        return NextResponse.json(
+          { error: "limit_reached", used, limit: FREE_LIMIT, remaining: 0 },
+          { status: 429 }
+        );
+      }
+      // peek — только предпросмотр лимита, без запуска анализа и без списания
+      if (peek) {
+        return NextResponse.json({ ok: true, used, limit: FREE_LIMIT, remaining });
+      }
     }
 
     // цены Stripe
@@ -64,6 +86,11 @@ export async function POST(req: NextRequest) {
     // не пускаем к оплате, деньги не берём, отправляем пройти заново
     if (!aiScores || typeof aiScores.overall !== "number" || aiScores.overall <= 0) {
       return NextResponse.json({ error: "analysis_failed" }, { status: 422 });
+    }
+
+    // списываем одну бесплатную проверку: только быстрая, только при успехе
+    if (mode === "quick") {
+      await incrChecks(ip);
     }
 
     // временное сохранение результата (до оплаты)

@@ -14,11 +14,11 @@ const en = {
     errorCannotCheck: "We can't analyze this website. Please try a different one.",
     errorNotAccessible:
       "We can't reach this website. Make sure it's publicly accessible.",
-    quickButton: "Quick Check $5.99",
+    quickButton: "Free Quick Check",
     quickChecking: "Checking",
     quickDesc:
       "Your site's readiness score, 10 key factors, and quick recommendations on screen",
-    proButton: "Full Audit $19.99",
+    proButton: "Detailed Check $30",
     proChecking: "Checking",
     proDesc:
       "15 factors, results on screen and by email, detailed recommendations for the owner and a ready-to-use brief for your developer",
