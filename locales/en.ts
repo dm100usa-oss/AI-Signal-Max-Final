@@ -43,7 +43,7 @@ const en = {
     timerText: (sec: number) => `Check completes in ${sec} sec`,
     checkComplete: "Check complete",
     getResult: "Get your result",
-    limitTitle: "You've used all 3 free checks this month",
+    limitTitle: "You have already used all three free checks available this month",
     placeholder: "https://example.com",
     errorInvalidUrl: "Enter a valid URL, including https://",
     limitText: "Your free check will be available again on the 1st of next month.",

@@ -208,7 +208,7 @@ export default function QuickPreview() {
           <p className="text-base text-neutral-600 mb-4 text-center">
             {t.limitText}
           </p>
-          <p className="text-base text-neutral-600 mb-6 text-center">
+          <p className="text-base font-semibold text-neutral-600 mb-6 text-center">
             {t.limitText2}
           </p>
 
@@ -253,7 +253,7 @@ export default function QuickPreview() {
           <button
             onClick={() => goLimit("pro")}
             style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
-            className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
+            className="mt-4 w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
           >
             {t.limitDetailedButton}
           </button>
