@@ -49,7 +49,7 @@ const en = {
     limitText: "Your free check will be available again on the 1st of next month.",
     limitText2: "You can continue right now by choosing one of the options.",
     limitExpressButton: "Express Check $5.99",
-    limitExpressDesc: "Your site's overall readiness score plus ratings across the four key areas that affect its visibility in AI answers and recommendations.",
+    limitExpressDesc: "Your site's readiness score, ratings across four key areas and 10 main factors. General recommendations for improvement.",
     limitDetailedButton: "Detailed Check $30",
     limitDetailedDesc: "15 factors, results on screen and by email, detailed recommendations for the owner and a ready-to-use brief for your developer",
     backHome: "Back to home",

@@ -187,7 +187,7 @@ export default function QuickPreview() {
 
   if (checkingLimit) {
     return (
-      <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+      <main className="mx-auto max-w-2xl px-3 sm:px-6 pt-20 pb-16 text-center bg-white">
         <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
           AI Answers Score
         </h1>
@@ -197,7 +197,7 @@ export default function QuickPreview() {
 
   if (limitReached) {
     return (
-      <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+      <main className="mx-auto max-w-2xl px-3 sm:px-6 pt-20 pb-16 text-center bg-white">
         <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
           AI Answers Score
         </h1>
@@ -271,7 +271,7 @@ export default function QuickPreview() {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 text-center bg-white">
+    <main className="mx-auto max-w-2xl px-3 sm:px-6 pt-20 pb-16 text-center bg-white">
       <TopLights active={showDots} />
 
       <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
