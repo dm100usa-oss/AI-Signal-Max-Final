@@ -58,8 +58,8 @@ export async function POST(req: Request) {
       }
 
       const { results } = data;
-      // общий скор для PDF = новый aiScores.overall (старый score как запасной)
-      const score = data.aiScores?.overall ?? data.score;
+      // общий скор для PDF = только новый aiScores.overall (единый расчёт по 4 направлениям)
+      const score = data.aiScores?.overall;
       console.log(`Webhook started for ${url} | Score: ${score}`);
 
       const baseData = {

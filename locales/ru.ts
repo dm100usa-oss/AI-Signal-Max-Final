@@ -434,14 +434,14 @@ const ru = {
   scanFailed: {
     message:
       "Не удалось завершить сканирование этого сайта. Проверьте адрес и попробуйте снова.",
-    backButton: "Back to Home",
+    backButton: "Назад на главную",
   },
 
   notFound: {
     title: "Website not found",
     message:
       "Не удалось выполнить сканирование этого сайта. Проверьте адрес и попробуйте снова.",
-    backButton: "Back to Home",
+    backButton: "Назад на главную",
   },
 
   reviews: {

@@ -60,6 +60,12 @@ export async function POST(req: NextRequest) {
     const analysis = await analyze(url, mode);
     const { score, results, factors, items, allItems, aiScores, pageLang } = analysis;
 
+    // проверка результата ДО оплаты: если расчёт не собрался или дал 0 —
+    // не пускаем к оплате, деньги не берём, отправляем пройти заново
+    if (!aiScores || typeof aiScores.overall !== "number" || aiScores.overall <= 0) {
+      return NextResponse.json({ error: "analysis_failed" }, { status: 422 });
+    }
+
     // временное сохранение результата (до оплаты)
     const tempKey = `pending:${url}`;
     await saveData(tempKey, { score, results, factors });

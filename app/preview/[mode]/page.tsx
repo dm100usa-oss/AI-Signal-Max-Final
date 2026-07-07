@@ -75,7 +75,9 @@ export default function PreviewPage({
     const left = Math.max(0, minDuration - (Date.now() - started));
     await new Promise((r) => setTimeout(r, left));
 
-    if (json?.url) {
+    if (json?.error === "analysis_failed") {
+      router.push("/scan-failed");
+    } else if (json?.url) {
       window.location.href = json.url as string;
     } else {
       setLoading(false);

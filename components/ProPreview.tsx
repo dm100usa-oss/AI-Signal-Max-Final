@@ -119,7 +119,8 @@ export default function FullPreview() {
             body: JSON.stringify({ mode: "pro", url }),
           });
           const json = await resp.json();
-          if (json?.url) router.push(json.url);
+          if (json?.error === "analysis_failed") router.push("/scan-failed");
+          else if (json?.url) router.push(json.url);
           else router.push("/pay");
         } catch {
           router.push("/pay");

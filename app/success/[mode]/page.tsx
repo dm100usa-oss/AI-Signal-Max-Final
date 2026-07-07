@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Donut from "../../../components/Donut";
 import { AiScores } from "../../../components/PartScores";
 import { useLang } from "@/hooks/useTranslation";
@@ -43,6 +44,7 @@ const PARAM_PRIORITY = [
 
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
+  const router = useRouter();
   const interfaceLang = useLang();
   const lang = interfaceLang;
   const t = lang === "ru" ? ru.success : en.success;
@@ -68,8 +70,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const res = await fetch(`/api/result?url=${encodeURIComponent(targetUrl)}&mode=${mode}`);
         const data = await res.json();
 
-        if (!data || !data.score) throw new Error("No valid data");
-        const overallScore = data.aiScores?.overall ?? data.score;
+        if (!data || !data.aiScores?.overall) throw new Error("No valid data");
+        const overallScore = data.aiScores.overall;
         setScore(overallScore);
         if (data.aiScores) setAiScores(data.aiScores);
         if (data.items) setItems(data.items);
@@ -93,6 +95,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         setFactors(mode === "quick" ? quickFactors : mappedFactors);
       } catch (err) {
         console.error("Failed to load analysis:", err);
+        router.push("/scan-failed");
+        return;
       } finally {
         setLoading(false);
         setTimeout(() => setShowSummary(true), 1500);
