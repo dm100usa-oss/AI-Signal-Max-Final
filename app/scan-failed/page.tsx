@@ -22,7 +22,8 @@ export default function ScanFailedPage() {
           </p>
           <button
             onClick={back}
-            className="rounded-2xl bg-amber-600 px-5 py-2 font-medium text-white shadow-md transition-colors hover:bg-amber-700"
+            style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="rounded-2xl bg-amber-600 px-5 py-2 font-medium text-white transition-all duration-200 ease-out hover:bg-amber-700 hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
           >
             {t.backButton}
           </button>

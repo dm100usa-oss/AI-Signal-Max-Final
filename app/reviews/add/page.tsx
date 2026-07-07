@@ -69,7 +69,8 @@ export default function AddReviewPage() {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+              className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 disabled:opacity-50"
             >
               {status === "loading" ? t.submitting : t.submitButton}
             </button>

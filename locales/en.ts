@@ -425,8 +425,8 @@ const en = {
       "The documents are structured so you can make some changes yourself and hand the ready technical brief straight to a developer, saving time.",
       "If you'd like to review all 15 check parameters and see the result for each, open the \"Main parameters\" section below.",
     ],
-    requestLead: "If you don't have a developer or don't know who to assign this to — we can help. Leave a request and we'll get in touch.",
-    requestButton: "Leave a request",
+    requestLead: "Let us handle the changes, so you don't spend time and effort",
+    requestButton: "View our services",
   },
 
   scanFailed: {

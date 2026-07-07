@@ -186,7 +186,8 @@ export default function Home() {
       {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
 
       <button onClick={() => go("quick")}
-        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 transition-colors cursor-pointer">
+        style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer">
         {loading === "quick" ? <span className="inline-flex items-center">{t.home.quickChecking}<Dots /></span> : t.home.quickButton}
       </button>
 
@@ -195,7 +196,8 @@ export default function Home() {
       </p>
 
       <button onClick={() => go("pro")}
-        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-colors cursor-pointer">
+        style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer">
         {loading === "pro" ? <span className="inline-flex items-center">{t.home.proChecking}<Dots /></span> : t.home.proButton}
       </button>
 

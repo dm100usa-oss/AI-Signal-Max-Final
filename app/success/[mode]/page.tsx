@@ -277,8 +277,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-8">
           <button
             onClick={() => setShowParams((v) => !v)}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-teal-300 shadow-sm font-medium text-teal-900"
-            style={{ backgroundColor: "#CCF2EC" }}
+            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-teal-300 font-medium text-teal-900 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
+            style={{ backgroundColor: "#CCF2EC", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
           >
             <span>{t.paramsToggle}</span>
             <span
@@ -308,9 +308,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-6">
           <p className="text-lg text-gray-600 text-center mb-3">{t.requestLead}</p>
           <button
-            onClick={() => (window.location.href = "/?request=1")}
-            className="w-full px-6 py-3 rounded-2xl text-white font-medium text-base"
-            style={{ background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)" }}
+            onClick={() => (window.location.href = `https://ai-answers-rank.vercel.app/${lang}/services`)}
+            className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
+            style={{ backgroundImage: "linear-gradient(180deg, #2E6AA6 0%, #1a4a7a 55%, #143a61 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
           >
             {t.requestButton}
           </button>
@@ -321,7 +321,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-6">
           <button
             onClick={() => (window.location.href = "/reviews?add=true")}
-            className="w-full px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-colors flex items-center justify-center space-x-2"
+            style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="w-full px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 flex items-center justify-center space-x-2"
           >
             <span style={{ color: "#facc15", WebkitTextStroke: "0.8px #eab308", fontSize: "20px", lineHeight: "20px" }}>★</span>
             <span>{t.leaveReview}</span>

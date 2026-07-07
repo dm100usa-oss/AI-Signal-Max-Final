@@ -189,7 +189,8 @@ function ReviewsPage() {
           <button
             type="submit"
             disabled={status === "loading" || userRating === 0}
-            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-70 flex justify-center items-center"
+            style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 disabled:opacity-70 flex justify-center items-center"
           >
             {status === "loading" ? (
               <span className="inline-flex items-center">{t.submitting}<Dots /></span>
@@ -241,8 +242,8 @@ function ReviewsPage() {
 
       <button
         onClick={handleBack}
-        className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium shadow-lg transition-opacity"
-        style={{ background: "linear-gradient(90deg,#2563eb 0%,#3b82f6 100%)", opacity: 0.9 }}
+        className="fixed bottom-16 right-6 px-4 py-3 rounded-full text-white text-sm font-medium transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
+        style={{ background: "linear-gradient(90deg,#2563eb 0%,#3b82f6 100%)", opacity: 0.9, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
       >
         {t.backHome}
       </button>
