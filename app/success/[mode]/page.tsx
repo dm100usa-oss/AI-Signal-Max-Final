@@ -11,8 +11,8 @@ type Mode = "quick" | "pro";
 
 interface Factor {
   key: string;
-  name: string;
-  desc: string;
+  name?: string;
+  desc?: string;
   status: "Good" | "Moderate" | "Poor";
 }
 
@@ -75,17 +75,14 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         if (data.items) setItems(data.items);
         if (data.allItems) setAllItems(data.allItems);
 
-        // язык отчёта = язык интерфейса (с которого запускали проверку), НЕ язык сайта
-        const resultLang: "ru" | "en" = interfaceLang === "ru" ? "ru" : "en";
-        const langT = resultLang === "ru" ? ru.success : en.success;
-
-        const allFactors = langT.factors;
+        // сохраняем только ключ и статус; названия берём из текущего языка при отрисовке
+        const allFactors = (interfaceLang === "ru" ? ru.success : en.success).factors;
         const scoreStatus: "Good" | "Moderate" | "Poor" =
           overallScore >= 75 ? "Good" : overallScore >= 40 ? "Moderate" : "Poor";
 
         const mappedFactors = allFactors.map((f) => ({
-          ...f,
-          status: f.key === "score" ? scoreStatus : data.results[f.key] || "Moderate",
+          key: f.key,
+          status: (f.key === "score" ? scoreStatus : data.results[f.key] || "Moderate") as "Good" | "Moderate" | "Poor",
         }));
 
         const QUICK_FACTOR_KEYS = [
@@ -345,13 +342,17 @@ function StatusText({ status, lang }: { status: Factor["status"]; lang: string }
 
 function FactorItem({ factor, lang }: { factor: Factor; lang: string }) {
   const borderColors = { Good: "border-green-500", Moderate: "border-yellow-500", Poor: "border-red-500" };
+  const t = lang === "ru" ? ru.success : en.success;
+  const def = t.factors.find((f) => f.key === factor.key);
+  const name = def?.name ?? factor.name ?? "";
+  const desc = def?.desc ?? factor.desc ?? "";
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm flex items-center">
       <div className="flex items-start space-x-4 flex-1">
         <div className={`w-5 h-5 flex-shrink-0 rounded-full border-2 ${borderColors[factor.status]}`} />
         <div>
-          <p className="font-semibold">{factor.name}</p>
-          <p className="text-sm text-gray-600">{factor.desc}</p>
+          <p className="font-semibold">{name}</p>
+          <p className="text-sm text-gray-600">{desc}</p>
         </div>
       </div>
       <div className="w-24 text-right">
