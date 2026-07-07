@@ -165,20 +165,39 @@ export default function QuickPreview() {
         <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
           AI Answers Score
         </h1>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-          <p className="text-xl font-semibold text-neutral-900 mb-3">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm text-left">
+          <p className="text-xl font-semibold text-neutral-900 mb-3 text-center">
             {t.limitTitle}
           </p>
-          <p className="text-base text-neutral-600 mb-6">
+          <p className="text-base text-neutral-600 mb-8 text-center">
             {t.limitText}
           </p>
+
           <button
-            onClick={() => router.push("/")}
-            className="w-full max-w-xs px-6 py-3 rounded-2xl text-white font-medium text-base"
-            style={{ background: "linear-gradient(90deg, #2563eb 0%, #3b82f6 100%)" }}
+            onClick={() =>
+              router.push(`/preview/quick?url=${encodeURIComponent(url)}&status=ok`)
+            }
+            style={{ backgroundColor: "#0891b2", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
           >
-            {t.backHome}
+            {t.limitExpressButton}
           </button>
+          <p className="text-sm text-neutral-600 mt-2 mb-6 leading-relaxed">
+            {t.limitExpressDesc}
+          </p>
+
+          <button
+            onClick={() =>
+              router.push(`/preview/pro?url=${encodeURIComponent(url)}&status=ok`)
+            }
+            style={{ backgroundColor: "#059669", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
+          >
+            {t.limitDetailedButton}
+          </button>
+          <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
+            {t.limitDetailedDesc}
+          </p>
         </div>
         <footer className="mt-20 text-center text-xs text-neutral-500">
           {tf.copyright}
