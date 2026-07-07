@@ -1,4 +1,4 @@
-export type Mode = "quick" | "pro";
+export type Mode = "quick" | "express" | "pro";
 
 export type CheckKey =
   | "robots_txt"

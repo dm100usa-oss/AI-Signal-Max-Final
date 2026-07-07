@@ -8,7 +8,7 @@ import { useLang } from "@/hooks/useTranslation";
 import en from "@/locales/en";
 import ru from "@/locales/ru";
 
-type Mode = "quick" | "pro";
+type Mode = "quick" | "express" | "pro";
 
 interface Factor {
   key: string;
@@ -92,7 +92,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           "sitemap_xml", "https", "page_speed", "structured_data", "open_graph", "score",
         ];
         const quickFactors = mappedFactors.filter(f => QUICK_FACTOR_KEYS.includes(f.key));
-        setFactors(mode === "quick" ? quickFactors : mappedFactors);
+        setFactors(mode === "pro" ? mappedFactors : quickFactors);
       } catch (err) {
         console.error("Failed to load analysis:", err);
         router.push("/scan-failed");
@@ -161,7 +161,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   return (
     <main className="max-w-3xl mx-auto px-6 py-12">
       <h1 className="text-2xl font-semibold text-center mb-2">
-        {mode === "quick" ? t.quickTitle : t.proTitle}
+        {mode === "pro" ? t.proTitle : t.quickTitle}
       </h1>
 
       {url && (

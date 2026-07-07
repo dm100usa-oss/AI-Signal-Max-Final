@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const { mode, url, lang = "en" } = await req.json();
 
     // проверка режима
-    if (mode !== "quick" && mode !== "pro") {
+    if (mode !== "quick" && mode !== "express" && mode !== "pro") {
       return NextResponse.json({ error: "Invalid mode" }, { status: 400 });
     }
 
@@ -43,9 +43,9 @@ export async function POST(req: NextRequest) {
 
     // цены Stripe
     const priceId =
-      mode === "quick"
-        ? "price_1SaTZaFEP1IRb3Hwea5vrLgL"
-        : process.env.STRIPE_PRICE_FULL;
+      mode === "pro"
+        ? process.env.STRIPE_PRICE_FULL
+        : "price_1SaTZaFEP1IRb3Hwea5vrLgL"; // quick / express — $5.99
 
     if (!priceId) {
       return NextResponse.json(

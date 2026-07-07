@@ -82,7 +82,7 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
   };
 
   const score = calcWeightedScore(all);
-  const keysToShow = mode === "quick" ? QUICK_KEYS : PRO_KEYS;
+  const keysToShow = mode === "pro" ? PRO_KEYS : QUICK_KEYS;
   const items = keysToShow.map((k) => all[k]);
   const allItems = Object.values(all);
 

@@ -53,9 +53,18 @@ export default function QuickPreview() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const url = searchParams.get("url") || "";
+  const mode = searchParams.get("mode") === "express" ? "express" : "quick";
+  const isExpress = mode === "express";
   const lang = useLang();
   const t = lang === "ru" ? ru.quickPreview : en.quickPreview;
   const tf = lang === "ru" ? ru.footer : en.footer;
+
+  // список бегущих строк и заголовок зависят от режима
+  const runFactors = isExpress ? t.factorsExpress : t.factors;
+  const runAnalyzing = isExpress ? t.analyzingExpress : t.analyzing;
+  const barGradient = isExpress
+    ? "from-cyan-600 via-cyan-700 to-cyan-800"
+    : "from-blue-500 via-blue-600 to-blue-700";
 
   const today = new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
     day: "numeric",
@@ -63,7 +72,7 @@ export default function QuickPreview() {
     year: "numeric",
   });
 
-  const totalTime = 20;
+  const totalTime = isExpress ? 28 : 20;
   const [current, setCurrent] = useState(0);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(totalTime);
@@ -100,7 +109,7 @@ export default function QuickPreview() {
     }
   };
 
-  const goLimit = (targetMode: "quick" | "pro") => {
+  const goLimit = (targetMode: "quick" | "express" | "pro") => {
     let u = normalizeLimitUrl(limitUrl);
     if (!/^https?:\/\//i.test(u) && u.length > 0) u = "https://" + u;
     if (!isValidLimitUrl(u)) {
@@ -108,7 +117,11 @@ export default function QuickPreview() {
       return;
     }
     setLimitError("");
-    router.push(`/preview/${targetMode}?url=${encodeURIComponent(u)}&status=ok`);
+    if (targetMode === "express") {
+      router.push(`/preview/express?mode=express&url=${encodeURIComponent(u)}&status=ok`);
+    } else {
+      router.push(`/preview/${targetMode}?url=${encodeURIComponent(u)}&status=ok`);
+    }
   };
 
   // Проверка лимита ДО анимации (peek — не списывает)
@@ -144,9 +157,12 @@ export default function QuickPreview() {
       setTimeLeft((t) => (t > 0 ? t - 1 : 0));
     }, 1000);
 
+    // строки: все, кроме последней, идут в обычном ритме;
+    // последняя ("Будет ли ИИ рекомендовать") держится дольше
+    const stepMs = (totalTime / (runFactors.length + 1)) * 1000;
     const factorTimer = setInterval(() => {
-      setCurrent((p) => (p < t.factors.length - 1 ? p + 1 : p));
-    }, (totalTime / t.factors.length) * 1000);
+      setCurrent((p) => (p < runFactors.length - 1 ? p + 1 : p));
+    }, stepMs);
 
     setTimeout(() => setFadeHeader(true), 1500);
     setTimeout(() => setShowDots(true), 1900);
@@ -158,6 +174,24 @@ export default function QuickPreview() {
 
       setTimeout(async () => {
         try {
+          if (isExpress) {
+            // экспресс: платный поток $5.99 через Stripe
+            const resp = await fetch("/api/pay", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mode: "express", url, lang }),
+            });
+            const json = await resp.json();
+            if (json?.error === "analysis_failed") {
+              router.push("/scan-failed");
+            } else if (json?.url) {
+              window.location.href = json.url as string;
+            } else {
+              router.push("/scan-failed");
+            }
+            return;
+          }
+
           const resp = await fetch("/api/check", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -240,7 +274,7 @@ export default function QuickPreview() {
           {limitError && <div className="mb-3 text-sm text-rose-600 text-center">{limitError}</div>}
 
           <button
-            onClick={() => goLimit("quick")}
+            onClick={() => goLimit("express")}
             style={{ backgroundColor: "#0891b2", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
             className="w-full rounded-md px-4 py-3 text-white text-base font-medium transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
           >
@@ -305,7 +339,7 @@ export default function QuickPreview() {
       <div className="rounded-md p-0">
         <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
           <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
-            {t.factors[current]}
+            {runFactors[current]}
           </p>
           <style jsx>{`
             @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -315,7 +349,7 @@ export default function QuickPreview() {
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 transition-all duration-1000 ease-linear"
+            className={`h-full bg-gradient-to-r ${barGradient} transition-all duration-1000 ease-linear`}
             style={{ width: `${progress}%` }}
           />
           {showResultText && (
@@ -333,7 +367,7 @@ export default function QuickPreview() {
         </div>
 
         <p className="text-center text-sm text-neutral-600 mb-4">
-          {t.analyzing}
+          {runAnalyzing}
         </p>
 
         <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
@@ -348,7 +382,7 @@ export default function QuickPreview() {
             <div
               className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
                 showFinal
-                  ? "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 opacity-100"
+                  ? `bg-gradient-to-r ${barGradient} opacity-100`
                   : "bg-gray-200 opacity-0"
               }`}
             />
