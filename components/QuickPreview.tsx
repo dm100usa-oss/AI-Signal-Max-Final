@@ -76,7 +76,7 @@ export default function QuickPreview() {
   const [checkingLimit, setCheckingLimit] = useState(true);
 
   // поле ввода адреса на плашке лимита (редактируемое, по умолчанию — уже проверенный сайт)
-  const [limitUrl, setLimitUrl] = useState(url);
+  const [limitUrl, setLimitUrl] = useState("");
   const [limitError, setLimitError] = useState("");
 
   const normalizeLimitUrl = (v: string) =>
@@ -201,7 +201,7 @@ export default function QuickPreview() {
         <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
           AI Answers Score
         </h1>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm text-left">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm text-left">
           <p className="text-2xl font-semibold text-neutral-900 mb-3 text-center">
             {t.limitTitle}
           </p>
