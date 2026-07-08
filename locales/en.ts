@@ -206,7 +206,7 @@ const en = {
   },
 
   success: {
-    quickTitle: "Quick Check Results",
+    quickTitle: "Quick Check Result",
     proTitle: "Detailed check result",
     siteLabel: "Website",
     dateLabel: "Date",

@@ -206,7 +206,7 @@ const ru = {
   },
 
   success: {
-    quickTitle: "Результаты быстрой проверки",
+    quickTitle: "Результат быстрой проверки",
     proTitle: "Результат детальной проверки",
     siteLabel: "Сайт",
     dateLabel: "Дата",
