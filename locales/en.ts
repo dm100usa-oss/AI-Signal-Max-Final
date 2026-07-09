@@ -212,6 +212,7 @@ const en = {
     tempDomainWarning: "This site is on a temporary address (e.g. .vercel.app / .netlify.app). AI systems almost never recommend such addresses. A permanent domain of your own is needed.",
     aiSeesTitle: "AI sees and evaluates a site differently than a person does.",
     whyResultTitle: "Why this result?",
+    aiSeesIntro: "AI already sees part of the information about your site.",
     aiSeesText: "It analyzes only the data available to it. If there is not enough, it may not recommend the site, even if it looks modern and convenient.",
     dateLabel: "Date",
     loading: "Loading results...",
