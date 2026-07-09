@@ -526,17 +526,16 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           </ul>
 
           <p className="text-xl font-normal text-gray-800 text-center mb-1 mt-10">{t.quickDetailAfter1}</p>
-          <p className="text-xl font-bold text-gray-800 text-center mb-4">{t.quickDetailAfter2}</p>
+          <p className="text-xl font-bold text-gray-800 text-center mb-3">{t.quickDetailAfter2}</p>
 
-          <p className="text-lg text-gray-700 leading-relaxed mb-3 mt-10 text-center">
+          <p className="text-lg text-gray-700 leading-relaxed mb-3 mt-3 text-center">
             {t.quickDoneP4}
           </p>
-          <div className="flex items-baseline justify-center gap-2.5 mb-1">
+          <div className="flex items-baseline justify-center gap-2.5 mb-5">
             <span className="text-2xl font-bold text-green-700">{t.quickPriceNew}</span>
-            <span className="text-lg text-gray-400 line-through decoration-red-500">{t.quickPriceOld}</span>
+            <span className="text-lg font-semibold text-gray-400 line-through decoration-red-500">{t.quickPriceOld}</span>
             <span className="text-sm font-bold text-white bg-red-500 rounded-md px-2 py-0.5">{t.quickPriceOff}</span>
           </div>
-          <p className="text-sm text-gray-500 text-center mb-5">{t.quickPriceNote}</p>
 
           <button
             onClick={() => {
