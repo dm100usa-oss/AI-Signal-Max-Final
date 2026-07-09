@@ -510,20 +510,22 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             <MaterialsBlock url={url} mode={mode} items={items} allItems={allItems} lang={lang} />
           </div>
 
-          <p className="text-xl font-semibold text-gray-800 text-center mb-2">{t.quickDetailLead}</p>
+          <p className="text-xl font-semibold text-gray-800 text-center mb-2 mt-8">{t.quickCheckDone}</p>
+
+          <p className="text-xl font-semibold text-gray-800 text-center mb-2 mt-12">{t.quickDetailLead}</p>
           <ul className="space-y-2 mb-3">
-            {[t.quickDetailItem1, t.quickDetailItem2, t.quickDetailItem3].map((it, i) => (
+            {[t.quickDetailItem1, t.quickDetailItem2, t.quickDetailItem3, t.quickDetailItem4, t.quickDetailItem5, t.quickDetailItem6].map((it, i) => (
               <li key={i} className="flex gap-3 leading-relaxed">
                 <span
                   className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
                   style={{ backgroundColor: "#16a34a" }}
                 />
-                <span className="text-lg text-gray-700">{it}</span>
+                <span className="text-lg text-gray-700" dangerouslySetInnerHTML={{ __html: it }} />
               </li>
             ))}
           </ul>
           <p
-            className="text-xl text-gray-700 leading-relaxed mb-4 text-justify"
+            className="text-xl font-semibold text-gray-800 text-center mb-4 mt-6"
             dangerouslySetInnerHTML={{ __html: t.quickDetailAfter }}
           />
 
