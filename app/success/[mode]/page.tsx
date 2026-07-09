@@ -450,6 +450,32 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           {(() => {
             const [wp, wf, wd] = weakCounts;
             const allGood = wp === 0 && wf === 0 && wd === 0;
+
+            // Отличный результат (85+): не показываем негатив.
+            // Только ключевые факторы, салатовая точка, мягкая формулировка.
+            if (isExcellent) {
+              return (
+                <div>
+                  <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickResultTitle}</p>
+                  {wf > 0 ? (
+                    <ul className="space-y-2">
+                      <li className="flex gap-3 leading-relaxed">
+                        <span
+                          className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                          style={{ backgroundColor: "#84a916" }}
+                        />
+                        <span className="text-lg text-gray-700">
+                          {wf} {plural(wf, t.quickResultTopWords, lang)} {t.quickResultTopTail}
+                        </span>
+                      </li>
+                    </ul>
+                  ) : (
+                    <p className="text-lg text-gray-700 text-center leading-relaxed">{t.quickResultTopAllGood}</p>
+                  )}
+                </div>
+              );
+            }
+
             const rows: { n: number; words: string[]; tail: string }[] = [];
             if (wp > 0) rows.push({ n: wp, words: t.quickResultParamsWords, tail: t.quickResultParamsTail });
             if (wf > 0) rows.push({ n: wf, words: t.quickResultFactorsWords, tail: t.quickResultFactorsTail });
