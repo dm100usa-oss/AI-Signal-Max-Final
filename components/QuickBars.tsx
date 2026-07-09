@@ -56,7 +56,7 @@ export default function QuickBars({ scores, title, labels, statusText }: QuickBa
                 <div className="flex-1 text-base text-gray-800 whitespace-nowrap">{r.label}</div>
                 <div
                   className="rounded-md overflow-hidden shrink-0"
-                  style={{ width: "96px", height: "16px", backgroundColor: "#eef0f2", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)" }}
+                  style={{ width: "96px", height: "32px", backgroundColor: "#eef0f2", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)" }}
                 >
                   <div
                     className="h-full w-full flex items-center justify-center origin-left"
@@ -70,7 +70,7 @@ export default function QuickBars({ scores, title, labels, statusText }: QuickBa
                   >
                     <span
                       style={{
-                        fontSize: "10px",
+                        fontSize: "12px",
                         fontWeight: 600,
                         color: "#fff",
                         textShadow: "0 1px 1px rgba(0,0,0,0.3)",

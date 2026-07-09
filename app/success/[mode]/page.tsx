@@ -421,7 +421,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
               window.location.href = `/preview/pro?url=${encodeURIComponent(target)}&status=ok`;
             }}
             className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
-            style={{ backgroundImage: "linear-gradient(180deg, #2E6AA6 0%, #1a4a7a 55%, #143a61 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            style={{ backgroundImage: "linear-gradient(180deg, #22c55e 0%, #16a34a 55%, #12813c 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
           >
             {t.quickDoneButton}
           </button>
@@ -459,10 +459,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-6">
           <button
             onClick={() => (window.location.href = "/")}
-            style={{ backgroundColor: "rgba(16,185,129,0.185)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.10), 0 6px 16px rgba(30,40,60,0.12)" }}
-            className="w-full px-6 py-3 rounded-2xl font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
+            style={{ backgroundImage: "linear-gradient(180deg, #2E6AA6 0%, #1a4a7a 55%, #143a61 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
           >
-            <span style={{ color: "#111111" }}>{t.backHome}</span>
+            {t.backHome}
           </button>
         </div>
       )}
