@@ -224,7 +224,7 @@ const ru = {
     quickDetailItem2: "Пошаговый план действий",
     quickDetailItem3: "Техническое задание для разработчика",
     quickDetailAfter: "Эти ответы даёт <b>Детальная проверка</b>",
-    quickDoneP4: "Поскольку Быстрая проверка уже выполнена и часть данных собрана, Детальная проверка доступна для <b>Вас</b> по специальной цене:",
+    quickDoneP4: "Поскольку Быстрая проверка уже выполнена и часть данных собрана, Детальная проверка доступна для <b>Вас</b> <b><span class=\"whitespace-nowrap\">по специальной цене:</span></b>",
     quickPriceNew: "$19.99",
     quickPriceOld: "$30.00",
     quickDoneUrlPlaceholder: "https://example.com",

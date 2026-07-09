@@ -369,7 +369,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
       {/* QUICK: блок «Быстрая проверка завершена» + переход к детальной */}
       {showSummary && isQuick && (
-        <div className="max-w-xl mx-auto mb-6 rounded-2xl p-4 sm:p-6 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100">
+        <div className="max-w-xl mx-auto mb-6">
           <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickDoneTitle}</p>
 
           <ul className="space-y-2 mb-5">
