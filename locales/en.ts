@@ -213,7 +213,7 @@ const en = {
     aiSeesTitle: "AI sees and evaluates a site differently than a person does.",
     whyResultTitle: "Why this result?",
     quickBarsTitle: "How AI sees your site right now",
-    quickDoneTitle: "Quick check complete",
+    quickDoneTitle: "We've successfully checked:",
     quickDoneCheckedLabel: "Checked:",
     quickDoneItem1: "28 factors",
     quickDoneItem2: "15 key parameters",
@@ -264,7 +264,7 @@ const en = {
     labels: {
       title_tag: "Title",
       h1_present: "H1",
-      h2_present: "Currently on site",
+      h2_present: "H2 heading",
       meta_description: "Description",
       site_language: "Language",
       mobile_friendly: "Mobile version",

@@ -772,12 +772,37 @@ const LANG_MAP: Record<string, string> = {
   pl: "Polski", nl: "Nederlands", uk: "Ukrainian",
 };
 
+// Определяем реальный язык по видимому тексту страницы,
+// а не только по атрибуту <html lang> (на двуязычных сайтах он часто неверен).
+function detectLangByText(html: string): string | null {
+  // берём только видимый текст: убираем script/style и все теги
+  const text = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]*>/g, " ");
+  const cyr = (text.match(/[а-яё]/gi) || []).length;
+  const lat = (text.match(/[a-z]/gi) || []).length;
+  const total = cyr + lat;
+  if (total < 20) return null; // текста слишком мало для надёжного вывода
+  if (cyr > lat) {
+    // кириллица: различаем украинский по характерным буквам
+    if (/[іїєґ]/i.test(text)) return "uk";
+    return "ru";
+  }
+  // латиница: различаем испанский по характерным символам
+  if (/[ñ¿¡]/i.test(text) || /[áéíóú]/i.test(text)) return "es";
+  return "en";
+}
+
 function checkLanguage(html: string | null): CheckItem {
-  const lang = textMatch(html, /<html[^>]+lang=["']([^"']+)["']/i);
-  if (!lang) return item("site_language", null, "No lang attribute", "Unknown");
-  const code = lang.split("-")[0].toLowerCase();
-  const name = LANG_MAP[code] || lang.toUpperCase();
-  return item("site_language", true, `Language: ${lang}`, name);
+  const declared = textMatch(html, /<html[^>]+lang=["']([^"']+)["']/i);
+  const byText = html ? detectLangByText(html) : null;
+
+  // приоритет — фактический текст; атрибут lang как запасной вариант
+  const code = (byText || (declared ? declared.split("-")[0].toLowerCase() : "")) || "";
+  if (!code) return item("site_language", null, "No lang attribute", "Unknown");
+  const name = LANG_MAP[code] || (declared ? declared.toUpperCase() : code.toUpperCase());
+  return item("site_language", true, `Language: ${declared || code}`, name);
 }
 
 function checkJSONLD(html: string | null): CheckItem {

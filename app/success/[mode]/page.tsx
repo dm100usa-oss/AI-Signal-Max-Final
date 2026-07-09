@@ -376,7 +376,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
 
       {/* QUICK: блок «Быстрая проверка завершена» + переход к детальной */}
       {showSummary && isQuick && (
-        <div className="max-w-xl mx-auto mb-6">
+        <div className="max-w-xl mx-auto mb-6 mt-10">
           <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickDoneTitle}</p>
 
           <ul className="space-y-2 mb-5">
@@ -391,7 +391,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             ))}
           </ul>
 
-          <p className="text-xl font-semibold text-gray-800 text-center mb-2">{t.quickObjectTitle}</p>
+          <p className="text-xl font-semibold text-gray-800 text-center mb-2 mt-8">{t.quickObjectTitle}</p>
           <div className="mb-5">
             <MaterialsBlock url={url} mode={mode} items={items} allItems={allItems} lang={lang} />
           </div>
@@ -556,12 +556,22 @@ function MaterialsBlock({ url, mode, items, allItems, lang }: { url: string; mod
 
   const siteLabel = lang === "ru" ? "Сайт" : "Site";
 
+  // нормализация для сравнения дублей (без учёта регистра и лишних пробелов)
+  const norm = (s: string) => s.replace(/\s+/g, " ").trim().toLowerCase();
+  const titleVal = lookup.get("title_tag");
+  const descVal = lookup.get("meta_description");
+  const h2Val = lookup.get("h2_present");
+  // H2 часто дословно повторяет Title или Description — такую строку не показываем
+  const h2IsDuplicate =
+    !!h2Val && ((titleVal && norm(h2Val) === norm(titleVal)) || (descVal && norm(h2Val) === norm(descVal)));
+
   return (
     <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 sm:px-6 py-4 text-sm sm:text-base text-gray-700 leading-relaxed">
       <MaterialRow label={siteLabel} value={hostname} withQuotes={false} lang={lang} />
       {primaryKeys.map((key) => {
         const value = lookup.get(key);
         if (!value) return null;
+        if (key === "h2_present" && h2IsDuplicate) return null;
         const label = (t.labels as Record<string, string>)[key] || key;
         const withQuotes = !RAW_VALUE_KEYS.has(key);
         return (

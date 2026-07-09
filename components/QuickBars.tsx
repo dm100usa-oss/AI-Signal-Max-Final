@@ -47,7 +47,7 @@ export default function QuickBars({ scores, title, labels, statusText }: QuickBa
   return (
     <div className="max-w-xl mx-auto mb-6">
       <div className="rounded-2xl p-4 sm:p-6 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100">
-        <p className="text-lg font-semibold text-gray-800 text-center mb-5">{title}</p>
+        <p className="text-xl font-semibold text-gray-800 text-center mb-5">{title}</p>
         <div className="flex flex-col gap-3">
           {rows.map((r, i) => {
             const st = statusFor(r.value);
