@@ -12,13 +12,13 @@ function statusFor(value: number): Status {
   return "poor";
 }
 
-// приглушённые полупрозрачные градиенты; зелёный только с 80
+// непрозрачные градиенты; зелёный — фирменный проектный (green-600), только с 80
 const GRADIENTS: Record<Status, string> = {
-  good: "linear-gradient(180deg, rgba(52,211,153,0.62) 0%, rgba(22,163,74,0.62) 60%, rgba(18,129,60,0.62) 100%)",
-  olive: "linear-gradient(180deg, rgba(163,196,89,0.62) 0%, rgba(132,169,22,0.62) 60%, rgba(110,140,17,0.62) 100%)",
-  amber: "linear-gradient(180deg, rgba(251,191,36,0.62) 0%, rgba(217,119,6,0.62) 60%, rgba(180,98,4,0.62) 100%)",
-  redorange: "linear-gradient(180deg, rgba(248,113,63,0.62) 0%, rgba(220,80,38,0.62) 60%, rgba(185,60,28,0.62) 100%)",
-  poor: "linear-gradient(180deg, rgba(220,60,60,0.62) 0%, rgba(178,28,28,0.62) 60%, rgba(140,20,20,0.62) 100%)",
+  good: "linear-gradient(180deg, #22c55e 0%, #16a34a 60%, #12813c 100%)",
+  olive: "linear-gradient(180deg, #a3c459 0%, #84a916 60%, #6e8c11 100%)",
+  amber: "linear-gradient(180deg, #fbbf24 0%, #d97706 60%, #b46204 100%)",
+  redorange: "linear-gradient(180deg, #f8713f 0%, #dc5026 60%, #b93c1c 100%)",
+  poor: "linear-gradient(180deg, #dc3c3c 0%, #b21c1c 60%, #8c1414 100%)",
 };
 
 const STATUS_KEY: Record<Status, "good" | "moderate" | "poor"> = {

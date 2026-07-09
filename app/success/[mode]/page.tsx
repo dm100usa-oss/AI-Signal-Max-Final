@@ -411,7 +411,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             dangerouslySetInnerHTML={{ __html: t.quickDoneP4 }}
           />
           <div className="flex items-baseline justify-center gap-2.5 mb-5">
-            <span className="text-2xl font-bold text-amber-600">{t.quickPriceNew}</span>
+            <span className="text-xl font-bold text-amber-600">{t.quickPriceNew}</span>
             <span className="text-xl text-gray-400 line-through decoration-red-500">{t.quickPriceOld}</span>
           </div>
 
@@ -443,7 +443,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       )}
 
       {showSummary && (
-        <div className="max-w-xl mx-auto mb-6 mt-12">
+        <div className="max-w-xl mx-auto mb-6 mt-20">
           <button
             onClick={() => (window.location.href = "/reviews?add=true")}
             style={{ backgroundImage: "linear-gradient(180deg, #fef9c3 0%, #fde68a 55%, #fcd34d 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
