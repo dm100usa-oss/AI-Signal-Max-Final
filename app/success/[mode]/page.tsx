@@ -145,6 +145,9 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
     : score >= 21 ? t.levels.low
     : t.levels.veryLow;
 
+  // на верхнем уровне (85–100) блок «Почему такой результат?» не показываем
+  const isExcellent = score >= 85;
+
   // сильные и слабые стороны из проверенных параметров (по статусу)
   const [nStrong, nWeak] = sideCounts(score);
   const statusByKey = new Map(factors.map((f) => [f.key, f.status]));
@@ -192,12 +195,12 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       </h1>
 
       {url && (
-        <div className="mb-4 text-center text-sm text-neutral-600">
+        <div className="mb-2 text-center text-sm text-neutral-600">
           {t.siteLabel}: {url} &nbsp; | &nbsp; {t.dateLabel}: {date}
         </div>
       )}
 
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-3">
         <Donut score={score} />
       </div>
 
@@ -216,14 +219,18 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                   {firstPart}<span className="hidden sm:inline">{restPart ? "." : ""}</span>
                 </span>
                 {restPart && (
-                  <span className="block sm:inline text-lg font-semibold text-gray-800 sm:ml-1">
+                  <span className="block sm:inline text-xl font-semibold text-gray-800 sm:ml-1">
                     {restPart}
                   </span>
                 )}
               </p>
               <p className="text-lg text-gray-700 leading-relaxed text-justify">{level.text}</p>
-              <p className="mt-8 mb-1 text-xl font-semibold text-gray-800 text-center">{t.whyResultTitle}</p>
-              <p className="text-lg text-gray-700 leading-relaxed text-justify">{level.why}</p>
+              {!isExcellent && (
+                <>
+                  <p className="mt-8 mb-1 text-xl font-semibold text-gray-800 text-center">{t.whyResultTitle}</p>
+                  <p className="text-lg text-gray-700 leading-relaxed text-justify">{level.why}</p>
+                </>
+              )}
             </>
           );
         })()}

@@ -380,7 +380,7 @@ const en = {
         why: "AI sees and evaluates a site differently than a person does. It analyzes only the data available to it. If there is not enough, it may not recommend the site, even if it looks modern and convenient.",
       },
       medium: {
-        title: "Good progress. Your site is already halfway ready for AI recommendations",
+        title: "Fair result. Your site is already halfway ready for AI recommendations",
         text: "The site has a solid foundation. Many important elements are present, but some signals are not strong enough.",
         why: "AI sees and evaluates a site differently than a person does. It analyzes only the data available to it. If there is not enough, it may not recommend the site, even if it looks modern and convenient.",
       },
