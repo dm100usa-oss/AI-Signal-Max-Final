@@ -218,6 +218,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                 )}
               </p>
               <p className="text-base text-gray-700 leading-relaxed text-justify">{level.text}</p>
+              <p className="mt-5 mb-1 text-lg font-semibold text-gray-800 text-center">{t.whyResultTitle}</p>
+              <p className="text-base text-gray-700 leading-relaxed text-justify">{t.aiSeesTitle} {t.aiSeesText}</p>
             </>
           );
         })()}
