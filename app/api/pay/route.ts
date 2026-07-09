@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     // анализ сайта
     const analysis = await analyze(url, mode);
-    const { score, results, factors, items, allItems, aiScores, pageLang } = analysis;
+    const { score, results, factors, items, allItems, aiScores, pageLang, factorScores, notApplicable } = analysis;
 
     // проверка результата ДО оплаты: если расчёт не собрался или дал 0 —
     // не пускаем к оплате, деньги не берём, отправляем пройти заново
@@ -92,9 +92,11 @@ export async function POST(req: NextRequest) {
       allItems,
       aiScores,
       pageLang,
+      factorScores,
+      notApplicable,
     });
 
-    await saveData(url, { url, mode, score, results, factors, items, allItems, aiScores, pageLang });
+    await saveData(url, { url, mode, score, results, factors, items, allItems, aiScores, pageLang, factorScores, notApplicable });
 
     return NextResponse.json({ url: session.url });
   } catch (e: any) {

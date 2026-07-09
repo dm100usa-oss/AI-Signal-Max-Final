@@ -729,12 +729,12 @@ function checkCanonical(html: string | null, origin: string): CheckItem {
 }
 
 function checkTitle(html: string | null): CheckItem {
-  const t = stripTags(textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || "");
+  const t = decodeEntities(stripTags(textMatch(html, /<title[^>]*>([\s\S]*?)<\/title>/i) || ""));
   return item("title_tag", t.length ? true : false, t.length ? `Title: ${t}` : "Missing <title>", t || "Not found");
 }
 
 function checkMetaDescription(html: string | null): CheckItem {
-  const d = textMatch(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["'][^>]*>/i) || "";
+  const d = decodeEntities(textMatch(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["'][^>]*>/i) || "");
   return item("meta_description", d.trim().length ? true : false, d ? `Meta description: ${d}` : "Missing meta description", d || "Not found");
 }
 
