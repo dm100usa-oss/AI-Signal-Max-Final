@@ -41,6 +41,8 @@ export interface AnalyzeResult {
   factors: Record<string, { status: "Good" | "Moderate" | "Poor" }>;
   aiScores?: AiScores;
   pageLang?: string;
+  factorScores?: Partial<Record<FactorKey, number>>;
+  notApplicable?: FactorKey[];
 }
 
 const DEFAULT_UA =
