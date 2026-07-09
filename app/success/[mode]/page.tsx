@@ -513,8 +513,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           <p className="text-xl font-semibold text-gray-800 text-center mb-2 mt-8">{t.quickCheckDone}</p>
 
           <p className="text-xl font-semibold text-gray-800 text-center mb-2 mt-12">{t.quickDetailLead}</p>
-          <ul className="space-y-2 mb-3">
-            {[t.quickDetailItem1, t.quickDetailItem2, t.quickDetailItem3, t.quickDetailItem4, t.quickDetailItem5, t.quickDetailItem6].map((it, i) => (
+          <ul className="space-y-2 mb-3 mt-6">
+            {[t.quickDetailItem1, t.quickDetailItem2, t.quickDetailItem3, t.quickDetailItem4, t.quickDetailItem5].map((it, i) => (
               <li key={i} className="flex gap-3 leading-relaxed">
                 <span
                   className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
@@ -524,19 +524,19 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
               </li>
             ))}
           </ul>
-          <p
-            className="text-xl font-semibold text-gray-800 text-center mb-4 mt-6"
-            dangerouslySetInnerHTML={{ __html: t.quickDetailAfter }}
-          />
 
-          <p
-            className="text-lg text-gray-700 leading-relaxed mb-2 text-justify"
-            dangerouslySetInnerHTML={{ __html: t.quickDoneP4 }}
-          />
-          <div className="flex items-baseline justify-center gap-2.5 mb-5">
-            <span className="text-xl font-bold text-amber-600">{t.quickPriceNew}</span>
-            <span className="text-xl text-gray-400 line-through decoration-red-500">{t.quickPriceOld}</span>
+          <p className="text-xl font-normal text-gray-800 text-center mb-1 mt-10">{t.quickDetailAfter1}</p>
+          <p className="text-xl font-bold text-gray-800 text-center mb-4">{t.quickDetailAfter2}</p>
+
+          <p className="text-lg text-gray-700 leading-relaxed mb-3 mt-10 text-center">
+            {t.quickDoneP4}
+          </p>
+          <div className="flex items-baseline justify-center gap-2.5 mb-1">
+            <span className="text-2xl font-bold text-green-700">{t.quickPriceNew}</span>
+            <span className="text-lg text-gray-400 line-through decoration-red-500">{t.quickPriceOld}</span>
+            <span className="text-sm font-bold text-white bg-red-500 rounded-md px-2 py-0.5">{t.quickPriceOff}</span>
           </div>
+          <p className="text-sm text-gray-500 text-center mb-5">{t.quickPriceNote}</p>
 
           <button
             onClick={() => {
