@@ -353,28 +353,34 @@ const en = {
     // --- Five result levels (detailed check) ---
     levels: {
       veryLow: {
-        title: "Right now your site is nearly invisible to AI, but that's fixable",
+        title: "Right now your site is nearly invisible to AI",
         text: "For now it's hard for AI to understand what your site does, so it rarely recommends it to users. It's best to start with the basic improvements.",
+        why: "AI sees and evaluates a site differently than a person does. It analyzes only the data available to it. If there is not enough, it may not recommend the site, even if it looks modern and convenient.",
       },
       low: {
         title: "Your site is taking its first steps toward AI recommendations",
-        text: "AI already sees part of the information about your site, but doesn't yet fully understand it. Right now it's important to strengthen the basic elements so your site becomes much clearer to AI.",
+        text: "AI already sees part of the information about the site, but doesn't fully understand it. Right now it's important to strengthen the basic elements so the site becomes noticeably clearer.",
+        why: "AI sees and evaluates a site differently than a person does. It analyzes only the data available to it. If there is not enough, it may not recommend the site, even if it looks modern and convenient.",
       },
       medium: {
         title: "Good progress. Your site is already halfway ready for AI recommendations",
-        text: "Your site already has a solid foundation. Many important elements are present, but some signals are still not strong enough. After improvements, your site can significantly raise its chances of appearing in AI recommendations.",
+        text: "The site has a solid foundation. Many important elements are present, but some signals are not strong enough.",
+        why: "AI sees and evaluates a site differently than a person does. It analyzes only the data available to it. If there is not enough, it may not recommend the site, even if it looks modern and convenient.",
       },
       good: {
         title: "Good result. Your site is confidently moving toward AI recommendations",
-        text: "Your site already has a good foundation, and many important elements work correctly. After improving a few factors, your site can significantly strengthen its position and appear in AI recommendations more often.",
+        text: "It has a good foundation, and many important elements work correctly.",
+        why: "AI can access and understand most of the information on the site, but there are individual weak spots. With a small improvement, it has very good chances of appearing in AI answers and recommendations.",
       },
       veryGood: {
         title: "Very good result. Your site is already very close to AI recommendations",
-        text: "Your site already has a strong foundation and confidently competes for a place in AI recommendations. A few important elements remain to be strengthened, which will help AI choose your site even more often.",
+        text: "It has a strong foundation and confidently competes for a place in recommendations. Strengthening a few small elements will help AI choose your site more often.",
+        why: "AI can access and understand almost all of the information on the site, so it is already among the sites AI considers for consistent recommendations. Improve a few positions to appear in AI answers more often.",
       },
       excellent: {
         title: "Excellent result. Your site is well prepared for AI recommendations",
-        text: "Your site already meets most of the factors modern AI uses when choosing sources of information. This is a high level of readiness. Small targeted improvements will help you keep your competitive edge as AI evolves.",
+        text: "It meets most of the factors modern AI uses when choosing sources of information. This is a high level of readiness. AI algorithms change over time, so it's important to check the site periodically to hold its leading positions.",
+        why: "AI can access and understand all the key information on the site, so it confidently ranks among the sources AI recommends. This is a strong position.",
       },
     },
     strengthsTitle: "Strengths",

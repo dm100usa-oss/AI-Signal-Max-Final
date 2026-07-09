@@ -198,7 +198,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       </div>
 
       <div
-        className="max-w-xl mx-auto rounded-2xl p-6 mb-8 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 transition-all duration-1000 ease-in-out"
+        className="max-w-xl mx-auto rounded-2xl p-2.5 sm:p-6 mb-8 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100 transition-all duration-1000 ease-in-out"
         style={{ opacity: showSummary ? 1 : 0 }}
       >
         {showSummary && (() => {
@@ -218,9 +218,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                 )}
               </p>
               <p className="text-lg text-gray-700 leading-relaxed text-justify">{level.text}</p>
-              <p className="mt-5 text-lg text-gray-700 leading-relaxed text-justify">{t.aiSeesIntro}</p>
               <p className="mt-4 mb-1 text-xl font-semibold text-gray-800 text-center">{t.whyResultTitle}</p>
-              <p className="text-lg text-gray-700 leading-relaxed text-justify">{t.aiSeesTitle} {t.aiSeesText}</p>
+              <p className="text-lg text-gray-700 leading-relaxed text-justify">{level.why}</p>
             </>
           );
         })()}
