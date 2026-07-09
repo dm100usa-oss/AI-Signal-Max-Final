@@ -240,6 +240,11 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             tech: t.aiScores.tech,
             authority: t.aiScores.authority,
           }}
+          statusText={{
+            good: t.statusGood,
+            moderate: t.statusModerate,
+            poor: t.statusPoor,
+          }}
         />
       )}
 
@@ -366,10 +371,38 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       {showSummary && isQuick && (
         <div className="max-w-xl mx-auto mb-6 rounded-2xl p-4 sm:p-6 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100">
           <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickDoneTitle}</p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">{t.quickDoneP1}</p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">{t.quickDoneP2}</p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">{t.quickDoneP3}</p>
-          <p className="text-lg text-gray-700 leading-relaxed mb-5 text-justify">{t.quickDoneP4}</p>
+
+          <p className="text-lg text-gray-700 mb-2">{t.quickDoneCheckedLabel}</p>
+          <ul className="space-y-2 mb-5">
+            {[t.quickDoneItem1, t.quickDoneItem2, t.quickDoneItem3].map((it, i) => (
+              <li key={i} className="flex gap-3 leading-relaxed">
+                <span
+                  className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                  style={{ backgroundColor: "#2563EB" }}
+                />
+                <span className="text-lg text-gray-700">{it}</span>
+              </li>
+            ))}
+          </ul>
+
+          <p className="text-lg font-semibold text-gray-800 mb-2">{t.quickObjectTitle}</p>
+          <div className="mb-5">
+            <MaterialsBlock url={url} mode={mode} items={items} allItems={allItems} lang={lang} />
+          </div>
+
+          <p
+            className="text-lg text-gray-700 leading-relaxed mb-4 text-justify"
+            dangerouslySetInnerHTML={{ __html: t.quickDoneP3 }}
+          />
+          <p
+            className="text-lg text-gray-700 leading-relaxed mb-2 text-justify"
+            dangerouslySetInnerHTML={{ __html: t.quickDoneP4 }}
+          />
+          <div className="flex items-baseline justify-center gap-3 mb-5">
+            <span className="text-4xl font-bold text-gray-900">{t.quickPriceNew}</span>
+            <span className="text-lg text-red-600 line-through">{t.quickPriceOld}</span>
+          </div>
+
           <input
             type="url"
             value={detailUrl}
@@ -383,10 +416,22 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
               window.location.href = `/preview/pro?url=${encodeURIComponent(target)}&status=ok`;
             }}
             className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
-            style={{ backgroundImage: "linear-gradient(180deg, #2E6AA6 0%, #1a4a7a 55%, #143a61 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            style={{ backgroundImage: "linear-gradient(180deg, #22c55e 0%, #16a34a 55%, #12813c 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
           >
             {t.quickDoneButton}
           </button>
+
+          <ul className="mt-4 space-y-1.5">
+            {[t.quickIncludes1, t.quickIncludes2, t.quickIncludes3].map((it, i) => (
+              <li key={i} className="flex gap-2.5 leading-relaxed">
+                <span
+                  className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                  style={{ backgroundColor: "#16a34a" }}
+                />
+                <span className="text-sm text-gray-600">{it}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -408,11 +453,23 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-6">
           <button
             onClick={() => (window.location.href = "/reviews?add=true")}
-            style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
-            className="w-full px-6 py-3 rounded-2xl text-gray-800 font-medium text-base bg-yellow-100 border border-yellow-400 hover:bg-yellow-200 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 flex items-center justify-center space-x-2"
+            style={{ backgroundImage: "linear-gradient(180deg, #fef9c3 0%, #fde68a 55%, #fcd34d 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="w-full px-6 py-3 rounded-2xl text-gray-800 font-medium text-base border border-yellow-400 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 flex items-center justify-center space-x-2"
           >
             <span style={{ color: "#facc15", WebkitTextStroke: "0.8px #eab308", fontSize: "20px", lineHeight: "20px" }}>★</span>
             <span>{t.leaveReview}</span>
+          </button>
+        </div>
+      )}
+
+      {showSummary && (
+        <div className="max-w-xl mx-auto mb-6">
+          <button
+            onClick={() => (window.location.href = "/")}
+            style={{ backgroundImage: "linear-gradient(180deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
+          >
+            {t.backHome}
           </button>
         </div>
       )}
