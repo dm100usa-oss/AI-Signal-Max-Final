@@ -389,7 +389,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             <MaterialsBlock url={url} mode={mode} items={items} allItems={allItems} lang={lang} />
           </div>
 
-          <p className="text-lg text-gray-700 mb-2">{t.quickDetailLead}</p>
+          <p className="text-xl font-semibold text-gray-800 text-center mb-2">{t.quickDetailLead}</p>
           <ul className="space-y-2 mb-3">
             {[t.quickDetailItem1, t.quickDetailItem2, t.quickDetailItem3].map((it, i) => (
               <li key={i} className="flex gap-3 leading-relaxed">
@@ -402,7 +402,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             ))}
           </ul>
           <p
-            className="text-lg text-gray-700 leading-relaxed mb-4 text-justify"
+            className="text-xl text-gray-700 leading-relaxed mb-4 text-justify"
             dangerouslySetInnerHTML={{ __html: t.quickDetailAfter }}
           />
 

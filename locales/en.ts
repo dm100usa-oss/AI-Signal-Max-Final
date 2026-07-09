@@ -223,7 +223,7 @@ const en = {
     quickDetailItem1: "Recommendations",
     quickDetailItem2: "Step-by-step action plan",
     quickDetailItem3: "Technical brief for a developer",
-    quickDetailAfter: "The <b>Detailed check</b> provides those answers.",
+    quickDetailAfter: "The <b>Detailed check</b> provides those answers",
     quickDoneP4: "Since the Quick check is already done and part of the data is collected, the Detailed check is available to <b>you</b> at a special price:",
     quickPriceNew: "$19.99",
     quickPriceOld: "$30.00",
