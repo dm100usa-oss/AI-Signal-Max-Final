@@ -45,6 +45,40 @@ const PARAM_PRIORITY = [
   "canonical", "mobile_friendly", "alt_attributes", "page_404",
 ];
 
+// 15 ключевых факторов (топ по вкладу в общий балл)
+const KEY_FACTORS_15: FactorKey[] = [
+  "real_business", "facts", "topic_coverage", "reviews", "org_schema",
+  "structured_content", "direct_answers", "experience", "specialization", "no_js",
+  "services", "trust_signals", "structured_data", "title_tag", "meta_description",
+];
+// 28 параметров = 15 ключевых + следующие 13 по весу
+const PARAMS_28: FactorKey[] = [
+  ...KEY_FACTORS_15,
+  "robots_txt", "authorship", "h1_present", "contacts", "meta_robots",
+  "sitemap_xml", "offer", "https", "tables_lists", "social",
+  "freshness", "x_robots_tag", "page_speed",
+];
+// порог: доля выполнения ниже 0.75 — «требует улучшения»
+const WEAK_SHARE = 0.75;
+// порог для направления
+const WEAK_DIRECTION = 55;
+
+// сколько из списка ключей «слабые» по factorScores (не применимые — пропускаем)
+function countWeak(
+  keys: FactorKey[],
+  fScores: Partial<Record<FactorKey, number>>,
+  naSet: Set<FactorKey>
+): number {
+  let n = 0;
+  for (const k of keys) {
+    if (naSet.has(k)) continue;
+    const share = fScores[k];
+    if (share === undefined) continue;
+    if (share < WEAK_SHARE) n++;
+  }
+  return n;
+}
+
 // временные/тестовые адреса, которые ИИ почти не рекомендует
 function isTempDomain(rawUrl: string): boolean {
   let host = "";
@@ -55,6 +89,18 @@ function isTempDomain(rawUrl: string): boolean {
     ".surge.sh", ".repl.co", ".glitch.me", ".webflow.io", ".wixsite.com",
   ];
   return TEMP.some((suf) => host.endsWith(suf));
+}
+
+// выбор словоформы по числу.
+// ru: words = [для 1, для 2-4, для 5+]; en: words = [ед., мн.]
+function plural(n: number, words: string[], lang: string): string {
+  if (lang === "ru") {
+    const m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return words[0];
+    if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return words[1];
+    return words[2];
+  }
+  return n === 1 ? words[0] : words[1];
 }
 
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
@@ -76,6 +122,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const [detailUrl, setDetailUrl] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const [showParams, setShowParams] = useState(false);
+  // числа для блока «По результатам проверки» [параметры, ключевые факторы, направления]
+  const [weakCounts, setWeakCounts] = useState<[number, number, number]>([0, 0, 0]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -120,6 +168,13 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         // Пока показываем полный набор факторов во всех режимах (как на детальной).
         // Завтра уберём лишнее для quick/express.
         setFactors(mappedFactors);
+
+        // числа для блока «По результатам проверки»
+        const weakParams = countWeak(PARAMS_28, fScores, naSet);
+        const weakFactors = countWeak(KEY_FACTORS_15, fScores, naSet);
+        const dirs = [data.aiScores.home, data.aiScores.content, data.aiScores.tech, data.aiScores.authority];
+        const weakDirs = dirs.filter((v: number) => v < WEAK_DIRECTION).length;
+        setWeakCounts([weakParams, weakFactors, weakDirs]);
       } catch (err) {
         console.error("Failed to load analysis:", err);
         router.push("/scan-failed");
@@ -219,7 +274,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                   {firstPart}<span className="hidden sm:inline">{restPart ? "." : ""}</span>
                 </span>
                 {restPart && (
-                  <span className="block sm:inline text-xl font-semibold text-gray-800 sm:ml-1">
+                  <span className="block sm:inline text-xl font-semibold text-gray-800 mt-3 sm:mt-0 sm:ml-1">
                     {restPart}
                   </span>
                 )}
@@ -377,6 +432,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       {/* QUICK: блок «Быстрая проверка завершена» + переход к детальной */}
       {showSummary && isQuick && (
         <div className="max-w-xl mx-auto mb-6 mt-10">
+          <div className="rounded-2xl p-4 sm:p-6 mb-8 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100">
           <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickDoneTitle}</p>
 
           <ul className="space-y-2 mb-5">
@@ -390,6 +446,38 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
               </li>
             ))}
           </ul>
+
+          {(() => {
+            const [wp, wf, wd] = weakCounts;
+            const allGood = wp === 0 && wf === 0 && wd === 0;
+            const rows: { n: number; words: string[]; tail: string }[] = [];
+            if (wp > 0) rows.push({ n: wp, words: t.quickResultParamsWords, tail: t.quickResultParamsTail });
+            if (wf > 0) rows.push({ n: wf, words: t.quickResultFactorsWords, tail: t.quickResultFactorsTail });
+            if (wd > 0) rows.push({ n: wd, words: t.quickResultDirectionsWords, tail: t.quickResultDirectionsTail });
+            return (
+              <div>
+                <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickResultTitle}</p>
+                {allGood ? (
+                  <p className="text-lg text-gray-700 text-center leading-relaxed">{t.quickResultAllGood}</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {rows.map((r, i) => (
+                      <li key={i} className="flex gap-3 leading-relaxed">
+                        <span
+                          className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                          style={{ backgroundColor: "#dc2626" }}
+                        />
+                        <span className="text-lg text-gray-700">
+                          {r.n} {plural(r.n, r.words, lang)}{r.tail ? " " + r.tail : ""}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })()}
+          </div>
 
           <p className="text-xl font-semibold text-gray-800 text-center mb-2 mt-8">{t.quickObjectTitle}</p>
           <div className="mb-5">

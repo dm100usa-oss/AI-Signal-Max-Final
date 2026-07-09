@@ -53,7 +53,7 @@ export default function QuickBars({ scores, title, labels, statusText }: QuickBa
             const st = statusFor(r.value);
             return (
               <div key={i} className="flex items-center gap-3">
-                <div className="flex-1 text-base text-gray-800 whitespace-nowrap">{r.label}</div>
+                <div className="flex-1 text-lg text-gray-700 whitespace-nowrap">{r.label}</div>
                 <div
                   className="rounded-md overflow-hidden shrink-0"
                   style={{ width: "96px", height: "32px", backgroundColor: "#eef0f2", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)" }}
