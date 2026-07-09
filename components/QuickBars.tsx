@@ -2,19 +2,31 @@
 
 import type { AiScores } from "./PartScores";
 
-type Status = "good" | "moderate" | "poor";
+type Status = "good" | "olive" | "amber" | "redorange" | "poor";
 
 function statusFor(value: number): Status {
-  if (value >= 75) return "good";
-  if (value >= 40) return "moderate";
+  if (value >= 80) return "good";
+  if (value >= 65) return "olive";
+  if (value >= 55) return "amber";
+  if (value >= 40) return "redorange";
   return "poor";
 }
 
-// премиальные градиенты в стиле кнопок: светлее сверху, темнее снизу
+// приглушённые полупрозрачные градиенты; зелёный только с 80
 const GRADIENTS: Record<Status, string> = {
-  good: "linear-gradient(180deg, #34d399 0%, #16a34a 60%, #12813c 100%)",
-  moderate: "linear-gradient(180deg, #fbbf24 0%, #eab308 60%, #ca9a04 100%)",
-  poor: "linear-gradient(180deg, #f87171 0%, #dc2626 60%, #b41d1d 100%)",
+  good: "linear-gradient(180deg, rgba(52,211,153,0.62) 0%, rgba(22,163,74,0.62) 60%, rgba(18,129,60,0.62) 100%)",
+  olive: "linear-gradient(180deg, rgba(163,196,89,0.62) 0%, rgba(132,169,22,0.62) 60%, rgba(110,140,17,0.62) 100%)",
+  amber: "linear-gradient(180deg, rgba(251,191,36,0.62) 0%, rgba(217,119,6,0.62) 60%, rgba(180,98,4,0.62) 100%)",
+  redorange: "linear-gradient(180deg, rgba(248,113,63,0.62) 0%, rgba(220,80,38,0.62) 60%, rgba(185,60,28,0.62) 100%)",
+  poor: "linear-gradient(180deg, rgba(220,60,60,0.62) 0%, rgba(178,28,28,0.62) 60%, rgba(140,20,20,0.62) 100%)",
+};
+
+const STATUS_KEY: Record<Status, "good" | "moderate" | "poor"> = {
+  good: "good",
+  olive: "good",
+  amber: "moderate",
+  redorange: "poor",
+  poor: "poor",
 };
 
 interface QuickBarsProps {
@@ -36,40 +48,37 @@ export default function QuickBars({ scores, title, labels, statusText }: QuickBa
     <div className="max-w-xl mx-auto mb-6">
       <div className="rounded-2xl p-4 sm:p-6 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100">
         <p className="text-lg font-semibold text-gray-800 text-center mb-5">{title}</p>
-        <div className="flex flex-col gap-3.5">
+        <div className="flex flex-col gap-3">
           {rows.map((r, i) => {
             const st = statusFor(r.value);
             return (
               <div key={i} className="flex items-center gap-3">
-                <div className="text-base text-gray-800 flex-shrink-0" style={{ width: "120px" }}>
-                  {r.label}
-                </div>
+                <div className="flex-1 text-base text-gray-800 whitespace-nowrap">{r.label}</div>
                 <div
-                  className="flex-1 rounded-md overflow-hidden"
-                  style={{ height: "26px", backgroundColor: "#eef0f2", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.06)" }}
+                  className="rounded-md overflow-hidden shrink-0"
+                  style={{ width: "96px", height: "16px", backgroundColor: "#eef0f2", boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)" }}
                 >
                   <div
                     className="h-full w-full flex items-center justify-center origin-left"
                     style={{
                       backgroundImage: GRADIENTS[st],
-                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.45), 0 1px 2px rgba(0,0,0,0.12)",
+                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35)",
                       borderRadius: "6px",
-                      animation: "quickBarFill 10s ease-in-out infinite",
-                      animationDelay: `${i * 0.5}s`,
+                      animation: "quickBarFill 20s ease-in-out infinite",
+                      animationDelay: `${i * 0.6}s`,
                     }}
                   >
                     <span
-                      className="quick-bar-label"
                       style={{
-                        fontSize: "13px",
+                        fontSize: "10px",
                         fontWeight: 600,
                         color: "#fff",
-                        textShadow: "0 1px 1px rgba(0,0,0,0.25)",
-                        animation: "quickBarText 10s ease-in-out infinite",
-                        animationDelay: `${i * 0.5}s`,
+                        textShadow: "0 1px 1px rgba(0,0,0,0.3)",
+                        animation: "quickBarText 20s ease-in-out infinite",
+                        animationDelay: `${i * 0.6}s`,
                       }}
                     >
-                      {statusText[st]}
+                      {statusText[STATUS_KEY[st]]}
                     </span>
                   </div>
                 </div>

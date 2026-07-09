@@ -372,7 +372,6 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         <div className="max-w-xl mx-auto mb-6 rounded-2xl p-4 sm:p-6 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100">
           <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickDoneTitle}</p>
 
-          <p className="text-lg text-gray-700 mb-2">{t.quickDoneCheckedLabel}</p>
           <ul className="space-y-2 mb-5">
             {[t.quickDoneItem1, t.quickDoneItem2, t.quickDoneItem3].map((it, i) => (
               <li key={i} className="flex gap-3 leading-relaxed">
@@ -385,31 +384,37 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
             ))}
           </ul>
 
-          <p className="text-lg font-semibold text-gray-800 mb-2">{t.quickObjectTitle}</p>
+          <p className="text-xl font-semibold text-gray-800 text-center mb-2">{t.quickObjectTitle}</p>
           <div className="mb-5">
             <MaterialsBlock url={url} mode={mode} items={items} allItems={allItems} lang={lang} />
           </div>
 
+          <p className="text-lg text-gray-700 mb-2">{t.quickDetailLead}</p>
+          <ul className="space-y-2 mb-3">
+            {[t.quickDetailItem1, t.quickDetailItem2, t.quickDetailItem3].map((it, i) => (
+              <li key={i} className="flex gap-3 leading-relaxed">
+                <span
+                  className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
+                  style={{ backgroundColor: "#16a34a" }}
+                />
+                <span className="text-lg text-gray-700">{it}</span>
+              </li>
+            ))}
+          </ul>
           <p
             className="text-lg text-gray-700 leading-relaxed mb-4 text-justify"
-            dangerouslySetInnerHTML={{ __html: t.quickDoneP3 }}
+            dangerouslySetInnerHTML={{ __html: t.quickDetailAfter }}
           />
+
           <p
             className="text-lg text-gray-700 leading-relaxed mb-2 text-justify"
             dangerouslySetInnerHTML={{ __html: t.quickDoneP4 }}
           />
-          <div className="flex items-baseline justify-center gap-3 mb-5">
-            <span className="text-4xl font-bold text-gray-900">{t.quickPriceNew}</span>
-            <span className="text-lg text-red-600 line-through">{t.quickPriceOld}</span>
+          <div className="flex items-baseline justify-center gap-2.5 mb-5">
+            <span className="text-2xl font-bold text-amber-600">{t.quickPriceNew}</span>
+            <span className="text-xl text-gray-400 line-through decoration-red-500">{t.quickPriceOld}</span>
           </div>
 
-          <input
-            type="url"
-            value={detailUrl}
-            onChange={(e) => setDetailUrl(e.target.value)}
-            placeholder={t.quickDoneUrlPlaceholder}
-            className="w-full px-4 py-3 mb-3 rounded-xl border border-gray-300 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
-          />
           <button
             onClick={() => {
               const target = (detailUrl || url).trim();
@@ -420,18 +425,6 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           >
             {t.quickDoneButton}
           </button>
-
-          <ul className="mt-4 space-y-1.5">
-            {[t.quickIncludes1, t.quickIncludes2, t.quickIncludes3].map((it, i) => (
-              <li key={i} className="flex gap-2.5 leading-relaxed">
-                <span
-                  className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
-                  style={{ backgroundColor: "#16a34a" }}
-                />
-                <span className="text-sm text-gray-600">{it}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       )}
 
@@ -534,9 +527,9 @@ function quoted(value: string, lang: string): string {
 function MaterialRow({ label, value, withQuotes, lang }: { label: string; value: string; withQuotes: boolean; lang: string }) {
   const display = withQuotes ? quoted(value, lang) : value;
   return (
-    <div className="flex items-baseline gap-0 min-w-0">
-      <span className="text-gray-400 shrink-0" style={{ width: "8rem" }}>{label}:</span>
-      <span className="text-gray-800 min-w-0 break-words">{display}</span>
+    <div className="flex items-baseline gap-2 min-w-0">
+      <span className="text-gray-400 shrink-0 basis-1/3 break-words">{label}:</span>
+      <span className="text-gray-800 min-w-0 basis-2/3 break-words">{display}</span>
     </div>
   );
 }
