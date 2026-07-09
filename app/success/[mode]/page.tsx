@@ -188,12 +188,12 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
       </h1>
 
       {url && (
-        <div className="mb-6 text-center text-sm text-neutral-600">
+        <div className="mb-4 text-center text-sm text-neutral-600">
           {t.siteLabel}: {url} &nbsp; | &nbsp; {t.dateLabel}: {date}
         </div>
       )}
 
-      <div className="flex justify-center mb-6">
+      <div className="flex justify-center mb-4">
         <Donut score={score} />
       </div>
 
@@ -217,7 +217,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                   </span>
                 )}
               </p>
-              <p className="text-base text-gray-700 leading-relaxed text-justify">{level.text}</p>
+              <p className="text-lg text-gray-700 leading-relaxed text-justify">{level.text}</p>
               <p className="mt-5 text-lg text-gray-700 leading-relaxed text-justify">{t.aiSeesIntro}</p>
               <p className="mt-4 mb-1 text-xl font-semibold text-gray-800 text-center">{t.whyResultTitle}</p>
               <p className="text-lg text-gray-700 leading-relaxed text-justify">{t.aiSeesTitle} {t.aiSeesText}</p>
