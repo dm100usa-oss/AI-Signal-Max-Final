@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Donut from "../../../components/Donut";
-import { AiScores } from "../../../components/PartScores";
+import PartScores, { AiScores } from "../../../components/PartScores";
+import { paramShare, shareToStatus } from "@/lib/paramMapping";
+import type { FactorKey } from "@/lib/partScores";
 import { useLang } from "@/hooks/useTranslation";
 import en from "@/locales/en";
 import ru from "@/locales/ru";
@@ -41,6 +43,18 @@ const PARAM_PRIORITY = [
   "sitemap_xml", "h2_present", "page_speed", "https", "meta_robots",
   "canonical", "mobile_friendly", "alt_attributes", "page_404",
 ];
+
+// временные/тестовые адреса, которые ИИ почти не рекомендует
+function isTempDomain(rawUrl: string): boolean {
+  let host = "";
+  try { host = new URL(rawUrl).hostname.toLowerCase(); } catch { return false; }
+  const TEMP = [
+    ".vercel.app", ".netlify.app", ".github.io", ".pages.dev",
+    ".web.app", ".firebaseapp.com", ".onrender.com", ".herokuapp.com",
+    ".surge.sh", ".repl.co", ".glitch.me", ".webflow.io", ".wixsite.com",
+  ];
+  return TEMP.some((suf) => host.endsWith(suf));
+}
 
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
@@ -82,17 +96,26 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const scoreStatus: "Good" | "Moderate" | "Poor" =
           overallScore >= 75 ? "Good" : overallScore >= 40 ? "Moderate" : "Poor";
 
-        const mappedFactors = allFactors.map((f) => ({
-          key: f.key,
-          status: (f.key === "score" ? scoreStatus : data.results[f.key] || "Moderate") as "Good" | "Moderate" | "Poor",
-        }));
+        // Источник статуса — новая система (AI Scores). Названия параметров не меняются.
+        const fScores = (data.factorScores || {}) as Partial<Record<FactorKey, number>>;
+        const naSet = new Set<FactorKey>((data.notApplicable || []) as FactorKey[]);
+        const mappedFactors = allFactors.map((f) => {
+          if (f.key === "score") return { key: f.key, status: scoreStatus };
+          const share = paramShare(f.key, fScores, naSet);
+          // если параметр не сопоставлен с новой системой — оставляем старый статус как запас
+          const status = share === null
+            ? ((data.results[f.key] || "Moderate") as "Good" | "Moderate" | "Poor")
+            : shareToStatus(share);
+          return { key: f.key, status };
+        });
 
         const QUICK_FACTOR_KEYS = [
           "robots_txt", "meta_description", "title_tag", "h2_present",
           "sitemap_xml", "https", "page_speed", "structured_data", "open_graph", "score",
         ];
-        const quickFactors = mappedFactors.filter(f => QUICK_FACTOR_KEYS.includes(f.key));
-        setFactors(mode === "pro" ? mappedFactors : quickFactors);
+        // Пока показываем полный набор факторов во всех режимах (как на детальной).
+        // Завтра уберём лишнее для quick/express.
+        setFactors(mappedFactors);
       } catch (err) {
         console.error("Failed to load analysis:", err);
         router.push("/scan-failed");
@@ -199,6 +222,18 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
           );
         })()}
       </div>
+
+      {/* Предупреждение о временном домене */}
+      {showSummary && url && isTempDomain(url) && (
+        <div className="max-w-xl mx-auto mb-6 rounded-xl px-4 py-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm text-center">
+          {t.tempDomainWarning}
+        </div>
+      )}
+
+      {/* Четыре направления (AI Scores) — сразу под плашкой заключения */}
+      {showSummary && aiScores && (
+        <PartScores scores={aiScores} t={t.aiScores} />
+      )}
 
       {/* Сильные и слабые стороны */}
       {showSummary && (strengths.length > 0 || weaknesses.length > 0) && (
@@ -403,7 +438,8 @@ function MaterialRow({ label, value, withQuotes, lang }: { label: string; value:
 
 function MaterialsBlock({ url, mode, items, allItems, lang }: { url: string; mode: Mode; items: CheckItem[]; allItems: CheckItem[]; lang: string }) {
   const t = lang === "ru" ? ru.success : en.success;
-  const primaryKeys = mode === "pro" ? PRIMARY_PRO_KEYS : PRIMARY_QUICK_KEYS;
+  // Пока во всех режимах — полный набор (как на детальной). Завтра уберём лишнее.
+  const primaryKeys = PRIMARY_PRO_KEYS;
 
   const lookup = new Map<string, string>();
   for (const item of [...items, ...allItems]) {

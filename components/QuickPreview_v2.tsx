@@ -152,7 +152,7 @@ export default function QuickPreview_v2() {
 
       {/* Нижний дисклеймер */}
       <footer className="mt-12 text-center text-xs text-neutral-500">
-        © 2025 AI Answers Score. All rights reserved.
+        © 2026 AI Answers Score. All rights reserved.
         <br />
         <span className="opacity-60">
           Visibility scores are estimated and based on publicly available data. Not legal advice.

@@ -41,8 +41,8 @@ export async function POST(req: Request) {
       data: dataForDeveloper,
     });
 
-    // Send email with both PDFs
-    if (email) {
+    // Send email with both PDFs — только для детальной проверки (pro)
+    if (email && (mode || "pro") === "pro") {
       await sendReportEmail({
         to: email,
         url: website,

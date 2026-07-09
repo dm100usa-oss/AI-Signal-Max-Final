@@ -1,6 +1,6 @@
 const en = {
   footer: {
-    copyright: "© 2025 AI Answers Score. All rights reserved.",
+    copyright: "© 2026 AI Answers Score. All rights reserved.",
     disclaimer:
       "Visibility scores are estimated and based on publicly available data. Not legal advice.",
   },
@@ -209,6 +209,7 @@ const en = {
     quickTitle: "Quick Check Result",
     proTitle: "Detailed check result",
     siteLabel: "Website",
+    tempDomainWarning: "This site is on a temporary address (e.g. .vercel.app / .netlify.app). AI systems almost never recommend such addresses. A permanent domain of your own is needed.",
     dateLabel: "Date",
     loading: "Loading results...",
     highReadiness: "High AI Readiness",

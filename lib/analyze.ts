@@ -124,6 +124,8 @@ export async function analyze(rawUrl: string, mode: Mode): Promise<AnalyzeResult
     results,
     factors,
     aiScores,
+    factorScores,
+    notApplicable: Array.from(notApplicable),
     pageLang,
   };
 

@@ -1,6 +1,6 @@
 const ru = {
   footer: {
-    copyright: "© 2025 AI Answers Score. All rights reserved.",
+    copyright: "© 2026 AI Answers Score. All rights reserved.",
     disclaimer:
       "Показатели видимости рассчитаны приблизительно и основаны на общедоступных данных. Не являются юридической консультацией.",
   },
@@ -209,6 +209,7 @@ const ru = {
     quickTitle: "Результат быстрой проверки",
     proTitle: "Результат детальной проверки",
     siteLabel: "Сайт",
+    tempDomainWarning: "Сайт находится на временном адресе (например .vercel.app / .netlify.app). ИИ почти не рекомендует такие адреса. Нужен свой постоянный домен.",
     dateLabel: "Дата",
     loading: "Загрузка результатов...",
     highReadiness: "Высокая готовность сайта",
