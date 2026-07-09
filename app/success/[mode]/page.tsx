@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Donut from "../../../components/Donut";
 import PartScores, { AiScores } from "../../../components/PartScores";
+import QuickBars from "../../../components/QuickBars";
 import { paramShare, shareToStatus } from "@/lib/paramMapping";
 import type { FactorKey } from "@/lib/partScores";
 import { useLang } from "@/hooks/useTranslation";
@@ -58,6 +59,7 @@ function isTempDomain(rawUrl: string): boolean {
 
 export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const mode = params.mode as Mode;
+  const isQuick = mode === "quick";
   const router = useRouter();
   const interfaceLang = useLang();
   const lang = interfaceLang;
@@ -71,6 +73,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
   const [items, setItems] = useState<CheckItem[]>([]);
   const [allItems, setAllItems] = useState<CheckItem[]>([]);
   const [url, setUrl] = useState("");
+  const [detailUrl, setDetailUrl] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const [showParams, setShowParams] = useState(false);
 
@@ -80,6 +83,7 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         const currentUrl = new URL(window.location.href);
         const targetUrl = currentUrl.searchParams.get("url") || "";
         setUrl(targetUrl);
+        setDetailUrl(targetUrl);
 
         const res = await fetch(`/api/result?url=${encodeURIComponent(targetUrl)}&mode=${mode}`);
         const data = await res.json();
@@ -225,6 +229,20 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         })()}
       </div>
 
+      {/* QUICK: полосы по 4 направлениям без цифр */}
+      {showSummary && isQuick && aiScores && (
+        <QuickBars
+          scores={aiScores}
+          title={t.quickBarsTitle}
+          labels={{
+            home: t.aiScores.home,
+            content: t.aiScores.content,
+            tech: t.aiScores.tech,
+            authority: t.aiScores.authority,
+          }}
+        />
+      )}
+
       {/* Предупреждение о временном домене */}
       {showSummary && url && isTempDomain(url) && (
         <div className="max-w-xl mx-auto mb-6 rounded-xl px-4 py-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm text-center">
@@ -232,13 +250,13 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </div>
       )}
 
-      {/* Четыре направления (AI Scores) — сразу под плашкой заключения */}
-      {showSummary && aiScores && (
+      {/* Четыре направления (AI Scores) — не показываем в quick */}
+      {showSummary && !isQuick && aiScores && (
         <PartScores scores={aiScores} t={t.aiScores} />
       )}
 
-      {/* Сильные и слабые стороны */}
-      {showSummary && (strengths.length > 0 || weaknesses.length > 0) && (
+      {/* Сильные и слабые стороны — не в quick */}
+      {showSummary && !isQuick && (strengths.length > 0 || weaknesses.length > 0) && (
         <div className="max-w-xl mx-auto mb-8 space-y-8 mt-10">
           {strengths.length > 0 && (
             <div>
@@ -275,8 +293,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </div>
       )}
 
-      {/* Блок ChatGPT */}
-      {showSummary && (
+      {/* Блок ChatGPT — не в quick */}
+      {showSummary && !isQuick && (
         <div className="max-w-xl mx-auto mb-8 rounded-2xl border border-gray-200 bg-gray-50 p-6">
           <p className="text-lg text-gray-600 mb-1">{t.chatgpt.lead}</p>
           <p className="text-lg font-medium text-gray-800 mb-4">«{t.chatgpt.question}»</p>
@@ -291,8 +309,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </div>
       )}
 
-      {/* Что это значит */}
-      {showSummary && (
+      {/* Что это значит — не в quick */}
+      {showSummary && !isQuick && (
         <div className="max-w-xl mx-auto mb-8">
           <p className="text-lg font-semibold text-gray-800 mb-2">{t.meaningTitle}</p>
           <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">
@@ -313,8 +331,8 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </div>
       )}
 
-      {/* Разворачиваемые параметры */}
-      {showSummary && (
+      {/* Разворачиваемые параметры — не в quick */}
+      {showSummary && !isQuick && (
         <div className="max-w-xl mx-auto mb-8">
           <button
             onClick={() => setShowParams((v) => !v)}
@@ -344,8 +362,36 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
         </div>
       )}
 
-      {/* Кнопка заявки */}
-      {showSummary && (
+      {/* QUICK: блок «Быстрая проверка завершена» + переход к детальной */}
+      {showSummary && isQuick && (
+        <div className="max-w-xl mx-auto mb-6 rounded-2xl p-4 sm:p-6 bg-white/60 backdrop-blur-sm shadow-md border border-gray-100">
+          <p className="text-xl font-semibold text-gray-800 text-center mb-4">{t.quickDoneTitle}</p>
+          <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">{t.quickDoneP1}</p>
+          <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">{t.quickDoneP2}</p>
+          <p className="text-lg text-gray-700 leading-relaxed mb-4 text-justify">{t.quickDoneP3}</p>
+          <p className="text-lg text-gray-700 leading-relaxed mb-5 text-justify">{t.quickDoneP4}</p>
+          <input
+            type="url"
+            value={detailUrl}
+            onChange={(e) => setDetailUrl(e.target.value)}
+            placeholder={t.quickDoneUrlPlaceholder}
+            className="w-full px-4 py-3 mb-3 rounded-xl border border-gray-300 text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+          />
+          <button
+            onClick={() => {
+              const target = (detailUrl || url).trim();
+              window.location.href = `/preview/pro?url=${encodeURIComponent(target)}&status=ok`;
+            }}
+            className="w-full px-6 py-3 rounded-2xl text-white font-semibold text-base transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5"
+            style={{ backgroundImage: "linear-gradient(180deg, #2E6AA6 0%, #1a4a7a 55%, #143a61 100%)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+          >
+            {t.quickDoneButton}
+          </button>
+        </div>
+      )}
+
+      {/* Кнопка заявки — не в quick */}
+      {showSummary && !isQuick && (
         <div className="max-w-xl mx-auto mb-6">
           <p className="text-lg text-gray-600 text-center mb-3">{t.requestLead}</p>
           <button
