@@ -31,18 +31,24 @@ function TopLights({ active }: { active: boolean }) {
         ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[-6px]"}`}
       style={{ pointerEvents: "none" }}
     >
+      <span className={`top-light green-light ${active ? "light-active" : ""}`} />
       <span className={`top-light yellow-light ${active ? "light-active" : ""}`} />
       <span className={`top-light blue-light ${active ? "light-active" : ""}`} />
-      <span className={`top-light green-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light red-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light cyan-light ${active ? "light-active" : ""}`} />
 
       <style jsx>{`
         .top-light { width: 12px; height: 12px; border-radius: 9999px; opacity: 0; border: 1px solid rgba(0,0,0,0.08); box-shadow: inset 0 0 0.5px rgba(255,255,255,0.6); }
+        .green-light { background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669 65%); }
         .yellow-light { background: radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 65%); }
         .blue-light { background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 65%); }
-        .green-light { background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669 65%); }
+        .red-light { background: radial-gradient(circle at 30% 30%, #fca5a5, #dc2626 65%); }
+        .cyan-light { background: radial-gradient(circle at 30% 30%, #7dd3fc, #0891b2 65%); }
         .light-active { animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1); }
-        .blue-light.light-active { animation-delay: 0.35s; }
-        .green-light.light-active { animation-delay: 0.7s; }
+        .yellow-light.light-active { animation-delay: 0.35s; }
+        .blue-light.light-active { animation-delay: 0.7s; }
+        .red-light.light-active { animation-delay: 1.05s; }
+        .cyan-light.light-active { animation-delay: 1.4s; }
         @keyframes minimalWave { 0% { opacity: 0; } 15% { opacity: 0.85; } 30% { opacity: 0; } 100% { opacity: 0; } }
       `}</style>
     </div>
