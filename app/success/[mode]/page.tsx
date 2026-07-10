@@ -489,10 +489,10 @@ export default function SuccessPage({ params }: { params: { mode: Mode } }) {
                   <ul className="space-y-2">
                     {rows.map((r, i) => (
                       <li key={i} className="flex gap-3 leading-relaxed">
-                        <span
-                          className="mt-1.5 h-3.5 w-3.5 shrink-0 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]"
-                          style={{ backgroundColor: "#dc2626" }}
-                        />
+                        <svg width="26" height="18" viewBox="0 0 26 18" className="mt-1.5 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="9" cy="9" r="7" fill="#f5c518" />
+                          <circle cx="16" cy="9" r="7" fill="#dc2626" />
+                        </svg>
                         <span className="text-lg text-gray-700">
                           {r.n} {plural(r.n, r.words, lang)}{r.tail ? " " + r.tail : ""}
                         </span>
