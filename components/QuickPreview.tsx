@@ -39,11 +39,11 @@ function TopLights({ active }: { active: boolean }) {
 
       <style jsx>{`
         .top-light { width: 12px; height: 12px; border-radius: 9999px; opacity: 0; border: 1px solid rgba(0,0,0,0.08); box-shadow: inset 0 0 0.5px rgba(255,255,255,0.6); }
-        .green-light { background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669 65%); }
-        .yellow-light { background: radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 65%); }
-        .blue-light { background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 65%); }
-        .red-light { background: radial-gradient(circle at 30% 30%, #fca5a5, #dc2626 65%); }
-        .cyan-light { background: radial-gradient(circle at 30% 30%, #7dd3fc, #0891b2 65%); }
+        .green-light { background: radial-gradient(circle at 30% 30%, #34d399, #047857 65%); }
+        .yellow-light { background: radial-gradient(circle at 30% 30%, #fbbf24, #b45309 65%); }
+        .blue-light { background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8 65%); }
+        .red-light { background: radial-gradient(circle at 30% 30%, #f87171, #b91c1c 65%); }
+        .cyan-light { background: radial-gradient(circle at 30% 30%, #38bdf8, #0e7490 65%); }
         .light-active { animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1); }
         .yellow-light.light-active { animation-delay: 0.35s; }
         .blue-light.light-active { animation-delay: 0.7s; }

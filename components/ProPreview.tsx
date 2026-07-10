@@ -283,11 +283,11 @@ export default function FullPreview() {
         @keyframes minimalWave { 0% { opacity: 0; } 20% { opacity: 0; } 32% { opacity: 0.9; } 46% { opacity: 0; } 100% { opacity: 0; } }
         .top-light { width: 12px; height: 12px; border-radius: 9999px; border: 1px solid rgba(0,0,0,0.12); opacity: 0; animation: none; }
         .light-active { animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1); }
-        .yellow-light { background: radial-gradient(circle at 30% 30%, #fde68a, #f59e0b 65%); }
-        .blue-light { background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 65%); }
-        .green-light { background: radial-gradient(circle at 30% 30%, #6ee7b7, #059669 65%); }
-        .red-light { background: radial-gradient(circle at 30% 30%, #fca5a5, #dc2626 65%); }
-        .cyan-light { background: radial-gradient(circle at 30% 30%, #7dd3fc, #0891b2 65%); }
+        .yellow-light { background: radial-gradient(circle at 30% 30%, #fbbf24, #b45309 65%); }
+        .blue-light { background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8 65%); }
+        .green-light { background: radial-gradient(circle at 30% 30%, #34d399, #047857 65%); }
+        .red-light { background: radial-gradient(circle at 30% 30%, #f87171, #b91c1c 65%); }
+        .cyan-light { background: radial-gradient(circle at 30% 30%, #38bdf8, #0e7490 65%); }
         .light-active.green-light { animation-delay: 0s; }
         .light-active.yellow-light { animation-delay: 0.35s; }
         .light-active.blue-light { animation-delay: 0.7s; }
