@@ -1,0 +1,249 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslation, Lang } from "@/hooks/useTranslation";
+
+function Dots() {
+  return (
+    <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle">
+      <span className="dot">.</span>
+      <span className="dot dot2">.</span>
+      <span className="dot dot3">.</span>
+      <style jsx>{`
+        .dot { opacity: .2; animation: aiv-dots 1200ms infinite; }
+        .dot2 { animation-delay: 200ms; }
+        .dot3 { animation-delay: 400ms; }
+        @keyframes aiv-dots {
+          0% { opacity: .2; }
+          30% { opacity: 1; }
+          60% { opacity: .2; }
+          100% { opacity: .2; }
+        }
+      `}</style>
+    </span>
+  );
+}
+
+const normalizeUrl = (v: string) =>
+  v.replace(/^\s*checked\s+website:\s*/i, "").trim();
+
+const isValidUrl = (u: string): boolean => {
+  try {
+    const url = new URL(u.trim());
+    if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+    const hostname = url.hostname.toLowerCase();
+    if (!hostname.includes(".")) return false;
+    if (hostname === "localhost") return false;
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return false;
+    const parts = hostname.split(".");
+    const tld = parts[parts.length - 1];
+    if (!/^[a-z]{2,}$/.test(tld)) return false;
+    if (parts.some((p) => p.length === 0)) return false;
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export default function Home() {
+  const router = useRouter();
+  const { t, lang, setLang } = useTranslation();
+  const [url, setUrl] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<"quick" | "pro" | null>(null);
+  const [wave, setWave] = useState(false);
+
+  const [rating, setRating] = useState<number | null>(null);
+  const [reviews, setReviews] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const resp = await fetch("/api/reviews/stats");
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data?.rating && data?.reviews) {
+            setRating(data.rating);
+            setReviews(data.reviews);
+          }
+        }
+      } catch {}
+    }
+    fetchStats();
+  }, []);
+
+  const go = useCallback(
+    async (mode: "quick" | "pro") => {
+      if (loading) return;
+      let u = normalizeUrl(url);
+      if (!u.startsWith("http://") && !u.startsWith("https://")) {
+        u = "https://" + u;
+      }
+      if (!isValidUrl(u)) {
+        setError(t.home.errorInvalidUrl);
+        return;
+      }
+      const hostname = new URL(u).hostname.toLowerCase();
+      const blockedDomains = [
+        "example.com", "example.org", "example.net",
+        "test.com", "test.org", "127.0.0.1", "0.0.0.0",
+        "dummy.com", "invalid", "example.local", "test.local",
+      ];
+      if (blockedDomains.includes(hostname)) {
+        setError(t.home.errorCannotCheck);
+        return;
+      }
+      setError(null);
+      setLoading(mode);
+      const minDuration = 2200;
+      const started = Date.now();
+      try {
+        const resp = await fetch("/api/precheck", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode, url: u, lang }),
+        });
+        const json = await resp.json();
+        if (!json?.ok) {
+          setError(t.home.errorNotAccessible);
+          setLoading(null);
+          return;
+        }
+      } catch {
+        setError(t.home.errorNotAccessible);
+        setLoading(null);
+        return;
+      }
+      const left = Math.max(0, minDuration - (Date.now() - started));
+      await new Promise((r) => setTimeout(r, left));
+      const q = new URLSearchParams({ url: u, status: "ok" }).toString();
+      router.push(`/preview/${mode}?${q}`);
+    },
+    [url, loading, router, t]
+  );
+
+  const clear = () => setUrl("");
+  const handleStarsClick = () => router.push("/reviews");
+
+  return (
+    <main className="mx-auto max-w-2xl px-6 pt-20 pb-16 transition-opacity duration-700">
+
+      {/* EN / RU switcher */}
+      <div className="fixed top-4 right-4 z-50 flex rounded-md overflow-hidden border border-neutral-200 text-sm font-medium">
+        {(["en", "ru"] as Lang[]).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className={[
+              "px-3 py-1 transition-colors cursor-pointer",
+              lang === l
+                ? "bg-neutral-900 text-white"
+                : "bg-white text-neutral-500 hover:bg-neutral-100",
+            ].join(" ")}
+          >
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-2">
+        AI Answers Score
+      </h1>
+      <p className="text-center text-base text-neutral-700 mb-8 lowercase font-medium tracking-tight">
+        {t.home.tagline}
+      </p>
+      <p className="text-center text-neutral-600 mb-8 leading-relaxed">
+        {t.home.description}
+      </p>
+
+      <div className="mb-2 relative">
+        <input
+          type="url"
+          inputMode="url"
+          placeholder={t.home.placeholder}
+          value={url}
+          onChange={(e) => setUrl(normalizeUrl(e.target.value))}
+          onPaste={(e) => {
+            const pasted = (e.clipboardData || (window as any).clipboardData).getData("text");
+            const cleaned = normalizeUrl(pasted);
+            if (cleaned !== pasted) { e.preventDefault(); setUrl(cleaned); }
+          }}
+          onKeyDown={(e) => { if (e.key === "Enter") go("quick"); }}
+          className={[
+            "w-full rounded-md border px-4 py-3 pr-12 text-base outline-none",
+            error ? "border-rose-400 focus:ring-2 focus:ring-rose-300" : "border-neutral-300 focus:ring-2 focus:ring-blue-500",
+          ].join(" ")}
+        />
+        {url && (
+          <button type="button" aria-label="Clear" onClick={clear}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 cursor-pointer">
+            ×
+          </button>
+        )}
+      </div>
+
+      {error && <div className="mb-3 text-sm text-rose-600">{error}</div>}
+
+      <button onClick={() => go("quick")}
+        style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+        className="w-full rounded-md bg-blue-600 px-4 py-3 text-white text-base font-medium hover:bg-blue-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer">
+        {loading === "quick" ? <span className="inline-flex items-center">{t.home.quickChecking}<Dots /></span> : t.home.quickButton}
+      </button>
+
+      <p className="mt-2 mb-4 text-center text-sm text-neutral-600">
+        {t.home.quickDesc}
+      </p>
+
+      <button onClick={() => go("pro")}
+        style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+        className="w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer">
+        {loading === "pro" ? <span className="inline-flex items-center">{t.home.proChecking}<Dots /></span> : t.home.proButton}
+      </button>
+
+      <p className="mt-2 mb-6 text-center text-sm text-neutral-600">
+        {t.home.proDesc}
+      </p>
+
+      <div className="flex flex-col items-center mb-10">
+        <style jsx>{`
+          .ratingText { font-size: 17px; line-height: 1; color: #6b6b6b; font-weight: 400; user-select: none; }
+          .stars { position: relative; display: flex; gap: 10px; padding: 4px 8px; overflow: hidden; }
+          .stars::before {
+            content: ""; position: absolute; top: 0; left: -140%; width: 80%; height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+            filter: blur(6px); animation: shine 3.2s linear infinite;
+          }
+          @keyframes shine { 0% { left: -140%; } 55% { left: 160%; } 100% { left: 160%; } }
+          .star {
+            font-size: 26px; cursor: pointer; user-select: none;
+            background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 1px rgba(255,180,0,0.55), 0 0 1px rgba(255,160,0,0.55);
+            transition: transform 0.2s ease, filter 0.2s ease;
+          }
+          .flash .star { animation: clickFlash 0.45s ease; }
+          @keyframes clickFlash { 0% { filter: brightness(2.7); transform: scale(1.11); } 100% { filter: brightness(1); transform: scale(1); } }
+        `}</style>
+
+        <div className="flex items-center gap-4">
+          <span className="ratingText">{rating !== null ? rating.toFixed(1) : ""}</span>
+          <div className={`stars ${wave ? "flash" : ""}`}>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <span key={i} onClick={handleStarsClick} className="star">★</span>
+            ))}
+          </div>
+         <span className="ratingText">{reviews !== null ? `(${reviews})` : ""}</span>
+        </div>
+      </div>
+
+      <footer className="mt-12 text-center text-xs text-neutral-500">
+        {t.footer.copyright}
+        <br />
+        <span className="opacity-60">
+          {t.footer.disclaimer}
+        </span>
+      </footer>
+    </main>
+  );
+}

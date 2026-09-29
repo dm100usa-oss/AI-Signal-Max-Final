@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import en from "@/locales/en";
-import ru from "@/locales/ru";
+import en from "@/locales/tool/en";
+import ru from "@/locales/tool/ru";
 
 export type Lang = "en" | "ru";
 

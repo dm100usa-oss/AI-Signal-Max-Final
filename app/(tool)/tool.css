@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Input readability on macOS/Safari */
+input,
+textarea,
+select {
+  color: #111827;
+  background: #ffffff;
+}
+
+::placeholder {
+  color: #9CA3AF;
+}
+
+/* Safari autofill fix */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #111827;
+  box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* REAL page transition */
+.page-transition {
+  transition: opacity 220ms ease-out;
+}
+
+.page-transition.out {
+  opacity: 0;
+}
+
+.page-transition.in {
+  opacity: 1;
+}
+
+/* Шрифт экранов проверки — как в отдельном инструменте (стандартный набор
+   Tailwind). Нужен, потому что у главного сайта свой набор шрифтов в общих
+   настройках; так экраны проверки выглядят точно как раньше. */
+html,
+.font-sans {
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}

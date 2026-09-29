@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes chevronPulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+.chevron-pulse {
+  animation: chevronPulse 3.2s ease-in-out infinite;
+}
+
+/* Затемнение при нажатии как у синей кнопки: фон меняется на более тёмный
+   оттенок ТОГО ЖЕ цвета (без серой плёнки, без мути).
+   Каждая кнопка задаёт обычный фон инлайн и --press-bg (нажатый цвет). */
+.btn-press {
+  transition: background-color 0.12s ease-out;
+}
+.btn-press:active {
+  background-color: var(--press-bg) !important;
+}
+.btn-press.btn-press-grad:active {
+  background-image: none !important;
+}
