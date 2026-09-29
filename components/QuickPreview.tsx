@@ -1,0 +1,425 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useLang } from "@/hooks/useTranslation";
+import en from "@/locales/tool/en";
+import ru from "@/locales/tool/ru";
+
+function Dots({ colorClass = "text-neutral-400" }: { colorClass?: string }) {
+  return (
+    <span className={`inline-flex justify-start tabular-nums align-middle ${colorClass}`}>
+      <span className="dot">.</span>
+      <span className="dot dot2">.</span>
+      <span className="dot dot3">.</span>
+      <style jsx>{`
+        .dot { opacity: 0.2; animation: aiv-dots 1200ms infinite; }
+        .dot2 { animation-delay: 200ms; }
+        .dot3 { animation-delay: 400ms; }
+        @keyframes aiv-dots {
+          0% { opacity: 0.2; } 30% { opacity: 1; } 60% { opacity: 0.2; } 100% { opacity: 0.2; }
+        }
+      `}</style>
+    </span>
+  );
+}
+
+function TopLights({ active }: { active: boolean }) {
+  return (
+    <div
+      className={`flex justify-center mb-6 h-6 items-center space-x-3 transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]
+        ${active ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[-6px]"}`}
+      style={{ pointerEvents: "none" }}
+    >
+      <span className={`top-light green-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light yellow-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light blue-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light red-light ${active ? "light-active" : ""}`} />
+      <span className={`top-light cyan-light ${active ? "light-active" : ""}`} />
+
+      <style jsx>{`
+        .top-light { width: 12px; height: 12px; border-radius: 9999px; opacity: 0; border: 1px solid rgba(0,0,0,0.08); box-shadow: inset 0 0 0.5px rgba(255,255,255,0.6); }
+        .green-light { background: radial-gradient(circle at 30% 30%, #34d399, #047857 65%); }
+        .yellow-light { background: radial-gradient(circle at 30% 30%, #fbbf24, #b45309 65%); }
+        .blue-light { background: radial-gradient(circle at 30% 30%, #60a5fa, #1d4ed8 65%); }
+        .red-light { background: radial-gradient(circle at 30% 30%, #f87171, #b91c1c 65%); }
+        .cyan-light { background: radial-gradient(circle at 30% 30%, #38bdf8, #0e7490 65%); }
+        .light-active { animation: minimalWave 3.3s infinite cubic-bezier(0.4,0,0.2,1); }
+        .yellow-light.light-active { animation-delay: 0.35s; }
+        .blue-light.light-active { animation-delay: 0.7s; }
+        .red-light.light-active { animation-delay: 1.05s; }
+        .cyan-light.light-active { animation-delay: 1.4s; }
+        @keyframes minimalWave { 0% { opacity: 0; } 15% { opacity: 0.85; } 30% { opacity: 0; } 100% { opacity: 0; } }
+      `}</style>
+    </div>
+  );
+}
+
+export default function QuickPreview() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const url = searchParams.get("url") || "";
+  const mode = searchParams.get("mode") === "express" ? "express" : "quick";
+  const isExpress = mode === "express";
+  const lang = useLang();
+  const t = lang === "ru" ? ru.quickPreview : en.quickPreview;
+  const tf = lang === "ru" ? ru.footer : en.footer;
+
+  // список бегущих строк и заголовок зависят от режима
+  const runFactors = isExpress ? t.factorsExpress : t.factors;
+  const runAnalyzing = isExpress ? t.analyzingExpress : t.analyzing;
+  const barGradient = isExpress
+    ? "from-cyan-500 via-cyan-600 to-cyan-700"
+    : "from-blue-500 via-blue-600 to-blue-700";
+
+  const today = new Date().toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const totalTime = isExpress ? 28 : 20;
+  const [current, setCurrent] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(totalTime);
+  const [finished, setFinished] = useState(false);
+  const [fadeHeader, setFadeHeader] = useState(false);
+  const [showDots, setShowDots] = useState(false);
+  const [showFinal, setShowFinal] = useState(false);
+  const [showResultText, setShowResultText] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+  const [checkingLimit, setCheckingLimit] = useState(true);
+
+  // поле ввода адреса на плашке лимита (редактируемое, по умолчанию — уже проверенный сайт)
+  const [limitUrl, setLimitUrl] = useState("");
+  const [limitError, setLimitError] = useState("");
+
+  const normalizeLimitUrl = (v: string) =>
+    v.replace(/^\s*checked\s+website:\s*/i, "").trim();
+
+  const isValidLimitUrl = (u: string): boolean => {
+    try {
+      const parsed = new URL(u.trim());
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+      const hostname = parsed.hostname.toLowerCase();
+      if (!hostname.includes(".")) return false;
+      if (hostname === "localhost") return false;
+      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return false;
+      const parts = hostname.split(".");
+      const tld = parts[parts.length - 1];
+      if (!/^[a-z]{2,}$/.test(tld)) return false;
+      if (parts.some((p) => p.length === 0)) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const goLimit = (targetMode: "quick" | "express" | "pro") => {
+    let u = normalizeLimitUrl(limitUrl);
+    if (!/^https?:\/\//i.test(u) && u.length > 0) u = "https://" + u;
+    if (!isValidLimitUrl(u)) {
+      setLimitError(t.errorInvalidUrl || "Введите корректный URL, включая https://");
+      return;
+    }
+    setLimitError("");
+    if (targetMode === "express") {
+      router.push(`/preview/express?mode=express&url=${encodeURIComponent(u)}&status=ok`);
+    } else {
+      router.push(`/preview/${targetMode}?url=${encodeURIComponent(u)}&status=ok`);
+    }
+  };
+
+  // Проверка лимита ДО анимации (peek — не списывает).
+  // В express-режиме лимит не проверяем: это платный поток.
+  useEffect(() => {
+    if (isExpress) {
+      setCheckingLimit(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const resp = await fetch("/api/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode: "quick", url, peek: true }),
+        });
+        if (cancelled) return;
+        if (resp.status === 429) {
+          setLimitReached(true);
+        }
+      } catch {
+        // при ошибке проверки не блокируем — пойдёт обычным путём
+      } finally {
+        if (!cancelled) setCheckingLimit(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  useEffect(() => {
+    if (checkingLimit || limitReached) return;
+
+    const progressTimer = setInterval(() => {
+      setProgress((p) => (p >= 100 ? 100 : p + 100 / totalTime));
+      setTimeLeft((t) => (t > 0 ? t - 1 : 0));
+    }, 1000);
+
+    // строки: все, кроме последней, идут в обычном ритме;
+    // последняя ("Будет ли ИИ рекомендовать") держится дольше
+    const stepMs = (totalTime / (runFactors.length + 1)) * 1000;
+    const factorTimer = setInterval(() => {
+      setCurrent((p) => (p < runFactors.length - 1 ? p + 1 : p));
+    }, stepMs);
+
+    setTimeout(() => setFadeHeader(true), 1500);
+    setTimeout(() => setShowDots(true), 1900);
+
+    setTimeout(() => {
+      setFinished(true);
+      setTimeout(() => setShowFinal(true), 1400);
+      setTimeout(() => setShowResultText(true), 2200);
+
+      setTimeout(async () => {
+        try {
+          if (isExpress) {
+            // экспресс: платный поток $5.99 через Stripe
+            const resp = await fetch("/api/pay", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mode: "express", url, lang }),
+            });
+            const json = await resp.json();
+            if (json?.error === "analysis_failed") {
+              router.push("/scan-failed");
+            } else if (json?.url) {
+              window.location.href = json.url as string;
+            } else {
+              router.push("/scan-failed");
+            }
+            return;
+          }
+
+          const resp = await fetch("/api/check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mode: "quick", url }),
+          });
+          if (resp.status === 429) {
+            setLimitReached(true);
+            return;
+          }
+          const json = await resp.json();
+          if (json && !json.error) {
+            router.push(`/success/quick?url=${encodeURIComponent(url)}&status=ok`);
+          } else {
+            router.push("/scan-failed");
+          }
+        } catch {
+          router.push("/scan-failed");
+        }
+      }, 4000);
+    }, totalTime * 1000);
+
+    return () => {
+      clearInterval(progressTimer);
+      clearInterval(factorTimer);
+    };
+  }, [router, url, checkingLimit, limitReached]);
+
+  if (checkingLimit) {
+    return (
+      <main className="mx-auto max-w-2xl px-3 sm:px-6 pt-20 pb-16 text-center bg-white">
+        <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
+          AI Answers Score
+        </h1>
+      </main>
+    );
+  }
+
+  if (limitReached) {
+    return (
+      <main className="mx-auto max-w-2xl px-3 sm:px-6 pt-20 pb-16 text-center bg-white">
+        <h1 className="text-center text-4xl font-semibold tracking-tight mb-6 text-neutral-900">
+          AI Answers Score
+        </h1>
+        <div className="rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm text-left">
+          <p className="text-xl font-semibold text-neutral-900 mb-3 text-center">
+            {t.limitTitle}
+          </p>
+          <p className="text-base text-neutral-600 mb-4 text-center">
+            {t.limitText}
+          </p>
+          <p className="text-base font-semibold text-neutral-600 mb-6 text-center">
+            {t.limitText2}
+          </p>
+
+          <div className="mb-2 relative">
+            <input
+              type="url"
+              inputMode="url"
+              placeholder={t.placeholder}
+              value={limitUrl}
+              onChange={(e) => setLimitUrl(normalizeLimitUrl(e.target.value))}
+              onPaste={(e) => {
+                const pasted = (e.clipboardData || (window as any).clipboardData).getData("text");
+                const cleaned = normalizeLimitUrl(pasted);
+                if (cleaned !== pasted) { e.preventDefault(); setLimitUrl(cleaned); }
+              }}
+              className={[
+                "w-full rounded-md border px-4 py-3 pr-12 text-base outline-none",
+                limitError ? "border-rose-400 focus:ring-2 focus:ring-rose-300" : "border-neutral-300 focus:ring-2 focus:ring-blue-500",
+              ].join(" ")}
+            />
+            {limitUrl && (
+              <button type="button" aria-label="Clear" onClick={() => setLimitUrl("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full w-6 h-6 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 cursor-pointer">
+                ×
+              </button>
+            )}
+          </div>
+
+          {limitError && <div className="mb-3 text-sm text-rose-600 text-center">{limitError}</div>}
+
+          <button
+            onClick={() => goLimit("express")}
+            style={{ backgroundColor: "#0aa5d1", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="w-full rounded-md px-4 py-3 text-white text-base font-medium transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
+          >
+            {t.limitExpressButton}
+          </button>
+          <p className="mt-2 mb-6 text-sm text-neutral-600 leading-relaxed text-center">
+            {t.limitExpressDesc}
+          </p>
+
+          <button
+            onClick={() => goLimit("pro")}
+            style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 6px rgba(30,40,60,0.12), 0 6px 16px rgba(30,40,60,0.16)" }}
+            className="mt-4 w-full rounded-md bg-green-600 px-4 py-3 text-white text-base font-medium hover:bg-green-700 transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98] md:ring-1 md:ring-black/5 cursor-pointer"
+          >
+            {t.limitDetailedButton}
+          </button>
+          <p className="mt-2 text-sm text-neutral-600 leading-relaxed text-center">
+            {t.limitDetailedDesc}
+          </p>
+        </div>
+        <footer className="mt-20 text-center text-xs text-neutral-500">
+          {tf.copyright}
+          <br />
+          <span className="opacity-60">{tf.disclaimer}</span>
+        </footer>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto max-w-2xl px-3 sm:px-6 pt-20 pb-16 text-center bg-white">
+      <TopLights active={showDots} />
+
+      <h1 className="text-center text-4xl font-semibold tracking-tight mb-4 text-neutral-900">
+        AI Answers Score
+      </h1>
+
+      <p className="text-base text-neutral-400 mt-1 mb-2">
+        {url} &nbsp; | &nbsp; {t.dateLabel}: {today}
+      </p>
+
+      <div className="my-6 flex items-center justify-center">
+        <div
+          className={`flex items-center justify-center text-[22px] sm:text-[24px] font-bold transition-all duration-[1800ms] ease-[cubic-bezier(0.4,0,0.2,1)] transform ${
+            fadeHeader
+              ? "opacity-60 text-neutral-400 translate-y-[-6px]"
+              : "opacity-100 text-neutral-800 translate-y-0"
+          }`}
+        >
+          {t.started}
+          <span className="inline-flex w-[1.7ch] justify-start tabular-nums align-middle ml-1">
+            {showDots && (
+              <>
+                <Dots colorClass="text-neutral-400" />
+                <Dots colorClass="text-blue-400/70 absolute" />
+              </>
+            )}
+          </span>
+        </div>
+      </div>
+
+      <div className="rounded-md p-0">
+        <div className="h-[64px] flex items-center justify-center transition-opacity duration-700 ease-in-out">
+          <p key={current} className="text-lg sm:text-xl font-medium text-neutral-900 animate-fadeInUp">
+            {runFactors[current]}
+          </p>
+          <style jsx>{`
+            @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .animate-fadeInUp { animation: fadeInUp 0.8s ease forwards; }
+          `}</style>
+        </div>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200 mb-4">
+          <div
+            className={`h-full bg-gradient-to-r ${barGradient} transition-all duration-1000 ease-linear`}
+            style={{ width: `${progress}%` }}
+          />
+          {showResultText && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm animate-fadeIn flex items-center">
+                {t.getResult}
+                <Dots colorClass="text-white ml-1" />
+              </p>
+              <style jsx>{`
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                .animate-fadeIn { animation: fadeIn 1s ease forwards; }
+              `}</style>
+            </div>
+          )}
+        </div>
+
+        <p className="text-center text-sm text-neutral-600 mb-4">
+          {runAnalyzing}
+        </p>
+
+        <div className="relative w-full h-12 rounded-md overflow-hidden bg-gray-200">
+          {!finished && (
+            <div
+              className="absolute left-0 top-0 h-full bg-gray-300 transition-all duration-1000 ease-linear"
+              style={{ width: `${(timeLeft / totalTime) * 100}%` }}
+            />
+          )}
+
+          {finished && (
+            <div
+              className={`absolute left-0 top-0 h-full w-full transition-all duration-700 ease-in-out ${
+                showFinal
+                  ? `bg-gradient-to-r ${barGradient} opacity-100`
+                  : "bg-gray-200 opacity-0"
+              }`}
+            />
+          )}
+
+          {!finished && (
+            <div className="relative z-10 flex items-center justify-center h-full text-neutral-500 text-sm font-medium transition-opacity duration-500">
+              {timeLeft > 0 ? t.timerText(timeLeft) : ""}
+            </div>
+          )}
+
+          {finished && showFinal && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <p className="text-lg sm:text-xl font-semibold text-white drop-shadow-sm transition-opacity duration-700">
+                {t.checkComplete}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <footer className="mt-20 text-center text-xs text-neutral-500">
+        {tf.copyright}
+        <br />
+        <span className="opacity-60">{tf.disclaimer}</span>
+      </footer>
+    </main>
+  );
+}
