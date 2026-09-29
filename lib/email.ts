@@ -15,7 +15,7 @@ type SendReportEmailParams = {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendReportEmail(params: SendReportEmailParams) {
-  const from = "AI Answers Score <reports@aivcheck.com>";
+  const from = "AI Answers Score <reports@aianswersrank.com>";
   const { to, url, mode, lang = "en", ownerBuffer, developerBuffer, score, results } = params;
 
   const isEn = lang === "en";
